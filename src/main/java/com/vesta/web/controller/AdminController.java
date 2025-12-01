@@ -1,4 +1,4 @@
-package com.vesta.web.controllers;
+package com.vesta.web.controller;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;

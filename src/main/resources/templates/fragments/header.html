@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav th:fragment="header-nav" class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">🛡️ VESTA</a>
+            <div class="d-flex align-items-center text-white" th:if="${session.token != null}">
+                <span class="me-3">Hola, <span th:text="${session.usuarioNombre}">Usuario</span></span>
+                <a href="/logout" class="btn btn-sm btn-light text-primary fw-bold">Salir</a>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

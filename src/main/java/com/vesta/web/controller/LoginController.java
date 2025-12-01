@@ -1,4 +1,4 @@
-package com.vesta.web.controllers;
+package com.vesta.web.controller;
 
 import com.vesta.web.dto.LoginResponse;
 import com.vesta.web.services.ApiService;
