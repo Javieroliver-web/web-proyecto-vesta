@@ -24,8 +24,6 @@ public class ClienteController {
         String nombre = (String) session.getAttribute("usuarioNombre");
         model.addAttribute("nombreUsuario", nombre);
 
-        // TODO: Aquí llamaremos a la API para traer la lista de seguros (Próximo paso)
-
         // 3. VISTA: Mostrar el HTML
         return "cliente/dashboard";
     }

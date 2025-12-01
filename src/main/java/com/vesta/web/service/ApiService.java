@@ -1,10 +1,9 @@
-package com.vesta.web.services;
+package com.vesta.web.service; // <--- CAMBIO A SINGULAR
 
-import com.vesta.web.dto.LoginRequest;
-import com.vesta.web.dto.LoginResponse;
+import com.vesta.web.dto.LoginDTO;         // Usaremos nombres Sprintix
+import com.vesta.web.dto.AuthResponseDTO;  // Usaremos nombres Sprintix
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,22 +15,22 @@ public class ApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-    // Leemos la URL de la API del application.properties
     @Value("${api.url}")
     private String apiUrl;
 
-    public LoginResponse login(String email, String password) {
+    // Cambiamos a devolver AuthResponseDTO
+    public AuthResponseDTO login(String email, String password) {
         try {
-            // Preparamos los datos
-            LoginRequest request = new LoginRequest(email, password);
+            LoginDTO request = new LoginDTO(); // Usamos el DTO nuevo
+            request.setEmail(email);
+            request.setPassword(password);
+            
             String url = apiUrl + "/auth/login";
 
-            // Hacemos la llamada POST a la API
-            ResponseEntity<LoginResponse> response = restTemplate.postForEntity(url, request, LoginResponse.class);
+            ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(url, request, AuthResponseDTO.class);
             
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            // Si la API devuelve 400/401, lanzamos error para que el Controller lo capture
             throw new RuntimeException("Credenciales incorrectas");
         } catch (Exception e) {
             throw new RuntimeException("Error de conexión con el servidor API");

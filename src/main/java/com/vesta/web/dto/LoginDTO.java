@@ -1,11 +1,13 @@
 package com.vesta.web.dto;
 
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Data @AllArgsConstructor @NoArgsConstructor
-public class LoginRequest {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginDTO {
     private String email;
     private String password;
 }
