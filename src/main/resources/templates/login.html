@@ -426,7 +426,8 @@
             try {
                 console.log('🔐 Intentando login con:', email);
                 
-                const response = await fetch('http://localhost:8080/api/auth/login', {
+                // Llamamos al backend WEB (no a la API directamente)
+                const response = await fetch('/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -444,16 +445,11 @@
                     // Login exitoso
                     console.log('✅ Login exitoso');
                     
-                    // Guardar token en localStorage
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userRole', data.rol);
-                    localStorage.setItem('userName', data.nombreCompleto);
-                    
                     // Redirigir según el rol
                     if (data.rol === 'ADMIN') {
                         window.location.href = '/admin/dashboard';
                     } else {
-                        window.location.href = '/usuario/dashboard';
+                        window.location.href = '/cliente/dashboard';
                     }
                 } else {
                     // Error en las credenciales

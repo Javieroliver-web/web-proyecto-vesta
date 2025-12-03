@@ -1,14 +1,16 @@
 package com.vesta.web.controller;
 
-import com.vesta.web.dto.AuthResponseDTO; // Nombre nuevo
-import com.vesta.web.service.ApiService;  // Paquete en singular
+import com.vesta.web.dto.AuthResponseDTO;
+import com.vesta.web.service.ApiService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -16,43 +18,115 @@ public class LoginController {
     @Autowired
     private ApiService apiService;
 
+    // Mostrar formulario de login
     @GetMapping("/")
     public String showLoginForm(HttpSession session) {
+        // Si ya hay sesión activa, redirigir al dashboard correspondiente
         if (session.getAttribute("token") != null) {
             String rol = (String) session.getAttribute("rol");
-            return "admin".equals(rol) ? "redirect:/admin/dashboard" : "redirect:/cliente/dashboard";
-        }
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String processLogin(@RequestParam String email, 
-                               @RequestParam String password, 
-                               HttpSession session, 
-                               Model model) {
-        try {
-            // Usamos la clase nueva AuthResponseDTO
-            AuthResponseDTO response = apiService.login(email, password);
-
-            session.setAttribute("token", response.getToken());
-            session.setAttribute("rol", response.getRol());
-            session.setAttribute("usuarioNombre", response.getNombre());
-
-            if ("admin".equals(response.getRol())) {
+            if ("ADMIN".equals(rol)) {
                 return "redirect:/admin/dashboard";
             } else {
                 return "redirect:/cliente/dashboard";
             }
+        }
+        return "login";
+    }
+
+    // Endpoint para procesar el login via AJAX
+    @PostMapping("/login")
+    @ResponseBody
+    public ResponseEntity<?> processLogin(@RequestBody LoginRequest request, HttpSession session) {
+        try {
+            System.out.println("🔐 Procesando login para: " + request.getEmail());
+            
+            // Validar que los campos no estén vacíos
+            if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "El correo electrónico es obligatorio");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+            
+            if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "La contraseña es obligatoria");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+            
+            // Intentar hacer login
+            AuthResponseDTO response = apiService.login(request.getEmail(), request.getPassword());
+
+            // Guardar en sesión HTTP
+            session.setAttribute("token", response.getToken());
+            session.setAttribute("rol", response.getRol());
+            session.setAttribute("usuarioNombre", response.getNombre());
+
+            System.out.println("✅ Login exitoso. Sesión creada para: " + response.getNombre());
+            
+            return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            return "login";
+            System.err.println("❌ Error en login: " + e.getMessage());
+            
+            // Devolver error en formato JSON
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        } catch (Exception e) {
+            System.err.println("❌ Error inesperado: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Error genérico
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Error al procesar el login. Verifica que la API esté funcionando.");
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        System.out.println("🚪 Cerrando sesión");
         session.invalidate();
         return "redirect:/";
+    }
+
+    // DTO interno para recibir el JSON del frontend
+    public static class LoginRequest {
+        private String correoElectronico;
+        private String contrasena;
+
+        public String getEmail() {
+            return correoElectronico;
+        }
+
+        public void setEmail(String email) {
+            this.correoElectronico = email;
+        }
+
+        public String getPassword() {
+            return contrasena;
+        }
+
+        public void setPassword(String password) {
+            this.contrasena = password;
+        }
+
+        public String getCorreoElectronico() {
+            return correoElectronico;
+        }
+
+        public void setCorreoElectronico(String correoElectronico) {
+            this.correoElectronico = correoElectronico;
+        }
+
+        public String getContrasena() {
+            return contrasena;
+        }
+
+        public void setContrasena(String contrasena) {
+            this.contrasena = contrasena;
+        }
     }
 }
