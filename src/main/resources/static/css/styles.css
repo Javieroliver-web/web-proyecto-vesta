@@ -1,70 +1,290 @@
 /* src/main/resources/static/css/styles.css */
+
 :root {
-    /* Paleta extraída de tu prototipo (globals.css) */
-    --vesta-bg: hsl(0, 0%, 100%);         /* Fondo blanco */
-    --vesta-fg: hsl(222.2, 84%, 4.9%);    /* Texto oscuro */
+    /* Paleta oficial Vesta basada en tu logo */
+    --vesta-gold: #f1a61c;
+    --vesta-gold-light: #f4b94c;
+    --vesta-gold-lighter: #ffcc7c;
+    --vesta-navy: #282c3f;
+    --vesta-navy-light: #3c425e;
+    --vesta-dark: #141620;
     
-    --vesta-primary: hsl(221.2, 83.2%, 53.3%); /* Azul Vesta (Botones, marcas) */
-    --vesta-primary-fg: hsl(210, 40%, 98%);
+    /* Backgrounds */
+    --vesta-bg: hsl(0, 0%, 100%);
+    --vesta-fg: #1a1d2e;
     
-    --vesta-secondary: hsl(210, 40%, 96.1%);
-    --vesta-secondary-fg: hsl(222.2, 47.4%, 11.2%);
-    
-    --vesta-muted: hsl(210, 40%, 96.1%);
-    --vesta-muted-fg: hsl(215.4, 16.3%, 46.9%);
-    
-    --vesta-accent: hsl(210, 40%, 96.1%);
-    --vesta-accent-fg: hsl(222.2, 47.4%, 11.2%);
-    
+    /* Estados */
+    --vesta-muted: #e9ecef;
+    --vesta-muted-fg: #6c757d;
     --vesta-danger: hsl(0, 84.2%, 60.2%);
     
-    --radius: 0.5rem;
+    --radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     background-color: var(--vesta-bg);
     color: var(--vesta-fg);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Fuente moderna */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+    line-height: 1.6;
 }
 
-/* === ADAPTACIÓN BOOTSTRAP A TU ESTILO === */
+/* === BOTONES === */
 
-/* Botones Primarios (Como en tu prototipo) */
 .btn-primary {
-    background-color: var(--vesta-primary);
-    border-color: var(--vesta-primary);
-    color: var(--vesta-primary-fg);
+    background: linear-gradient(135deg, var(--vesta-gold) 0%, var(--vesta-gold-light) 100%);
+    border: none;
+    color: white;
     border-radius: var(--radius);
-    padding: 0.5rem 1rem;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(241, 166, 28, 0.3);
 }
 
 .btn-primary:hover {
-    background-color: hsl(221.2, 83.2%, 45%); /* Un poco más oscuro */
+    background: linear-gradient(135deg, var(--vesta-gold-light) 0%, var(--vesta-gold) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(241, 166, 28, 0.4);
 }
 
-/* Tarjetas (Cards) estilo Vesta */
-.card {
-    border: 1px solid var(--vesta-muted);
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--vesta-gold);
+    color: var(--vesta-gold);
+    background: transparent;
     border-radius: var(--radius);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    background-color: white;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-.card-header {
-    background-color: transparent;
-    border-bottom: 1px solid var(--vesta-muted);
+.btn-outline-primary:hover {
+    background: var(--vesta-gold);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: var(--vesta-danger);
+    border: none;
+    color: white;
+    border-radius: var(--radius);
+}
+
+.btn-light {
+    background: white;
+    border: 2px solid var(--vesta-muted);
+    color: var(--vesta-navy);
     font-weight: 600;
 }
 
-/* Navbar estilo Vesta */
+/* === CARDS === */
+
+.card {
+    border: 1px solid var(--vesta-muted);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background-color: white;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--vesta-navy) 0%, var(--vesta-navy-light) 100%);
+    color: var(--vesta-gold);
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1.25rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--vesta-navy);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    color: var(--vesta-muted-fg);
+    font-size: 0.95rem;
+}
+
+/* === NAVBAR === */
+
 .navbar {
-    background-color: white !important;
-    border-bottom: 1px solid var(--vesta-muted);
+    background: linear-gradient(135deg, var(--vesta-navy) 0%, var(--vesta-navy-light) 100%) !important;
+    border-bottom: 3px solid var(--vesta-gold);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem 0;
 }
 
 .navbar-brand {
-    color: var(--vesta-primary) !important;
+    color: var(--vesta-gold) !important;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-brand:hover {
+    color: var(--vesta-gold-light) !important;
+}
+
+/* === TABS === */
+
+.nav-tabs {
+    border-bottom: 2px solid var(--vesta-muted);
+}
+
+.nav-tabs .nav-link {
+    color: var(--vesta-muted-fg);
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--vesta-gold);
+    border-bottom-color: var(--vesta-gold-lighter);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--vesta-gold);
+    background: transparent;
+    border-bottom-color: var(--vesta-gold);
+}
+
+/* === FORMS === */
+
+.form-label {
+    color: var(--vesta-navy);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 2px solid var(--vesta-muted);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--vesta-gold);
+    box-shadow: 0 0 0 4px rgba(241, 166, 28, 0.1);
+    outline: none;
+}
+
+/* === ALERTS === */
+
+.alert {
+    border-radius: var(--radius);
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, var(--vesta-gold-lighter) 0%, var(--vesta-gold-light) 100%);
+    color: var(--vesta-navy);
+}
+
+.alert-danger {
+    background: #fee;
+    color: #c33;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* === BADGES === */
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge.bg-primary {
+    background: var(--vesta-gold) !important;
+}
+
+/* === UTILIDADES === */
+
+.text-primary {
+    color: var(--vesta-gold) !important;
+}
+
+.text-muted {
+    color: var(--vesta-muted-fg) !important;
+}
+
+.bg-light {
+    background: #f8f9fa !important;
+}
+
+.border {
+    border-color: var(--vesta-muted) !important;
+}
+
+.border-primary {
+    border-color: var(--vesta-gold) !important;
+}
+
+/* === ANIMACIONES === */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.65rem 1.25rem;
+    }
 }
