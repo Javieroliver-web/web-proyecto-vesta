@@ -1,0 +1,70 @@
+/* src/main/resources/static/css/styles.css */
+:root {
+    /* Paleta extraída de tu prototipo (globals.css) */
+    --vesta-bg: hsl(0, 0%, 100%);         /* Fondo blanco */
+    --vesta-fg: hsl(222.2, 84%, 4.9%);    /* Texto oscuro */
+    
+    --vesta-primary: hsl(221.2, 83.2%, 53.3%); /* Azul Vesta (Botones, marcas) */
+    --vesta-primary-fg: hsl(210, 40%, 98%);
+    
+    --vesta-secondary: hsl(210, 40%, 96.1%);
+    --vesta-secondary-fg: hsl(222.2, 47.4%, 11.2%);
+    
+    --vesta-muted: hsl(210, 40%, 96.1%);
+    --vesta-muted-fg: hsl(215.4, 16.3%, 46.9%);
+    
+    --vesta-accent: hsl(210, 40%, 96.1%);
+    --vesta-accent-fg: hsl(222.2, 47.4%, 11.2%);
+    
+    --vesta-danger: hsl(0, 84.2%, 60.2%);
+    
+    --radius: 0.5rem;
+}
+
+body {
+    background-color: var(--vesta-bg);
+    color: var(--vesta-fg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Fuente moderna */
+}
+
+/* === ADAPTACIÓN BOOTSTRAP A TU ESTILO === */
+
+/* Botones Primarios (Como en tu prototipo) */
+.btn-primary {
+    background-color: var(--vesta-primary);
+    border-color: var(--vesta-primary);
+    color: var(--vesta-primary-fg);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: hsl(221.2, 83.2%, 45%); /* Un poco más oscuro */
+}
+
+/* Tarjetas (Cards) estilo Vesta */
+.card {
+    border: 1px solid var(--vesta-muted);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background-color: white;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--vesta-muted);
+    font-weight: 600;
+}
+
+/* Navbar estilo Vesta */
+.navbar {
+    background-color: white !important;
+    border-bottom: 1px solid var(--vesta-muted);
+}
+
+.navbar-brand {
+    color: var(--vesta-primary) !important;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
