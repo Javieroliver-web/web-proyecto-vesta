@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Datos - Vesta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        :root { --vesta-gold: #f1a61c; --vesta-navy: #282c3f; }
+        body { background: #f8f9fa; }
+        .navbar-vesta { background: linear-gradient(135deg, var(--vesta-navy) 0%, #3c425e 100%); padding: 1rem 0; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .navbar-brand { color: var(--vesta-gold) !important; font-weight: 700; font-size: 1.5rem; }
+        .action-card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+        .action-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .btn-action { background: linear-gradient(135deg, var(--vesta-gold) 0%, #f4b94c 100%); border: none; color: white; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-vesta">
+        <div class="container">
+            <a class="navbar-brand" href="/cliente/dashboard">
+                <i class="bi bi-shield-check"></i> VESTA
+            </a>
+            <span class="text-white">Hola, <strong th:text="${nombreUsuario}">Usuario</strong></span>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h2 class="fw-bold mb-4">
+            <i class="bi bi-person-lock" style="color: var(--vesta-gold);"></i>
+            Gestión de Datos Personales
+        </h2>
+
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>Tus derechos bajo el RGPD:</strong> Aquí puedes ejercer tus derechos de acceso, rectificación, supresión, portabilidad y oposición según los artículos 15-22 del RGPD.
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="action-card">
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-eye" style="color: var(--vesta-gold);"></i>
+                        Derecho de Acceso
+                    </h5>
+                    <p class="text-muted small">Consulta qué datos personales tuyos almacenamos (Art. 15 RGPD)</p>
+                    <button class="btn btn-action btn-sm" onclick="solicitarAcceso()">Solicitar Acceso</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="action-card">
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-pencil" style="color: var(--vesta-gold);"></i>
+                        Derecho de Rectificación
+                    </h5>
+                    <p class="text-muted small">Corrige datos incorrectos o desactualizados (Art. 16 RGPD)</p>
+                    <button class="btn btn-action btn-sm" onclick="solicitarRectificacion()">Solicitar Rectificación</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="action-card">
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-download" style="color: var(--vesta-gold);"></i>
+                        Derecho de Portabilidad
+                    </h5>
+                    <p class="text-muted small">Descarga tus datos en formato JSON (Art. 20 RGPD)</p>
+                    <button class="btn btn-action btn-sm" onclick="solicitarPortabilidad()">Descargar Datos</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="action-card">
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-x-circle text-danger"></i>
+                        Derecho de Supresión
+                    </h5>
+                    <p class="text-muted small">Elimina tu cuenta y datos (Derecho al olvido - Art. 17 RGPD)</p>
+                    <button class="btn btn-danger btn-sm" onclick="confirmarSupresion()">Eliminar Cuenta</button>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="mt-5 mb-3">📋 Mis Solicitudes</h4>
+        <div id="solicitudesList" class="action-card">
+            <p class="text-muted text-center py-4">No has realizado ninguna solicitud aún.</p>
+        </div>
+    </div>
+
+    <script>
+        const usuarioId = 1; // TODO: Obtener del session storage
+
+        async function solicitarAcceso() {
+            if (!confirm('¿Solicitar acceso a tus datos? Recibirás un informe en 30 días.')) return;
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/derechos/solicitar-acceso', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId })
+                });
+                const data = await response.json();
+                alert(data.message);
+                cargarSolicitudes();
+            } catch (error) {
+                alert('Error al procesar la solicitud');
+            }
+        }
+
+        async function solicitarRectificacion() {
+            const descripcion = prompt('Describe qué datos necesitas rectificar:');
+            if (!descripcion) return;
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/derechos/solicitar-rectificacion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId, descripcion })
+                });
+                const data = await response.json();
+                alert(data.message);
+                cargarSolicitudes();
+            } catch (error) {
+                alert('Error al procesar la solicitud');
+            }
+        }
+
+        async function solicitarPortabilidad() {
+            if (!confirm('Recibirás tus datos en formato JSON en un plazo de 30 días. ¿Continuar?')) return;
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/derechos/solicitar-portabilidad', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId })
+                });
+                const data = await response.json();
+                alert(data.message);
+                cargarSolicitudes();
+            } catch (error) {
+                alert('Error al procesar la solicitud');
+            }
+        }
+
+        async function confirmarSupresion() {
+            const confirmacion = prompt('⚠️ ACCIÓN IRREVERSIBLE\n\nEscribe "ELIMINAR CUENTA" para confirmar:');
+            if (confirmacion !== 'ELIMINAR CUENTA') {
+                alert('Cancelado');
+                return;
+            }
+            
+            const razon = prompt('(Opcional) ¿Por qué nos dejas?');
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/derechos/solicitar-supresion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId, descripcion: razon })
+                });
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = '/logout';
+            } catch (error) {
+                alert('Error al procesar la solicitud');
+            }
+        }
+
+        async function cargarSolicitudes() {
+            try {
+                const response = await fetch(`http://localhost:8080/api/derechos/mis-solicitudes/${usuarioId}`);
+                const solicitudes = await response.json();
+                
+                if (solicitudes.length === 0) return;
+                
+                const html = solicitudes.map(s => `
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${s.tipoSolicitud}</strong>
+                                <small class="text-muted d-block">${new Date(s.fechaSolicitud).toLocaleDateString('es-ES')}</small>
+                            </div>
+                            <span class="badge ${s.estado === 'COMPLETADA' ? 'bg-success' : 'bg-warning'}">${s.estado}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('solicitudesList').innerHTML = html;
+            } catch (error) {
+                console.error('Error cargando solicitudes:', error);
+            }
+        }
+
+        // Cargar solicitudes al inicio
+        cargarSolicitudes();
+    </script>
+</body>
+</html>

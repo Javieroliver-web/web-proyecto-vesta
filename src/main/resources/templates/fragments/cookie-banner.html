@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Banner de Cookies RGPD -->
+    <div th:fragment="cookie-banner" id="cookieBanner" style="display: none;">
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #282c3f 0%, #3c425e 100%); color: white; padding: 1.5rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.3); z-index: 9999;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-shield-check" style="color: #f1a61c;"></i>
+                            Protección de Datos y Cookies
+                        </h6>
+                        <p class="mb-2 small">
+                            Utilizamos cookies esenciales para el funcionamiento del sitio y cookies opcionales para mejorar tu experiencia. 
+                            Puedes aceptar todas o configurar tus preferencias. 
+                            <a href="/privacidad" style="color: #f1a61c;" target="_blank">Política de Privacidad</a> | 
+                            <a href="/cookies" style="color: #f1a61c;" target="_blank">Política de Cookies</a>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button onclick="acceptAllCookies()" class="btn btn-sm me-2" style="background: #f1a61c; color: white; font-weight: 600;">
+                            Aceptar Todas
+                        </button>
+                        <button onclick="showCookieSettings()" class="btn btn-sm btn-outline-light me-2">
+                            Configurar
+                        </button>
+                        <button onclick="rejectOptionalCookies()" class="btn btn-sm btn-outline-light">
+                            Rechazar Opcionales
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Panel de Configuración Detallada -->
+                <div id="cookieSettings" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <h6 class="fw-bold mb-3">Configuración de Cookies</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="cookiesEsenciales" checked disabled>
+                                <label class="form-check-label" for="cookiesEsenciales">
+                                    <strong>Cookies Esenciales</strong><br>
+                                    <small class="opacity-75">Necesarias para el funcionamiento básico</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="cookiesAnaliticas">
+                                <label class="form-check-label" for="cookiesAnaliticas">
+                                    <strong>Cookies Analíticas</strong><br>
+                                    <small class="opacity-75">Nos ayudan a mejorar el servicio</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="cookiesMarketing">
+                                <label class="form-check-label" for="cookiesMarketing">
+                                    <strong>Cookies de Marketing</strong><br>
+                                    <small class="opacity-75">Para publicidad personalizada</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="saveCustomCookiePreferences()" class="btn btn-sm" style="background: #f1a61c; color: white;">
+                        Guardar Preferencias
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Mostrar banner si no hay consentimiento guardado
+            if (!localStorage.getItem('cookieConsent')) {
+                document.getElementById('cookieBanner').style.display = 'block';
+            }
+
+            function acceptAllCookies() {
+                saveCookieConsent(true, true, true);
+            }
+
+            function rejectOptionalCookies() {
+                saveCookieConsent(true, false, false);
+            }
+
+            function showCookieSettings() {
+                document.getElementById('cookieSettings').style.display = 'block';
+            }
+
+            function saveCustomCookiePreferences() {
+                const analiticas = document.getElementById('cookiesAnaliticas').checked;
+                const marketing = document.getElementById('cookiesMarketing').checked;
+                saveCookieConsent(true, analiticas, marketing);
+            }
+
+            async function saveCookieConsent(esenciales, analiticas, marketing) {
+                // Guardar en localStorage
+                localStorage.setItem('cookieConsent', JSON.stringify({
+                    esenciales,
+                    analiticas,
+                    marketing,
+                    fecha: new Date().toISOString()
+                }));
+
+                // Enviar al backend si hay usuario logueado
+                const usuarioId = sessionStorage.getItem('usuarioId');
+                if (usuarioId) {
+                    try {
+                        await fetch('http://localhost:8080/api/cookies/consentimiento', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                usuarioId: parseInt(usuarioId),
+                                cookiesAnaliticas: analiticas,
+                                cookiesMarketing: marketing
+                            })
+                        });
+                    } catch (error) {
+                        console.error('Error guardando consentimiento:', error);
+                    }
+                }
+
+                // Ocultar banner
+                document.getElementById('cookieBanner').style.display = 'none';
+
+                // Aplicar cookies según consentimiento
+                if (analiticas) {
+                    // Activar Google Analytics u otras analíticas
+                    console.log('✅ Cookies analíticas activadas');
+                }
+                if (marketing) {
+                    // Activar píxeles de marketing
+                    console.log('✅ Cookies de marketing activadas');
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>
