@@ -27,12 +27,18 @@ public class RGPDController {
     public String misDatos(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         
+        // Verificar si hay sesión activa
         if (token == null) {
             return "redirect:/?error=login_required";
         }
 
+        // Recuperar datos de la sesión
         String nombre = (String) session.getAttribute("usuarioNombre");
+        Long userId = (Long) session.getAttribute("usuarioId"); // Recuperar ID guardado en LoginController
+
+        // Pasar datos a la vista (Thymeleaf)
         model.addAttribute("nombreUsuario", nombre);
+        model.addAttribute("userId", userId); // CAMBIO IMPORTANTE: Pasar el ID real a la vista
         
         return "legal/mis-datos";
     }

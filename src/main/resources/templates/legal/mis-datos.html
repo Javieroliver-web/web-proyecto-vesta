@@ -17,6 +17,8 @@
     </style>
 </head>
 <body>
+    <div th:replace="~{fragments/cookie-banner :: cookie-banner}"></div>
+
     <nav class="navbar navbar-expand-lg navbar-vesta">
         <div class="container">
             <a class="navbar-brand" href="/cliente/dashboard">
@@ -85,110 +87,117 @@
 
         <h4 class="mt-5 mb-3">📋 Mis Solicitudes</h4>
         <div id="solicitudesList" class="action-card">
-            <p class="text-muted text-center py-4">No has realizado ninguna solicitud aún.</p>
+            <p class="text-muted text-center py-4">Cargando solicitudes...</p>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="/cliente/dashboard" class="btn btn-outline-secondary">Volver al Dashboard</a>
         </div>
     </div>
 
-    <script>
-        const usuarioId = 1; // TODO: Obtener del session storage
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // INYECCIÓN DE THYMELEAF: Aquí obtenemos el ID real del backend
+        const usuarioId = [[${userId}]]; 
+        const apiBaseUrl = 'http://localhost:8080/api/derechos';
+        /*]]>*/
+
+        console.log("Gestión RGPD inicializada para usuario ID:", usuarioId);
 
         async function solicitarAcceso() {
             if (!confirm('¿Solicitar acceso a tus datos? Recibirás un informe en 30 días.')) return;
-            
-            try {
-                const response = await fetch('http://localhost:8080/api/derechos/solicitar-acceso', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId })
-                });
-                const data = await response.json();
-                alert(data.message);
-                cargarSolicitudes();
-            } catch (error) {
-                alert('Error al procesar la solicitud');
-            }
+            enviarSolicitud('solicitar-acceso', { usuarioId });
         }
 
         async function solicitarRectificacion() {
-            const descripcion = prompt('Describe qué datos necesitas rectificar:');
+            const descripcion = prompt('Describe qué datos necesitas rectificar (ej: cambio de dirección, nuevo email):');
             if (!descripcion) return;
-            
-            try {
-                const response = await fetch('http://localhost:8080/api/derechos/solicitar-rectificacion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId, descripcion })
-                });
-                const data = await response.json();
-                alert(data.message);
-                cargarSolicitudes();
-            } catch (error) {
-                alert('Error al procesar la solicitud');
-            }
+            enviarSolicitud('solicitar-rectificacion', { usuarioId, descripcion });
         }
 
         async function solicitarPortabilidad() {
             if (!confirm('Recibirás tus datos en formato JSON en un plazo de 30 días. ¿Continuar?')) return;
-            
-            try {
-                const response = await fetch('http://localhost:8080/api/derechos/solicitar-portabilidad', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId })
-                });
-                const data = await response.json();
-                alert(data.message);
-                cargarSolicitudes();
-            } catch (error) {
-                alert('Error al procesar la solicitud');
-            }
+            enviarSolicitud('solicitar-portabilidad', { usuarioId });
         }
 
         async function confirmarSupresion() {
-            const confirmacion = prompt('⚠️ ACCIÓN IRREVERSIBLE\n\nEscribe "ELIMINAR CUENTA" para confirmar:');
+            const confirmacion = prompt('⚠️ ACCIÓN IRREVERSIBLE\n\nEsta acción marcará tus datos para eliminación según el Art. 17 RGPD. Escribe "ELIMINAR CUENTA" para confirmar:');
             if (confirmacion !== 'ELIMINAR CUENTA') {
                 alert('Cancelado');
                 return;
             }
             
-            const razon = prompt('(Opcional) ¿Por qué nos dejas?');
+            const razon = prompt('(Opcional) ¿Por qué nos dejas? Nos ayuda a mejorar.');
             
             try {
-                const response = await fetch('http://localhost:8080/api/derechos/solicitar-supresion', {
+                await enviarSolicitud('solicitar-supresion', { usuarioId, descripcion: razon });
+                // En caso de supresión, cerramos sesión tras el aviso
+                setTimeout(() => window.location.href = '/logout', 2000);
+            } catch (error) {
+                // El error ya se maneja en enviarSolicitud
+            }
+        }
+
+        async function enviarSolicitud(endpoint, data) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId, descripcion: razon })
+                    body: JSON.stringify(data)
                 });
-                const data = await response.json();
-                alert(data.message);
-                window.location.href = '/logout';
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ ' + result.message);
+                    cargarSolicitudes(); // Recargar la lista
+                } else {
+                    alert('❌ Error: ' + (result.message || 'No se pudo procesar la solicitud'));
+                }
             } catch (error) {
-                alert('Error al procesar la solicitud');
+                console.error('Error:', error);
+                alert('Error de conexión con el servidor de derechos.');
             }
         }
 
         async function cargarSolicitudes() {
+            if (!usuarioId) return;
+            
             try {
-                const response = await fetch(`http://localhost:8080/api/derechos/mis-solicitudes/${usuarioId}`);
+                const response = await fetch(`${apiBaseUrl}/mis-solicitudes/${usuarioId}`);
                 const solicitudes = await response.json();
                 
-                if (solicitudes.length === 0) return;
+                const listContainer = document.getElementById('solicitudesList');
                 
-                const html = solicitudes.map(s => `
-                    <div class="border-bottom pb-2 mb-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>${s.tipoSolicitud}</strong>
-                                <small class="text-muted d-block">${new Date(s.fechaSolicitud).toLocaleDateString('es-ES')}</small>
-                            </div>
-                            <span class="badge ${s.estado === 'COMPLETADA' ? 'bg-success' : 'bg-warning'}">${s.estado}</span>
+                if (solicitudes.length === 0) {
+                    listContainer.innerHTML = '<p class="text-muted text-center py-4">No has realizado ninguna solicitud de derechos aún.</p>';
+                    return;
+                }
+                
+                const html = solicitudes.map(s => {
+                    let badgeClass = 'bg-secondary';
+                    if (s.estado === 'COMPLETADA') badgeClass = 'bg-success';
+                    if (s.estado === 'PENDIENTE') badgeClass = 'bg-warning text-dark';
+                    if (s.estado === 'EN_PROCESO') badgeClass = 'bg-info text-dark';
+                    
+                    return `
+                    <div class="border-bottom pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-primary">${s.tipoSolicitud}</strong>
+                            <span class="badge ${badgeClass}">${s.estado}</span>
                         </div>
+                        <p class="small text-muted mb-1">${s.descripcion || 'Sin descripción'}</p>
+                        <small class="text-muted" style="font-size: 0.75rem">
+                            <i class="bi bi-calendar"></i> ${new Date(s.fechaSolicitud).toLocaleDateString('es-ES')} 
+                            at ${new Date(s.fechaSolicitud).toLocaleTimeString('es-ES')}
+                        </small>
                     </div>
-                `).join('');
+                `}).join('');
                 
-                document.getElementById('solicitudesList').innerHTML = html;
+                listContainer.innerHTML = html;
             } catch (error) {
                 console.error('Error cargando solicitudes:', error);
+                document.getElementById('solicitudesList').innerHTML = '<p class="text-danger text-center">Error al cargar el historial.</p>';
             }
         }
 

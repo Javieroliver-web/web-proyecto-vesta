@@ -60,8 +60,11 @@ public class LoginController {
             session.setAttribute("token", response.getToken());
             session.setAttribute("rol", response.getRol());
             session.setAttribute("usuarioNombre", response.getNombre());
+            
+            // CAMBIO IMPORTANTE: Guardar el ID del usuario en la sesión para usarlo en RGPD
+            session.setAttribute("usuarioId", response.getId());
 
-            System.out.println("✅ Login exitoso. Sesión creada para: " + response.getNombre());
+            System.out.println("✅ Login exitoso. Sesión creada para: " + response.getNombre() + " (ID: " + response.getId() + ")");
             
             return ResponseEntity.ok(response);
 
@@ -113,20 +116,10 @@ public class LoginController {
             this.contrasena = password;
         }
 
-        public String getCorreoElectronico() {
-            return correoElectronico;
-        }
-
-        public void setCorreoElectronico(String correoElectronico) {
-            this.correoElectronico = correoElectronico;
-        }
-
-        public String getContrasena() {
-            return contrasena;
-        }
-
-        public void setContrasena(String contrasena) {
-            this.contrasena = contrasena;
-        }
+        // Getters/Setters adicionales por si Jackson usa los nombres originales
+        public String getCorreoElectronico() { return correoElectronico; }
+        public void setCorreoElectronico(String correoElectronico) { this.correoElectronico = correoElectronico; }
+        public String getContrasena() { return contrasena; }
+        public void setContrasena(String contrasena) { this.contrasena = contrasena; }
     }
 }
