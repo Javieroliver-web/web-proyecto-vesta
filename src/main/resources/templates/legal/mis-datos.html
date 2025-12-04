@@ -58,7 +58,7 @@
                         Derecho de Rectificación
                     </h5>
                     <p class="text-muted small">Corrige datos incorrectos o desactualizados (Art. 16 RGPD)</p>
-                    <button class="btn btn-action btn-sm" onclick="solicitarRectificacion()">Solicitar Rectificación</button>
+                    <button class="btn btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#modalRectificacion">Solicitar Rectificación</button>
                 </div>
             </div>
 
@@ -80,7 +80,7 @@
                         Derecho de Supresión
                     </h5>
                     <p class="text-muted small">Elimina tu cuenta y datos (Derecho al olvido - Art. 17 RGPD)</p>
-                    <button class="btn btn-danger btn-sm" onclick="confirmarSupresion()">Eliminar Cuenta</button>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalSupresion">Eliminar Cuenta</button>
                 </div>
             </div>
         </div>
@@ -95,46 +95,122 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalRectificacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Solicitar Rectificación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="descRectificacion" class="form-label">Describe qué datos son incorrectos y cuáles son los correctos:</label>
+                        <textarea class="form-control" id="descRectificacion" rows="3" placeholder="Ej: He cambiado mi dirección a Calle Nueva..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="procesarRectificacion()">Enviar Solicitud</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSupresion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">⚠️ Acción Irreversible</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Vas a solicitar el borrado de tus datos (Derecho al olvido).</p>
+                    <p class="small text-muted">Para confirmar, escribe <strong>ELIMINAR CUENTA</strong> en el campo de abajo:</p>
+                    <input type="text" class="form-control mb-3" id="confirmacionBorrado" placeholder="ELIMINAR CUENTA">
+                    
+                    <label for="razonBorrado" class="form-label small">Motivo (Opcional):</label>
+                    <input type="text" class="form-control" id="razonBorrado" placeholder="¿Por qué nos dejas?">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="procesarSupresion()">Confirmar Eliminación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="infoToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-primary text-white">
+                <strong class="me-auto">Información</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Acción realizada.
+            </div>
+        </div>
+    </div>
+
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // INYECCIÓN DE THYMELEAF: Aquí obtenemos el ID real del backend
         const usuarioId = [[${userId}]]; 
         const apiBaseUrl = 'http://localhost:8080/api/derechos';
         /*]]>*/
 
-        console.log("Gestión RGPD inicializada para usuario ID:", usuarioId);
+        function mostrarToast(mensaje) {
+            document.getElementById('toastMessage').textContent = mensaje;
+            const toastEl = document.getElementById('infoToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
 
         async function solicitarAcceso() {
-            if (!confirm('¿Solicitar acceso a tus datos? Recibirás un informe en 30 días.')) return;
+            // Acción directa, solo informamos
             enviarSolicitud('solicitar-acceso', { usuarioId });
         }
 
-        async function solicitarRectificacion() {
-            const descripcion = prompt('Describe qué datos necesitas rectificar (ej: cambio de dirección, nuevo email):');
-            if (!descripcion) return;
-            enviarSolicitud('solicitar-rectificacion', { usuarioId, descripcion });
-        }
-
         async function solicitarPortabilidad() {
-            if (!confirm('Recibirás tus datos en formato JSON en un plazo de 30 días. ¿Continuar?')) return;
+            // Acción directa
             enviarSolicitud('solicitar-portabilidad', { usuarioId });
         }
 
-        async function confirmarSupresion() {
-            const confirmacion = prompt('⚠️ ACCIÓN IRREVERSIBLE\n\nEsta acción marcará tus datos para eliminación según el Art. 17 RGPD. Escribe "ELIMINAR CUENTA" para confirmar:');
-            if (confirmacion !== 'ELIMINAR CUENTA') {
-                alert('Cancelado');
+        async function procesarRectificacion() {
+            const descripcion = document.getElementById('descRectificacion').value;
+            if (!descripcion) {
+                alert("Por favor, describe la rectificación."); // Validación básica
                 return;
             }
             
-            const razon = prompt('(Opcional) ¿Por qué nos dejas? Nos ayuda a mejorar.');
-            
+            // Cerrar modal
+            const modalEl = document.getElementById('modalRectificacion');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            enviarSolicitud('solicitar-rectificacion', { usuarioId, descripcion });
+        }
+
+        async function procesarSupresion() {
+            const confirmacion = document.getElementById('confirmacionBorrado').value;
+            const razon = document.getElementById('razonBorrado').value;
+
+            if (confirmacion !== 'ELIMINAR CUENTA') {
+                alert('El texto de confirmación no coincide.');
+                return;
+            }
+
             try {
-                await enviarSolicitud('solicitar-supresion', { usuarioId, descripcion: razon });
-                // En caso de supresión, cerramos sesión tras el aviso
-                setTimeout(() => window.location.href = '/logout', 2000);
+                // Enviar solicitud
+                await fetch(`${apiBaseUrl}/solicitar-supresion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId, descripcion: razon })
+                });
+                
+                // Redirigir al logout
+                window.location.href = '/logout';
             } catch (error) {
-                // El error ya se maneja en enviarSolicitud
+                console.error(error);
+                mostrarToast('Error al procesar la solicitud.');
             }
         }
 
@@ -149,14 +225,14 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert('✅ ' + result.message);
-                    cargarSolicitudes(); // Recargar la lista
+                    mostrarToast(result.message);
+                    cargarSolicitudes();
                 } else {
-                    alert('❌ Error: ' + (result.message || 'No se pudo procesar la solicitud'));
+                    mostrarToast('Error: ' + (result.message || 'No se pudo procesar'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión con el servidor de derechos.');
+                mostrarToast('Error de conexión con el servidor.');
             }
         }
 
@@ -178,7 +254,6 @@
                     let badgeClass = 'bg-secondary';
                     if (s.estado === 'COMPLETADA') badgeClass = 'bg-success';
                     if (s.estado === 'PENDIENTE') badgeClass = 'bg-warning text-dark';
-                    if (s.estado === 'EN_PROCESO') badgeClass = 'bg-info text-dark';
                     
                     return `
                     <div class="border-bottom pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
@@ -188,8 +263,7 @@
                         </div>
                         <p class="small text-muted mb-1">${s.descripcion || 'Sin descripción'}</p>
                         <small class="text-muted" style="font-size: 0.75rem">
-                            <i class="bi bi-calendar"></i> ${new Date(s.fechaSolicitud).toLocaleDateString('es-ES')} 
-                            at ${new Date(s.fechaSolicitud).toLocaleTimeString('es-ES')}
+                            <i class="bi bi-calendar"></i> ${new Date(s.fechaSolicitud).toLocaleDateString('es-ES')}
                         </small>
                     </div>
                 `}).join('');
@@ -197,12 +271,24 @@
                 listContainer.innerHTML = html;
             } catch (error) {
                 console.error('Error cargando solicitudes:', error);
-                document.getElementById('solicitudesList').innerHTML = '<p class="text-danger text-center">Error al cargar el historial.</p>';
             }
         }
 
         // Cargar solicitudes al inicio
         cargarSolicitudes();
+        
+        // Inicializar Bootstrap JS (necesario para modales y toasts)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Limpiar inputs de modales al cerrar
+            const modales = document.querySelectorAll('.modal');
+            modales.forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    const inputs = this.querySelectorAll('input, textarea');
+                    inputs.forEach(input => input.value = '');
+                });
+            });
+        });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
