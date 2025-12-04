@@ -12,19 +12,28 @@ public class ClienteController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-        // 1. SEGURIDAD: Verificar si hay token en sesión
+        // Verificar si hay token en sesión
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
 
-        if (token == null || !"cliente".equals(rol)) {
-            return "redirect:/"; // Si no es cliente o no hay sesión, volver al login
+        // CORRECCIÓN: El rol de la API es "USUARIO", no "cliente"
+        if (token == null) {
+            System.out.println("⚠️ No hay token en sesión, redirigiendo al login");
+            return "redirect:/";
         }
 
-        // 2. DATOS: Recuperar nombre para saludar
-        String nombre = (String) session.getAttribute("usuarioNombre");
-        model.addAttribute("nombreUsuario", nombre);
+        // Permitir acceso si el rol es USUARIO (no es ADMIN)
+        if ("ADMIN".equals(rol)) {
+            System.out.println("⚠️ Usuario con rol ADMIN intentando acceder al dashboard de cliente");
+            return "redirect:/admin/dashboard";
+        }
 
-        // 3. VISTA: Mostrar el HTML
+        // Recuperar nombre del usuario
+        String nombre = (String) session.getAttribute("usuarioNombre");
+        model.addAttribute("nombreUsuario", nombre != null ? nombre : "Cliente");
+
+        System.out.println("✅ Acceso permitido al dashboard de cliente para: " + nombre);
+        
         return "cliente/dashboard";
     }
 }

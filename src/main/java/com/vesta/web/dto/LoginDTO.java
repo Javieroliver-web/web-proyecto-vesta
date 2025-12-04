@@ -1,5 +1,6 @@
 package com.vesta.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -8,8 +9,11 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginDTO {
-    // Usamos DIRECTAMENTE los nombres que espera la API
-    // Eliminamos @JsonProperty para evitar confusiones
+    // IMPORTANTE: Estos @JsonProperty son necesarios para que Jackson
+    // serialice correctamente al enviar a la API
+    @JsonProperty("correoElectronico")
     private String correoElectronico;
+    
+    @JsonProperty("contrasena")
     private String contrasena;
 }

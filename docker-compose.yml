@@ -5,18 +5,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vesta_web_container
+    container_name: vesta-web  # Sin guiones bajos
     restart: unless-stopped
     ports:
       - "80:80"
     environment:
-      # URL INTERNA: Para llamadas de servidor a servidor (Docker -> Docker)
-      API_URL: http://vesta_api_container:8080/api
+      API_URL: http://vesta-api:8080/api  # Actualizado
     networks:
-      - vesta_net # Se une a la misma red
+      - vesta_net
 
-# USO DE LA RED EXTERNA
 networks:
   vesta_net:
     external: true
-    name: vesta_network_shared # <--- TIENE QUE COINCIDIR CON LA API
+    name: vesta_network_shared
