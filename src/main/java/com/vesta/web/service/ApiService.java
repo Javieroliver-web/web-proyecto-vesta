@@ -3,12 +3,13 @@ package com.vesta.web.service;
 import com.vesta.web.dto.AuthResponseDTO;
 import com.vesta.web.dto.CartItem;
 import com.vesta.web.dto.LoginDTO;
+import com.vesta.web.dto.RegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +25,11 @@ public class ApiService {
     @Value("${api.url}")
     private String apiUrl;
 
+    // === 1. LOGIN ===
     public AuthResponseDTO login(String email, String password) {
         try {
             LoginDTO request = new LoginDTO();
+            // Usamos los setters que coinciden con la API (español)
             request.setCorreoElectronico(email);
             request.setContrasena(password);
             
@@ -37,18 +40,36 @@ public class ApiService {
             return response.getBody();
 
         } catch (HttpClientErrorException e) {
-            System.err.println("❌ [WEB] ERROR API (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
-            throw new RuntimeException("Credenciales incorrectas o error de formato");
+            System.err.println("❌ [WEB] ERROR API LOGIN (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
+            throw new RuntimeException("Credenciales incorrectas");
         } catch (Exception e) {
-            System.err.println("❌ [WEB] ERROR CONEXIÓN: " + e.getMessage());
+            System.err.println("❌ [WEB] ERROR CONEXIÓN LOGIN: " + e.getMessage());
             throw new RuntimeException("Error de conexión con el servidor API");
         }
     }
 
-    // NUEVO MÉTODO PARA CHECKOUT
+    // === 2. REGISTRO ===
+    public void registrar(RegisterDTO registro) {
+        String url = apiUrl + "/auth/register";
+        
+        try {
+            System.out.println("📤 [WEB] Enviando Registro a: " + url);
+            // Enviamos el DTO de registro completo
+            restTemplate.postForEntity(url, registro, String.class);
+        } catch (HttpClientErrorException e) {
+            System.err.println("❌ [WEB] Error API Registro: " + e.getResponseBodyAsString());
+            throw new RuntimeException("Error al registrar usuario. Verifica los datos.");
+        } catch (Exception e) {
+            System.err.println("❌ [WEB] Error Conexión Registro: " + e.getMessage());
+            throw new RuntimeException("Error de conexión con el servidor");
+        }
+    }
+
+    // === 3. CHECKOUT (CARRITO) ===
     public void realizarCheckout(Long usuarioId, List<CartItem> carrito) {
         String url = apiUrl + "/ordenes/checkout";
         
+        // Construimos el JSON manualmente para asegurar la estructura que espera la API (CheckoutDTO)
         Map<String, Object> request = new HashMap<>();
         request.put("usuarioId", usuarioId);
         
@@ -62,8 +83,11 @@ public class ApiService {
         request.put("items", items);
 
         try {
-            System.out.println("📤 [WEB] Procesando checkout para usuario: " + usuarioId);
+            System.out.println("📤 [WEB] Procesando checkout para usuario ID: " + usuarioId);
             restTemplate.postForEntity(url, request, String.class);
+        } catch (HttpClientErrorException e) {
+             System.err.println("❌ [WEB] Error API Checkout: " + e.getResponseBodyAsString());
+             throw new RuntimeException("Error al procesar el pago.");
         } catch (Exception e) {
             System.err.println("❌ [WEB] Error en checkout: " + e.getMessage());
             throw new RuntimeException("Error al procesar el pago");
