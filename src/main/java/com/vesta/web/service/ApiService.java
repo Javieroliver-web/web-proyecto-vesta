@@ -6,6 +6,10 @@ import com.vesta.web.dto.LoginDTO;
 import com.vesta.web.dto.RegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference; // <--- NUEVO
+import org.springframework.http.HttpEntity; // <--- NUEVO
+import org.springframework.http.HttpHeaders; // <--- NUEVO
+import org.springframework.http.HttpMethod; // <--- NUEVO
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,72 +29,79 @@ public class ApiService {
     @Value("${api.url}")
     private String apiUrl;
 
-    // === 1. LOGIN ===
+    // ... (MANTÉN LOS MÉTODOS login, registrar y realizarCheckout QUE YA TIENES) ...
     public AuthResponseDTO login(String email, String password) {
+        // (Tu código actual de login)
         try {
             LoginDTO request = new LoginDTO();
-            // Usamos los setters que coinciden con la API (español)
             request.setCorreoElectronico(email);
             request.setContrasena(password);
-            
             String url = apiUrl + "/auth/login";
-            System.out.println("📤 [WEB] Enviando Login a: " + url);
-
             ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(url, request, AuthResponseDTO.class);
             return response.getBody();
-
-        } catch (HttpClientErrorException e) {
-            System.err.println("❌ [WEB] ERROR API LOGIN (" + e.getStatusCode() + "): " + e.getResponseBodyAsString());
-            throw new RuntimeException("Credenciales incorrectas");
-        } catch (Exception e) {
-            System.err.println("❌ [WEB] ERROR CONEXIÓN LOGIN: " + e.getMessage());
-            throw new RuntimeException("Error de conexión con el servidor API");
-        }
+        } catch (Exception e) { throw new RuntimeException("Error login"); }
     }
 
-    // === 2. REGISTRO ===
     public void registrar(RegisterDTO registro) {
-        String url = apiUrl + "/auth/register";
-        
-        try {
-            System.out.println("📤 [WEB] Enviando Registro a: " + url);
-            // Enviamos el DTO de registro completo
-            restTemplate.postForEntity(url, registro, String.class);
-        } catch (HttpClientErrorException e) {
-            System.err.println("❌ [WEB] Error API Registro: " + e.getResponseBodyAsString());
-            throw new RuntimeException("Error al registrar usuario. Verifica los datos.");
-        } catch (Exception e) {
-            System.err.println("❌ [WEB] Error Conexión Registro: " + e.getMessage());
-            throw new RuntimeException("Error de conexión con el servidor");
-        }
+        // (Tu código actual de registro)
+        try { restTemplate.postForEntity(apiUrl + "/auth/register", registro, String.class); }
+        catch (Exception e) { throw new RuntimeException("Error registro"); }
     }
 
-    // === 3. CHECKOUT (CARRITO) ===
     public void realizarCheckout(Long usuarioId, List<CartItem> carrito) {
+        // (Tu código actual de checkout)
+        // ...
         String url = apiUrl + "/ordenes/checkout";
-        
-        // Construimos el JSON manualmente para asegurar la estructura que espera la API (CheckoutDTO)
         Map<String, Object> request = new HashMap<>();
         request.put("usuarioId", usuarioId);
-        
         List<Map<String, Object>> items = carrito.stream().map(item -> {
             Map<String, Object> i = new HashMap<>();
             i.put("seguroId", item.getSeguroId());
             i.put("cantidad", item.getCantidad());
             return i;
         }).collect(Collectors.toList());
-        
         request.put("items", items);
+        try { restTemplate.postForEntity(url, request, String.class); }
+        catch (Exception e) { throw new RuntimeException("Error checkout"); }
+    }
 
+    // === NUEVOS MÉTODOS PARA ADMIN ===
+
+    public List<Map<String, Object>> obtenerTodasLasOrdenes(String token) {
+        String url = apiUrl + "/ordenes";
         try {
-            System.out.println("📤 [WEB] Procesando checkout para usuario ID: " + usuarioId);
-            restTemplate.postForEntity(url, request, String.class);
-        } catch (HttpClientErrorException e) {
-             System.err.println("❌ [WEB] Error API Checkout: " + e.getResponseBodyAsString());
-             throw new RuntimeException("Error al procesar el pago.");
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url, 
+                HttpMethod.GET, 
+                new HttpEntity<>(getHeaders(token)), 
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            return response.getBody();
         } catch (Exception e) {
-            System.err.println("❌ [WEB] Error en checkout: " + e.getMessage());
-            throw new RuntimeException("Error al procesar el pago");
+            e.printStackTrace();
+            return List.of(); 
         }
+    }
+
+    public List<Map<String, Object>> obtenerSolicitudesRGPD(String token) {
+        String url = apiUrl + "/derechos/todas"; // Apunta al nuevo endpoint
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url, 
+                HttpMethod.GET, 
+                new HttpEntity<>(getHeaders(token)), 
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    private HttpHeaders getHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        return headers;
     }
 }
