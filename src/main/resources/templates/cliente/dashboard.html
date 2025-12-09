@@ -120,19 +120,32 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    
+    <script th:inline="javascript">
+        // Recuperamos el token de la sesión del servidor
+        /*<![CDATA[*/
+        const authToken = [[${session.token}]];
+        /*]]>*/
+
         // URL de la API (Apunta directamente al puerto 8080 expuesto por Docker)
         const API_URL = 'http://localhost:8080/api';
 
         // 1. RECOMENDADOR
         async function cargarRecomendacion() {
             try {
-                // Simulamos email usuario (en real lo sacarías de la sesión)
-                const res = await fetch(`${API_URL}/innovation/recommendation?email=test@vesta.es`);
-                const data = await res.json();
-                document.getElementById('recText').innerText = data.mensaje;
-                document.getElementById('aiRecommendation').classList.remove('d-none');
-                document.getElementById('aiRecommendation').classList.add('d-flex');
+                const res = await fetch(`${API_URL}/innovation/recommendation?email=test@vesta.es`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('recText').innerText = data.mensaje;
+                    document.getElementById('aiRecommendation').classList.remove('d-none');
+                    document.getElementById('aiRecommendation').classList.add('d-flex');
+                }
             } catch (e) { console.error("Error IA Recomendación", e); }
         }
         // Cargar al iniciar
@@ -154,13 +167,20 @@
             try {
                 const res = await fetch(`${API_URL}/innovation/chat`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
                     body: JSON.stringify({ pregunta: texto })
                 });
-                const data = await res.json();
                 
-                // Pintar respuesta IA
-                chatBody.innerHTML += `<div class="chat-message chat-bot">${data.respuesta}</div>`;
+                if(res.ok) {
+                    const data = await res.json();
+                    // Pintar respuesta IA
+                    chatBody.innerHTML += `<div class="chat-message chat-bot">${data.respuesta}</div>`;
+                } else {
+                    chatBody.innerHTML += `<div class="chat-message chat-bot text-danger">Error de autorización.</div>`;
+                }
                 chatBody.scrollTop = chatBody.scrollHeight;
             } catch (e) {
                 chatBody.innerHTML += `<div class="chat-message chat-bot text-danger">Error de conexión con Vesta Brain.</div>`;
@@ -179,26 +199,39 @@
             const formData = new FormData();
             formData.append('polizaId', document.getElementById('polizaId').value);
             formData.append('descripcion', document.getElementById('descSiniestro').value);
-            formData.append('file', document.getElementById('fotoSiniestro').files[0]);
+            
+            const fileInput = document.getElementById('fotoSiniestro');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
 
             try {
                 const res = await fetch(`${API_URL}/siniestros`, {
                     method: 'POST',
+                    headers: {
+                        // IMPORTANTE: Al usar FormData NO se pone Content-Type,
+                        // pero SÍ necesitamos el Authorization
+                        'Authorization': 'Bearer ' + authToken
+                    },
                     body: formData
                 });
+                
+                if (!res.ok) throw new Error("Error en la petición: " + res.status);
+
                 const data = await res.json();
 
                 // Mostrar Veredicto
-                if (data.analisisIA.includes("APROBADO")) {
+                if (data.analisisIA && data.analisisIA.includes("APROBADO")) {
                     resultBox.className = 'alert alert-success mt-3';
                     resultBox.innerHTML = `<strong>¡Siniestro Aprobado!</strong><br>${data.analisisIA}`;
                 } else {
                     resultBox.className = 'alert alert-secondary mt-3';
-                    resultBox.innerHTML = `<strong>Pendiente de Revisión</strong><br>${data.analisisIA}`;
+                    resultBox.innerHTML = `<strong>Pendiente de Revisión</strong><br>${data.analisisIA || 'En proceso de revisión.'}`;
                 }
             } catch (e) {
+                console.error(e);
                 resultBox.className = 'alert alert-danger mt-3';
-                resultBox.innerText = 'Error al subir la evidencia.';
+                resultBox.innerText = 'Error al subir la evidencia. Verifica que estás logueado y que la imagen no sea demasiado grande.';
             }
         }
     </script>
