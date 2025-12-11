@@ -36,4 +36,25 @@ public class ClienteController {
         
         return "cliente/dashboard";
     }
+
+    // === NUEVO MÉTODO PARA CONFIGURACIÓN ===
+    @GetMapping("/configuracion")
+    public String configuracion(HttpSession session, Model model) {
+        String token = (String) session.getAttribute("token");
+        
+        // Si no hay sesión, redirigir al login
+        if (token == null) {
+            return "redirect:/login-page";
+        }
+
+        // Pasamos datos básicos a la vista para el header
+        model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
+        
+        // IMPORTANTE: Pasamos el ID del usuario a la vista.
+        // Esto es necesario para que el JavaScript del formulario de contraseña
+        // sepa a qué endpoint de la API llamar (PUT /api/usuarios/{id}).
+        model.addAttribute("usuarioId", session.getAttribute("usuarioId")); 
+        
+        return "cliente/configuracion";
+    }
 }

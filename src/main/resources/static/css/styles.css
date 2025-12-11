@@ -1,7 +1,7 @@
 /* src/main/resources/static/css/styles.css */
 
 :root {
-    /* Paleta oficial Vesta basada en tu logo */
+    /* === Paleta oficial Vesta basada en tu logo === */
     --vesta-gold: #f1a61c;
     --vesta-gold-light: #f4b94c;
     --vesta-gold-lighter: #ffcc7c;
@@ -9,16 +9,30 @@
     --vesta-navy-light: #3c425e;
     --vesta-dark: #141620;
     
-    /* Backgrounds */
-    --vesta-bg: hsl(0, 0%, 100%);
-    --vesta-fg: #1a1d2e;
-    
-    /* Estados */
-    --vesta-muted: #e9ecef;
-    --vesta-muted-fg: #6c757d;
+    /* Estados fijos */
     --vesta-danger: hsl(0, 84.2%, 60.2%);
-    
     --radius: 12px;
+
+    /* === VARIABLES DE TEMA (Por defecto: CLARO) === */
+    /* Estas variables cambiarán dinámicamente con JS */
+    --theme-bg: #f8f9fa;             /* Fondo principal */
+    --theme-bg-secondary: #e9ecef;   /* Fondos secundarios */
+    --theme-card-bg: #ffffff;        /* Fondo de tarjetas */
+    --theme-text-main: #1a1d2e;      /* Texto principal */
+    --theme-text-muted: #6c757d;     /* Texto secundario */
+    --theme-border: #e9ecef;         /* Color de bordes */
+    --theme-input-bg: #ffffff;       /* Fondo de inputs */
+}
+
+/* === TEMA OSCURO (Se activa al añadir atributo data-theme="dark") === */
+[data-theme="dark"] {
+    --theme-bg: #141620;             /* Fondo muy oscuro (vesta-dark) */
+    --theme-bg-secondary: #282c3f;   /* vesta-navy */
+    --theme-card-bg: #1a1d2e;        /* Fondo tarjetas */
+    --theme-text-main: #f8f9fa;      /* Texto blanco */
+    --theme-text-muted: #adb5bd;     /* Texto gris claro */
+    --theme-border: #282c3f;         /* Bordes oscuros */
+    --theme-input-bg: #0f1118;       /* Inputs muy oscuros */
 }
 
 * {
@@ -28,10 +42,12 @@
 }
 
 body {
-    background-color: var(--vesta-bg);
-    color: var(--vesta-fg);
+    background-color: var(--theme-bg);
+    color: var(--theme-text-main);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
     line-height: 1.6;
+    /* Suavizar la transición al cambiar de tema */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* === BOTONES === */
@@ -81,19 +97,25 @@ body {
 }
 
 .btn-light {
-    background: white;
-    border: 2px solid var(--vesta-muted);
-    color: var(--vesta-navy);
+    background: var(--theme-card-bg);
+    border: 2px solid var(--theme-border);
+    color: var(--theme-text-main);
     font-weight: 600;
+}
+
+.btn-light:hover {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-main);
 }
 
 /* === CARDS === */
 
 .card {
-    border: 1px solid var(--vesta-muted);
+    border: 1px solid var(--theme-border);
     border-radius: var(--radius);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    background-color: white;
+    background-color: var(--theme-card-bg); /* Variable dinámica */
+    color: var(--theme-text-main);          /* Variable dinámica */
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -114,19 +136,26 @@ body {
     padding: 0.75rem 1.25rem;
 }
 
+/* Excepción para headers que usan clases de bootstrap standard */
+.card-header.bg-white, 
+.card-header.bg-transparent {
+    background: var(--theme-card-bg) !important;
+    color: var(--theme-text-main);
+}
+
 .card-body {
     padding: 1.5rem;
 }
 
 .card-title {
-    color: var(--vesta-navy);
+    color: var(--theme-text-main);
     font-weight: 700;
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
 }
 
 .card-text {
-    color: var(--vesta-muted-fg);
+    color: var(--theme-text-muted);
     font-size: 0.95rem;
 }
 
@@ -153,14 +182,14 @@ body {
     color: var(--vesta-gold-light) !important;
 }
 
-/* === TABS === */
+/* === TABS & LISTAS === */
 
 .nav-tabs {
-    border-bottom: 2px solid var(--vesta-muted);
+    border-bottom: 2px solid var(--theme-border);
 }
 
 .nav-tabs .nav-link {
-    color: var(--vesta-muted-fg);
+    color: var(--theme-text-muted);
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
@@ -179,29 +208,56 @@ body {
     border-bottom-color: var(--vesta-gold);
 }
 
+/* Estilos para el menú lateral de configuración */
+.list-group-item {
+    background-color: var(--theme-card-bg);
+    color: var(--theme-text-main);
+    border-color: var(--theme-border);
+}
+.list-group-item-action:hover {
+    background-color: var(--theme-bg-secondary);
+    color: var(--theme-text-main);
+}
+.list-group-item.active {
+    background-color: var(--vesta-gold);
+    border-color: var(--vesta-gold);
+    color: white;
+}
+
 /* === FORMS === */
 
 .form-label {
-    color: var(--vesta-navy);
+    color: var(--theme-text-main);
     font-weight: 600;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }
 
-.form-control {
-    border: 2px solid var(--vesta-muted);
+/* Soporte para inputs normales y selects */
+.form-control, .form-select {
+    background-color: var(--theme-input-bg);
+    color: var(--theme-text-main);
+    border: 2px solid var(--theme-border);
     border-radius: var(--radius);
     padding: 0.75rem 1rem;
     transition: all 0.3s ease;
 }
 
-.form-control:focus {
+.form-control:focus, .form-select:focus {
+    background-color: var(--theme-input-bg);
+    color: var(--theme-text-main);
     border-color: var(--vesta-gold);
     box-shadow: 0 0 0 4px rgba(241, 166, 28, 0.1);
     outline: none;
 }
 
-/* === ALERTS === */
+/* Placeholder un poco más claro en modo oscuro */
+.form-control::placeholder {
+    color: var(--theme-text-muted);
+    opacity: 0.7;
+}
+
+/* === ALERTS (Adaptadas para modo oscuro) === */
 
 .alert {
     border-radius: var(--radius);
@@ -218,10 +274,30 @@ body {
     background: #fee;
     color: #c33;
 }
+[data-theme="dark"] .alert-danger {
+    background: rgba(220, 53, 69, 0.2);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+}
 
 .alert-success {
     background: #d4edda;
     color: #155724;
+}
+[data-theme="dark"] .alert-success {
+    background: rgba(40, 167, 69, 0.2);
+    color: #75b798;
+    border: 1px solid #75b798;
+}
+
+.alert-info {
+    background-color: #cff4fc;
+    color: #055160;
+}
+[data-theme="dark"] .alert-info {
+    background-color: rgba(13, 202, 240, 0.2);
+    color: #6edff6;
+    border: 1px solid #0dcaf0;
 }
 
 /* === BADGES === */
@@ -237,22 +313,26 @@ body {
     background: var(--vesta-gold) !important;
 }
 
-/* === UTILIDADES === */
+/* === UTILIDADES (Sobrescribir clases de bootstrap con variables) === */
 
 .text-primary {
     color: var(--vesta-gold) !important;
 }
 
 .text-muted {
-    color: var(--vesta-muted-fg) !important;
+    color: var(--theme-text-muted) !important;
 }
 
 .bg-light {
-    background: #f8f9fa !important;
+    background: var(--theme-bg-secondary) !important;
+}
+
+.bg-white {
+    background: var(--theme-card-bg) !important;
 }
 
 .border {
-    border-color: var(--vesta-muted) !important;
+    border-color: var(--theme-border) !important;
 }
 
 .border-primary {

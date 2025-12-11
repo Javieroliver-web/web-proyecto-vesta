@@ -2,10 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <nav th:fragment="header-nav" class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        
+        <script>
+            (function() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            })();
+        </script>
+
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">🛡️ VESTA</a>
+            <a class="navbar-brand fw-bold" href="/cliente/dashboard">🛡️ VESTA</a>
+            
             <div class="d-flex align-items-center text-white" th:if="${session.token != null}">
-                <span class="me-3">Hola, <span th:text="${session.usuarioNombre}">Usuario</span></span>
+                <span class="me-3 d-none d-md-inline">Hola, <span th:text="${session.usuarioNombre}">Usuario</span></span>
+                
+                <a href="/cliente/configuracion" class="btn btn-sm btn-outline-light me-2" title="Configuración">
+                    <i class="bi bi-gear-fill"></i>
+                </a>
+                
                 <a href="/logout" class="btn btn-sm btn-light text-primary fw-bold">Salir</a>
             </div>
         </div>
