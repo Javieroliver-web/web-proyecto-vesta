@@ -6,13 +6,12 @@ import com.vesta.web.dto.LoginDTO;
 import com.vesta.web.dto.RegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference; // <--- NUEVO
-import org.springframework.http.HttpEntity; // <--- NUEVO
-import org.springframework.http.HttpHeaders; // <--- NUEVO
-import org.springframework.http.HttpMethod; // <--- NUEVO
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -29,43 +28,57 @@ public class ApiService {
     @Value("${api.url}")
     private String apiUrl;
 
-    // ... (MANTÉN LOS MÉTODOS login, registrar y realizarCheckout QUE YA TIENES) ...
+    // === AUTENTICACIÓN ===
+
     public AuthResponseDTO login(String email, String password) {
-        // (Tu código actual de login)
         try {
             LoginDTO request = new LoginDTO();
             request.setCorreoElectronico(email);
             request.setContrasena(password);
+            
             String url = apiUrl + "/auth/login";
             ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(url, request, AuthResponseDTO.class);
+            
             return response.getBody();
-        } catch (Exception e) { throw new RuntimeException("Error login"); }
+        } catch (Exception e) {
+            throw new RuntimeException("Error en login: " + e.getMessage());
+        }
     }
 
     public void registrar(RegisterDTO registro) {
-        // (Tu código actual de registro)
-        try { restTemplate.postForEntity(apiUrl + "/auth/register", registro, String.class); }
-        catch (Exception e) { throw new RuntimeException("Error registro"); }
+        try {
+            String url = apiUrl + "/auth/register";
+            restTemplate.postForEntity(url, registro, String.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error en registro: " + e.getMessage());
+        }
     }
 
+    // === VENTAS (CLIENTE) ===
+
     public void realizarCheckout(Long usuarioId, List<CartItem> carrito) {
-        // (Tu código actual de checkout)
-        // ...
         String url = apiUrl + "/ordenes/checkout";
+        
         Map<String, Object> request = new HashMap<>();
         request.put("usuarioId", usuarioId);
+        
         List<Map<String, Object>> items = carrito.stream().map(item -> {
             Map<String, Object> i = new HashMap<>();
             i.put("seguroId", item.getSeguroId());
             i.put("cantidad", item.getCantidad());
             return i;
         }).collect(Collectors.toList());
+        
         request.put("items", items);
-        try { restTemplate.postForEntity(url, request, String.class); }
-        catch (Exception e) { throw new RuntimeException("Error checkout"); }
+        
+        try {
+            restTemplate.postForEntity(url, request, String.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error checkout: " + e.getMessage());
+        }
     }
 
-    // === NUEVOS MÉTODOS PARA ADMIN ===
+    // === GESTIÓN (ADMIN) ===
 
     public List<Map<String, Object>> obtenerTodasLasOrdenes(String token) {
         String url = apiUrl + "/ordenes";
@@ -84,7 +97,7 @@ public class ApiService {
     }
 
     public List<Map<String, Object>> obtenerSolicitudesRGPD(String token) {
-        String url = apiUrl + "/derechos/todas"; // Apunta al nuevo endpoint
+        String url = apiUrl + "/derechos/todas";
         try {
             ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                 url, 
@@ -98,6 +111,25 @@ public class ApiService {
             return List.of();
         }
     }
+
+    // === NUEVO MÉTODO: OBTENER SINIESTROS ===
+    public List<Map<String, Object>> obtenerSiniestros(String token) {
+        String url = apiUrl + "/siniestros";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url, 
+                HttpMethod.GET, 
+                new HttpEntity<>(getHeaders(token)), 
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    // === UTILIDADES ===
 
     private HttpHeaders getHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();

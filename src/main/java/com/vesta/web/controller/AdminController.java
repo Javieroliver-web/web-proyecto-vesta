@@ -28,6 +28,10 @@ public class AdminController {
         // Obtener datos reales de la API
         model.addAttribute("ordenes", apiService.obtenerTodasLasOrdenes(token));
         model.addAttribute("solicitudes", apiService.obtenerSolicitudesRGPD(token));
+        
+        // === NUEVO: Cargar lista de siniestros ===
+        model.addAttribute("siniestros", apiService.obtenerSiniestros(token));
+        
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
 
         return "admin/dashboard";

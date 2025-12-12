@@ -113,7 +113,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" onclick="enviarSiniestro()">Enviar Reporte</button>
+                    <button type="button" id="btnEnviarSiniestro" class="btn btn-danger" onclick="enviarSiniestro()">Enviar Reporte</button>
                 </div>
             </div>
         </div>
@@ -122,12 +122,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script th:inline="javascript">
-        // Recuperamos el token de la sesión del servidor
         /*<![CDATA[*/
         const authToken = [[${session.token}]];
         /*]]>*/
-
-        // URL de la API (Apunta directamente al puerto 8080 expuesto por Docker)
         const API_URL = 'http://localhost:8080/api';
 
         // 1. RECOMENDADOR
@@ -135,11 +132,8 @@
             try {
                 const res = await fetch(`${API_URL}/innovation/recommendation?email=test@vesta.es`, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + authToken
-                    }
+                    headers: { 'Authorization': 'Bearer ' + authToken }
                 });
-                
                 if(res.ok) {
                     const data = await res.json();
                     document.getElementById('recText').innerText = data.mensaje;
@@ -148,7 +142,6 @@
                 }
             } catch (e) { console.error("Error IA Recomendación", e); }
         }
-        // Cargar al iniciar
         window.onload = cargarRecomendacion;
 
         // 2. CHATBOT
@@ -157,13 +150,11 @@
             const texto = input.value.trim();
             if (!texto) return;
 
-            // Pintar mi mensaje
             const chatBody = document.getElementById('chatBody');
             chatBody.innerHTML += `<div class="chat-message chat-user">${texto}</div>`;
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
 
-            // Llamar a IA
             try {
                 const res = await fetch(`${API_URL}/innovation/chat`, {
                     method: 'POST',
@@ -173,10 +164,8 @@
                     },
                     body: JSON.stringify({ pregunta: texto })
                 });
-                
                 if(res.ok) {
                     const data = await res.json();
-                    // Pintar respuesta IA
                     chatBody.innerHTML += `<div class="chat-message chat-bot">${data.respuesta}</div>`;
                 } else {
                     chatBody.innerHTML += `<div class="chat-message chat-bot text-danger">Error de autorización.</div>`;
@@ -187,10 +176,20 @@
             }
         }
 
-        // 3. PERITO DIGITAL (Siniestros)
-        function setPoliza(id) { document.getElementById('polizaId').value = id; }
+        // 3. PERITO DIGITAL
+        function setPoliza(id) { 
+            document.getElementById('polizaId').value = id; 
+            // RESTAURAR BOTÓN AL ABRIR EL MODAL (Por si se ocultó anteriormente)
+            document.getElementById('btnEnviarSiniestro').style.display = 'block';
+            document.getElementById('analisisResult').classList.add('d-none'); // Ocultar mensajes anteriores
+            document.getElementById('formSiniestro').reset(); // Limpiar formulario
+        }
 
         async function enviarSiniestro() {
+            // OCULTAR BOTÓN INMEDIATAMENTE
+            const btnEnviar = document.getElementById('btnEnviarSiniestro');
+            btnEnviar.style.display = 'none';
+
             const resultBox = document.getElementById('analisisResult');
             resultBox.className = 'alert alert-warning mt-3';
             resultBox.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div> Analizando imagen con IA...';
@@ -208,11 +207,7 @@
             try {
                 const res = await fetch(`${API_URL}/siniestros`, {
                     method: 'POST',
-                    headers: {
-                        // IMPORTANTE: Al usar FormData NO se pone Content-Type,
-                        // pero SÍ necesitamos el Authorization
-                        'Authorization': 'Bearer ' + authToken
-                    },
+                    headers: { 'Authorization': 'Bearer ' + authToken },
                     body: formData
                 });
                 
@@ -220,7 +215,6 @@
 
                 const data = await res.json();
 
-                // Mostrar Veredicto
                 if (data.analisisIA && data.analisisIA.includes("APROBADO")) {
                     resultBox.className = 'alert alert-success mt-3';
                     resultBox.innerHTML = `<strong>¡Siniestro Aprobado!</strong><br>${data.analisisIA}`;
@@ -232,6 +226,9 @@
                 console.error(e);
                 resultBox.className = 'alert alert-danger mt-3';
                 resultBox.innerText = 'Error al subir la evidencia. Verifica que estás logueado y que la imagen no sea demasiado grande.';
+                
+                // SI FALLA, MOSTRAR EL BOTÓN DE NUEVO PARA QUE PUEDA REINTENTAR
+                btnEnviar.style.display = 'block';
             }
         }
     </script>
