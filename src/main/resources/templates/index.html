@@ -9,67 +9,196 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <style>
         .hero-section {
-            background: #282c3f;
+            background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);
             color: white;
-            padding: 5rem 0;
+            padding: 6rem 0;
             position: relative;
             overflow: hidden;
         }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(241, 166, 28, 0.15) 0%, transparent 70%);
+            top: -300px;
+            right: -200px;
+            border-radius: 50%;
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(244, 185, 76, 0.1) 0%, transparent 70%);
+            bottom: -200px;
+            left: -100px;
+            border-radius: 50%;
+            animation: pulse 10s ease-in-out infinite reverse;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+        
         .hero-title {
             font-size: 3.5rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f4b94c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideInUp 0.8s ease-out;
         }
+        
         .hero-text {
             font-size: 1.25rem;
-            color: #a0aec0;
+            color: #cbd5e0;
             margin-bottom: 2.5rem;
             max-width: 600px;
+            animation: slideInUp 1s ease-out;
         }
+        
+        .hero-buttons {
+            animation: slideInUp 1.2s ease-out;
+        }
+        
+        .hero-image {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
         .feature-icon {
-            width: 64px;
-            height: 64px;
-            background: #ffcc7c;
-            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
-            font-size: 1.75rem;
-            color: #282c3f;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(241, 166, 28, 0.3);
+            transition: all 0.3s ease;
         }
+        
+        .feature-card:hover .feature-icon {
+            transform: translateY(-8px) rotate(5deg);
+            box-shadow: 0 12px 32px rgba(241, 166, 28, 0.4);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            animation: slideInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .feature-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .feature-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
         .insurance-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
-            border: 1px solid #e9ecef;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
+        
+        .insurance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 185, 76, 0.15), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+        
+        .insurance-card:hover::before {
+            left: 100%;
+        }
+        
         .insurance-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
         }
+        
         .badge-category {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: white;
-            color: #f1a61c;
-            font-weight: 600;
-            padding: 0.35rem 0.8rem;
+            background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%);
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
             border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(241, 166, 28, 0.3);
+            z-index: 2;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
         }
+        
+        .search-bar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(241, 166, 28, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:hover {
+            border-color: rgba(241, 166, 28, 0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
         footer {
-            background: #282c3f;
+            background: linear-gradient(135deg, #282c3f 0%, #141620 100%);
             color: white;
             padding: 4rem 0 2rem;
+            position: relative;
         }
+        
         footer a {
-            color: #a0aec0;
+            color: #cbd5e0;
             text-decoration: none;
-            transition: color 0.2s;
+            transition: all 0.2s;
         }
+        
         footer a:hover {
-            color: #f1a61c;
+            color: #f4b94c;
+            transform: translateX(4px);
+            display: inline-block;
+        }
+        
+        .price-tag {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f1a61c 0%, #f4b94c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
@@ -92,59 +221,67 @@
     </nav>
 
     <div class="hero-section">
-        <div class="container">
+        <div class="container hero-content">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="bi bi-shield-check text-warning fs-4"></i>
-                        <span class="text-warning fw-bold">Vesta</span>
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <i class="bi bi-shield-check" style="color: #f4b94c; font-size: 2rem;"></i>
+                        <span style="color: #f4b94c; font-weight: 700; font-size: 1.25rem; letter-spacing: 2px;">VESTA</span>
                     </div>
                     <h1 class="hero-title">Micro-seguros<br>On-Demand</h1>
                     <p class="hero-text">Protección instantánea cuando la necesitas. Activa y desactiva coberturas según tus necesidades, sin papeleos ni permanencia.</p>
-                    <div class="d-flex gap-3">
-                        <a href="/register" class="btn btn-primary btn-lg px-5">Comenzar Ahora</a>
+                    <div class="d-flex gap-3 hero-buttons">
+                        <a href="/register" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Comenzar Ahora
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                            Saber más
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block text-end">
-                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80" alt="Vesta App" style="border-radius: 20px; opacity: 0.8; max-width: 100%;">
+                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80" alt="Vesta App" class="hero-image" style="border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 100%;">
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container" style="margin-top: -30px; position: relative; z-index: 10;">
-        <div class="bg-white p-4 rounded-3 shadow-sm d-flex gap-3 align-items-center border">
-            <i class="bi bi-search text-muted"></i>
-            <input type="text" class="form-control border-0 shadow-none" placeholder="Buscar seguros (ej: Viaje, Móvil)..." disabled style="background: transparent;">
-            <select class="form-select w-auto border-0 bg-light fw-bold text-muted" disabled>
+    <div class="container" style="margin-top: -40px; position: relative; z-index: 10;">
+        <div class="search-bar p-4 rounded-3 shadow-lg d-flex gap-3 align-items-center">
+            <i class="bi bi-search" style="color: #f1a61c; font-size: 1.5rem;"></i>
+            <input type="text" class="form-control border-0 shadow-none" placeholder="Buscar seguros (ej: Viaje, Móvil, Hogar)..." disabled style="background: transparent; font-size: 1.05rem;">
+            <select class="form-select w-auto border-0 fw-bold" disabled style="background: rgba(241, 166, 28, 0.1); color: #f1a61c; border-radius: 12px; padding: 0.75rem 1.5rem;">
                 <option>Todos</option>
             </select>
         </div>
     </div>
 
-    <div class="container py-5 mt-5">
-        <h2 class="text-center fw-bold mb-5">¿Por qué elegir Vesta?</h2>
-        <div class="row text-center g-4">
-            <div class="col-md-4">
+    <div class="container py-5 mt-5" id="features">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="font-size: 2.5rem; color: #282c3f;">¿Por qué elegir Vesta?</h2>
+            <p class="text-muted fs-5">Protección inteligente diseñada para tu estilo de vida</p>
+        </div>
+        <div class="row text-center g-5">
+            <div class="col-md-4 feature-card">
                 <div class="feature-icon">
-                    <i class="bi bi-shield-check"></i>
+                    <i class="bi bi-lightning-charge-fill"></i>
                 </div>
-                <h4 class="fw-bold mb-3">Activación Instantánea</h4>
-                <p class="text-muted">Activa tu seguro cuando lo necesites, sin trámites complicados ni esperas.</p>
+                <h4 class="fw-bold mb-3" style="color: #282c3f;">Activación Instantánea</h4>
+                <p class="text-muted">Activa tu seguro cuando lo necesites, sin trámites complicados ni esperas. En segundos estás protegido.</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 feature-card">
                 <div class="feature-icon">
-                    <i class="bi bi-phone"></i>
+                    <i class="bi bi-phone-fill"></i>
                 </div>
-                <h4 class="fw-bold mb-3">100% Digital</h4>
-                <p class="text-muted">Gestiona todos tus seguros desde tu dispositivo, sin papeleos.</p>
+                <h4 class="fw-bold mb-3" style="color: #282c3f;">100% Digital</h4>
+                <p class="text-muted">Gestiona todos tus seguros desde tu dispositivo, sin papeleos. Todo en la palma de tu mano.</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 feature-card">
                 <div class="feature-icon">
-                    <i class="bi bi-heart"></i>
+                    <i class="bi bi-wallet2"></i>
                 </div>
-                <h4 class="fw-bold mb-3">Paga Solo lo que Usas</h4>
-                <p class="text-muted">Sin compromisos a largo plazo. Activa y desactiva según necesites.</p>
+                <h4 class="fw-bold mb-3" style="color: #282c3f;">Paga Solo lo que Usas</h4>
+                <p class="text-muted">Sin compromisos a largo plazo. Activa y desactiva según necesites. Máxima flexibilidad.</p>
             </div>
         </div>
     </div>
@@ -165,12 +302,14 @@
                         <div class="card-body">
                             <h5 class="fw-bold">Seguro de Viaje</h5>
                             <p class="text-muted small">Protección completa durante tus vacaciones.</p>
-                            <div class="d-flex justify-content-between align-items-end mt-3">
+                            <div class="d-flex justify-content-between align-items-end mt-4">
                                 <div>
-                                    <span class="small text-muted">Desde</span>
-                                    <div class="fw-bold fs-4 text-warning">$15.99<span class="fs-6 text-muted fw-normal">/día</span></div>
+                                    <span class="small text-muted fw-semibold">Desde</span>
+                                    <div class="price-tag">$15.99<span class="fs-6 text-muted fw-normal">/día</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm">Ver más</a>
+                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -184,12 +323,14 @@
                         <div class="card-body">
                             <h5 class="fw-bold">Seguro de Dispositivos</h5>
                             <p class="text-muted small">Protege tu smartphone y gadgets.</p>
-                            <div class="d-flex justify-content-between align-items-end mt-3">
+                            <div class="d-flex justify-content-between align-items-end mt-4">
                                 <div>
-                                    <span class="small text-muted">Desde</span>
-                                    <div class="fw-bold fs-4 text-warning">$9.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
+                                    <span class="small text-muted fw-semibold">Desde</span>
+                                    <div class="price-tag">$9.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm">Ver más</a>
+                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -203,12 +344,14 @@
                         <div class="card-body">
                             <h5 class="fw-bold">Seguro de Eventos</h5>
                             <p class="text-muted small">Asegura tu entrada a conciertos.</p>
-                            <div class="d-flex justify-content-between align-items-end mt-3">
+                            <div class="d-flex justify-content-between align-items-end mt-4">
                                 <div>
-                                    <span class="small text-muted">Desde</span>
-                                    <div class="fw-bold fs-4 text-warning">$5.99<span class="fs-6 text-muted fw-normal">/evento</span></div>
+                                    <span class="small text-muted fw-semibold">Desde</span>
+                                    <div class="price-tag">$5.99<span class="fs-6 text-muted fw-normal">/evento</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm">Ver más</a>
+                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
