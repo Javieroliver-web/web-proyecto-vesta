@@ -1,27 +1,60 @@
-/* src/main/resources/static/css/styles.css */
-
 :root {
-    /* === Paleta oficial Vesta basada en tu logo === */
-    --vesta-gold: #f1a61c;
-    --vesta-gold-light: #f4b94c;
-    --vesta-gold-lighter: #ffcc7c;
-    --vesta-navy: #282c3f;
-    --vesta-navy-light: #3c425e;
-    --vesta-dark: #141620;
+    /* NUEVAS VARIABLES */
+    --gradient-primary: linear-gradient(135deg, #f4b94c 0%, #ffcc7c 100%);
+    --gradient-dark: linear-gradient(135deg, #282c3f 0%, #141620 100%);
+    --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
     
-    /* Estados fijos */
-    --vesta-danger: hsl(0, 84.2%, 60.2%);
-    --radius: 12px;
+    --shadow-sm: 0 2px 8px rgba(40, 44, 63, 0.08);
+    --shadow-md: 0 4px 16px rgba(40, 44, 63, 0.12);
+    --shadow-lg: 0 8px 32px rgba(40, 44, 63, 0.16);
+    --shadow-gold: 0 4px 20px rgba(244, 185, 76, 0.3);
+    
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --backdrop-blur: blur(10px);
+}
 
-    /* === VARIABLES DE TEMA (Por defecto: CLARO) === */
-    /* Estas variables cambiarán dinámicamente con JS */
-    --theme-bg: #f8f9fa;             /* Fondo principal */
-    --theme-bg-secondary: #e9ecef;   /* Fondos secundarios */
-    --theme-card-bg: #ffffff;        /* Fondo de tarjetas */
-    --theme-text-main: #1a1d2e;      /* Texto principal */
-    --theme-text-muted: #6c757d;     /* Texto secundario */
-    --theme-border: #e9ecef;         /* Color de bordes */
-    --theme-input-bg: #ffffff;       /* Fondo de inputs */
+/* ANIMACIONES MEJORADAS */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-card {
+    animation: slideInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+/* CARDS INTERACTIVAS */
+.insurance-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.insurance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(244, 185, 76, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.insurance-card:hover::before {
+    left: 100%;
+}
+
+.insurance-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(40, 44, 63, 0.2);
 }
 
 /* === TEMA OSCURO (Se activa al añadir atributo data-theme="dark") === */

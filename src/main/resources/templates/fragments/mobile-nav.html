@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav th:fragment="mobile-nav" class="bottom-nav d-md-none">
+        <style>
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                padding: 0.5rem 0;
+                z-index: 1000;
+                display: flex;
+            }
+            
+            .nav-item {
+                flex: 1;
+                text-align: center;
+                position: relative;
+                padding: 0.5rem;
+                color: #6c757d;
+                text-decoration: none;
+            }
+            
+            .nav-item.active {
+                color: #f4b94c;
+            }
+            
+            .nav-item.active::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 4px;
+                background: #f4b94c;
+                border-radius: 0 0 4px 4px;
+            }
+        </style>
+        
+        <a href="/cliente/dashboard" class="nav-item active">
+            <i class="bi bi-house-door fs-5 d-block"></i>
+            <small>Inicio</small>
+        </a>
+        <a href="/cliente/analytics" class="nav-item">
+            <i class="bi bi-graph-up fs-5 d-block"></i>
+            <small>Analytics</small>
+        </a>
+        <a href="/cliente/comparador" class="nav-item">
+            <i class="bi bi-list-check fs-5 d-block"></i>
+            <small>Comparar</small>
+        </a>
+        <a href="/cliente/carrito" class="nav-item">
+            <i class="bi bi-cart fs-5 d-block"></i>
+            <small>Carrito</small>
+        </a>
+        <a href="/cliente/configuracion" class="nav-item">
+            <i class="bi bi-person fs-5 d-block"></i>
+            <small>Perfil</small>
+        </a>
+    </nav>
+</body>
+</html>
