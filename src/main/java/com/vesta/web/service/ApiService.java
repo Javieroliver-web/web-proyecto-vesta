@@ -1,6 +1,7 @@
 package com.vesta.web.service;
 
 import com.vesta.web.dto.AuthResponseDTO;
+import com.vesta.web.dto.ApiResponseWrapper;
 import com.vesta.web.dto.CartItem;
 import com.vesta.web.dto.LoginDTO;
 import com.vesta.web.dto.RegisterDTO;
@@ -49,10 +50,22 @@ public class ApiService {
             String url = apiUrl + "/auth/login";
             logger.debug("Intentando login para: {}", email);
 
-            ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(url, request, AuthResponseDTO.class);
+            // La API devuelve ApiResponse<AuthResponseDTO>, no directamente AuthResponseDTO
+            ResponseEntity<ApiResponseWrapper<AuthResponseDTO>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<AuthResponseDTO>>() {
+                    });
 
             logger.info("Login exitoso para: {}", email);
-            return response.getBody();
+
+            // Extraer el AuthResponseDTO del wrapper
+            if (response.getBody() != null && response.getBody().getData() != null) {
+                return response.getBody().getData();
+            } else {
+                throw new RuntimeException("Respuesta de la API vacía o inválida");
+            }
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente en login para {}: {} - {}", email, e.getStatusCode(),

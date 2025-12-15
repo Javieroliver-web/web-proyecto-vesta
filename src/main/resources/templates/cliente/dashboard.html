@@ -199,7 +199,10 @@
         /*<![CDATA[*/
         const authToken = [[${session.token}]];
         /*]]>*/
-        const API_URL = 'http://localhost:8080/api';
+        // Detectar si estamos en Docker o local
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8080/api' 
+            : 'http://vesta-api:8080/api';
 
         // 1. RECOMENDADOR
         async function cargarRecomendacion() {

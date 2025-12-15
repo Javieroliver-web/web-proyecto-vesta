@@ -445,13 +445,10 @@
                 if (response.ok) {
                     // Login exitoso
                     console.log('✅ Login exitoso');
+                    console.log('🔀 Redirigiendo a:', data.redirectUrl);
                     
-                    // Redirigir según el rol
-                    if (data.rol === 'ADMIN') {
-                        window.location.href = '/admin/dashboard';
-                    } else {
-                        window.location.href = '/cliente/dashboard';
-                    }
+                    // Usar la URL de redirección que nos da el servidor
+                    window.location.href = data.redirectUrl || '/cliente/dashboard';
                 } else {
                     // Error en las credenciales
                     console.error('❌ Error de login:', data);
