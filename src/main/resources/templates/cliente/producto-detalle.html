@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalles del Producto - Vesta Seguros</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        :root {
+            --vesta-gold: #f1a61c;
+            --vesta-dark: #282c3f;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .breadcrumb-link {
+            color: var(--vesta-gold);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .breadcrumb-link:hover {
+            color: #f4b94c;
+        }
+        
+        .product-image-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            position: relative;
+        }
+        
+        .product-image-large {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .category-badge-large {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--vesta-gold);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .product-info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .product-title-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--vesta-dark);
+            margin-bottom: 20px;
+        }
+        
+        .product-description-large {
+            font-size: 1.1rem;
+            color: #6c757d;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .coberturas-section h5 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--vesta-dark);
+            margin-bottom: 20px;
+        }
+        
+        .cobertura-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .cobertura-item i {
+            color: #28a745;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+        
+        .cobertura-item span {
+            color: #495057;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 100px;
+        }
+        
+        .price-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        
+        .price-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--vesta-dark);
+            margin-bottom: 5px;
+        }
+        
+        .price-period {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+        
+        .duration-selector {
+            margin: 30px 0;
+        }
+        
+        .duration-selector label {
+            font-weight: 600;
+            color: var(--vesta-dark);
+            margin-bottom: 10px;
+        }
+        
+        .duration-input {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1.1rem;
+        }
+        
+        .duration-input:focus {
+            border-color: var(--vesta-gold);
+            box-shadow: 0 0 0 0.2rem rgba(241, 166, 28, 0.25);
+        }
+        
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .summary-row.total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--vesta-gold);
+            padding-top: 12px;
+            border-top: 2px solid #dee2e6;
+            margin-top: 12px;
+        }
+        
+        .btn-comprar {
+            background: linear-gradient(135deg, var(--vesta-dark) 0%, #1a1d2e 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(40, 44, 63, 0.3);
+        }
+        
+        .btn-comprar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(40, 44, 63, 0.4);
+            color: white;
+        }
+        
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0 0 0;
+        }
+        
+        .benefits-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #28a745;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .benefits-list li i {
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header-nav}"></div>
+
+    <div class="container mt-4 mb-5">
+        <a href="/cliente/marketplace" class="breadcrumb-link">
+            <i class="bi bi-arrow-left"></i> Volver al marketplace
+        </a>
+
+        <div class="row g-4">
+            <!-- Left Column: Product Info -->
+            <div class="col-lg-7">
+                <div class="product-image-container mb-4">
+                    <img id="productImage" src="" alt="Producto" class="product-image-large">
+                    <span id="categoryBadge" class="category-badge-large"></span>
+                </div>
+
+                <div class="product-info-card">
+                    <h1 id="productTitle" class="product-title-large"></h1>
+                    <p id="productDescription" class="product-description-large"></p>
+
+                    <div class="coberturas-section">
+                        <h5>Coberturas Incluidas</h5>
+                        <div id="coberturasContainer">
+                            <!-- Coberturas dinámicas -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pricing -->
+            <div class="col-lg-5">
+                <div class="pricing-card">
+                    <div class="price-label">Precio base</div>
+                    <div>
+                        <span id="precioBase" class="price-amount">$0.00</span>
+                        <span class="price-period">/por día</span>
+                    </div>
+
+                    <div class="duration-selector">
+                        <label for="duracionInput">Duración</label>
+                        <div class="input-group">
+                            <input type="number" id="duracionInput" class="form-control duration-input" 
+                                   value="30" min="1" max="365" onchange="calcularPrecio()">
+                            <span class="input-group-text">días</span>
+                        </div>
+                        <small class="text-muted">Ajusta la duración según tus necesidades</small>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Impuestos (16%)</span>
+                            <span id="impuestos">$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-comprar" onclick="comprarAhora()">
+                        <i class="bi bi-cart-check-fill me-2"></i> Comprar ahora
+                    </button>
+
+                    <ul class="benefits-list">
+                        <li><i class="bi bi-check-circle-fill"></i> Activación inmediata</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Cancela cuando quieras</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Soporte 24/7</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/modal-utils.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const authToken = [[${session.token}]];
+        /*]]>*/
+        
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8080/api' 
+            : 'http://vesta-api:8080/api';
+
+        let productoActual = null;
+        const productoId = window.location.pathname.split('/').pop();
+
+        // Coberturas por categoría
+        const coberturasPorCategoria = {
+            'Viaje': [
+                'Asistencia médica hasta $50,000',
+                'Cancelación de viaje',
+                'Pérdida de equipaje hasta $2,000',
+                'Retraso de vuelo',
+                'Asistencia legal en el extranjero'
+            ],
+            'Tecnología': [
+                'Daños accidentales',
+                'Robo y hurto',
+                'Averías técnicas',
+                'Reemplazo inmediato',
+                'Soporte técnico 24/7'
+            ],
+            'Entretenimiento': [
+                'Cancelación del evento',
+                'Pérdida de entrada',
+                'Accidentes durante el evento',
+                'Reembolso garantizado',
+                'Cambio de fecha'
+            ],
+            'Movilidad': [
+                'Robo de bicicleta',
+                'Daños por accidente',
+                'Responsabilidad civil',
+                'Asistencia en carretera',
+                'Reemplazo temporal'
+            ],
+            'Mascotas': [
+                'Consultas veterinarias',
+                'Cirugías de emergencia',
+                'Medicamentos',
+                'Hospitalización',
+                'Vacunación anual'
+            ]
+        };
+
+        window.onload = function() {
+            cargarProducto();
+        };
+
+        async function cargarProducto() {
+            try {
+                const res = await fetch(`${API_URL}/productos/${productoId}`, {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                if (res.ok) {
+                    productoActual = await res.json();
+                    mostrarProducto();
+                    calcularPrecio();
+                } else {
+                    showErrorModal('Error', 'No se pudo cargar el producto');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                showErrorModal('Error', 'Error de conexión con el servidor');
+            }
+        }
+
+        function mostrarProducto() {
+            document.getElementById('productImage').src = productoActual.imagenUrl || 'https://via.placeholder.com/600x400';
+            document.getElementById('categoryBadge').textContent = productoActual.categoria;
+            document.getElementById('productTitle').textContent = productoActual.nombre;
+            document.getElementById('productDescription').textContent = productoActual.descripcion;
+            document.getElementById('precioBase').textContent = '$' + productoActual.precioBase;
+
+            // Mostrar coberturas
+            const coberturas = coberturasPorCategoria[productoActual.categoria] || [
+                'Cobertura completa',
+                'Asistencia 24/7',
+                'Sin franquicia',
+                'Activación inmediata',
+                'Cancelación flexible'
+            ];
+
+            const coberturasHTML = coberturas.map(c => `
+                <div class="cobertura-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>${c}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('coberturasContainer').innerHTML = coberturasHTML;
+        }
+
+        function calcularPrecio() {
+            if (!productoActual) return;
+
+            const duracion = parseInt(document.getElementById('duracionInput').value) || 30;
+            const precioBase = parseFloat(productoActual.precioBase);
+            
+            // Calcular subtotal (precio por día * duración)
+            const subtotal = precioBase * duracion;
+            const impuestos = subtotal * 0.16;
+            const total = subtotal + impuestos;
+
+            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('impuestos').textContent = '$' + impuestos.toFixed(2);
+            document.getElementById('total').textContent = '$' + total.toFixed(2);
+        }
+
+        async function comprarAhora() {
+            const duracion = parseInt(document.getElementById('duracionInput').value);
+            
+            if (duracion < 1 || duracion > 365) {
+                showErrorModal('Error', 'La duración debe estar entre 1 y 365 días');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/polizas/contratar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        productoId: productoActual.id,
+                        duracion: duracion
+                    })
+                });
+
+                if (res.ok) {
+                    showSuccessModal(
+                        '¡Seguro Contratado!',
+                        'Tu póliza está activa. Puedes verla en "Mis Pólizas".',
+                        () => window.location.href = '/cliente/mis-polizas'
+                    );
+                } else {
+                    const error = await res.json();
+                    showErrorModal('Error', error.message || 'No se pudo contratar el seguro');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                showErrorModal('Error', 'Error de conexión con el servidor');
+            }
+        }
+    </script>
+</body>
+</html>

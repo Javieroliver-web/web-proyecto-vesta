@@ -92,27 +92,13 @@
             </button>
         </div>
         
-        <div class="row mb-5">
-            <div class="col-md-6 mb-3">
-                <div class="card policy-card border-0 shadow-sm hover-lift">
-                    <div class="card-body d-flex justify-content-between align-items-center p-4">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-phone-fill text-white fs-5"></i>
-                                </div>
-                                <h5 class="card-title fw-bold mb-0" style="color: #282c3f;">Seguro Móvil</h5>
-                            </div>
-                            <p class="mb-0 text-muted small mt-2">
-                                <i class="bi bi-calendar-check me-1"></i>Vence: 12/12/2025 • 
-                                <span class="badge bg-success">Cobertura Total</span>
-                            </p>
-                        </div>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#siniestroModal" onclick="setPoliza(1)">
-                            <i class="bi bi-exclamation-triangle me-1"></i> Reportar
-                        </button>
-                    </div>
+        <!-- Contenedor dinámico para pólizas del usuario -->
+        <div id="polizasContainer" class="row mb-5">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando pólizas...</span>
                 </div>
+                <p class="text-muted mt-2">Cargando tus pólizas...</p>
             </div>
         </div>
 
@@ -219,7 +205,78 @@
                 }
             } catch (e) { console.error("Error IA Recomendación", e); }
         }
-        window.onload = cargarRecomendacion;
+
+        // NUEVO: Cargar pólizas del usuario
+        async function cargarPolizas() {
+            try {
+                const res = await fetch(`${API_URL}/polizas/usuario`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                if (res.ok) {
+                    const polizas = await res.json();
+                    const container = document.getElementById('polizasContainer');
+                    
+                    if (polizas.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-12 text-center py-5">
+                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">No tienes pólizas activas</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Renderizar pólizas
+                    container.innerHTML = polizas.map(poliza => `
+                        <div class="col-md-6 mb-3">
+                            <div class="card policy-card border-0 shadow-sm hover-lift">
+                                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-phone-fill text-white fs-5"></i>
+                                            </div>
+                                            <h5 class="card-title fw-bold mb-0" style="color: #282c3f;">${poliza.producto.nombre}</h5>
+                                        </div>
+                                        <p class="mb-0 text-muted small mt-2">
+                                            <i class="bi bi-calendar-check me-1"></i>Vence: ${poliza.fechaFin} • 
+                                            <span class="badge bg-success">Cobertura Total</span>
+                                        </p>
+                                    </div>
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#siniestroModal" onclick="setPoliza(${poliza.id})">
+                                        <i class="bi bi-exclamation-triangle me-1"></i> Reportar
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    console.error('Error al cargar pólizas');
+                    document.getElementById('polizasContainer').innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-exclamation-triangle fs-1 text-danger"></i>
+                            <p class="text-danger mt-2">Error al cargar pólizas</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error("Error cargando pólizas", e);
+                document.getElementById('polizasContainer').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-exclamation-triangle fs-1 text-danger"></i>
+                        <p class="text-danger mt-2">Error de conexión</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar ambos al iniciar
+        window.onload = function() {
+            cargarRecomendacion();
+            cargarPolizas();
+        };
 
         // 2. CHATBOT
         async function enviarMensaje() {
