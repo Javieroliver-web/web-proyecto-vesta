@@ -24,4 +24,20 @@ public class HomeController {
         // Si no hay sesión, mostrar la Landing Page pública
         return "index";
     }
+
+    /**
+     * Página para solicitar recuperación de contraseña
+     */
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "forgot-password";
+    }
+
+    /**
+     * Página para resetear contraseña con código
+     */
+    @GetMapping("/reset-password")
+    public String resetPassword() {
+        return "reset-password";
+    }
 }
