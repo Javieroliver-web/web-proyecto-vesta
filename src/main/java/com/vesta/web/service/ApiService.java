@@ -109,6 +109,166 @@ public class ApiService {
         }
     }
 
+    /**
+     * Solicita recuperación de contraseña
+     */
+    public String forgotPassword(String email) {
+        try {
+            String url = apiUrl + "/auth/forgot-password";
+            logger.debug("Solicitando recuperación de contraseña para: {}", email);
+
+            Map<String, String> request = new HashMap<>();
+            request.put("email", email);
+
+            ResponseEntity<ApiResponseWrapper<String>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<String>>() {
+                    });
+
+            logger.info("Solicitud de recuperación enviada para: {}", email);
+
+            if (response.getBody() != null && response.getBody().getMessage() != null) {
+                return response.getBody().getMessage();
+            } else {
+                return "Se ha enviado un código de verificación a tu correo electrónico";
+            }
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en forgot-password para {}: {} - {}", email, e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("El correo electrónico no está registrado");
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor en forgot-password: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado en forgot-password: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al solicitar recuperación de contraseña: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Solicita recuperación de contraseña con método específico
+     */
+    public String forgotPassword(String email, String method) {
+        try {
+            String url = apiUrl + "/auth/forgot-password";
+            logger.debug("Solicitando recuperación de contraseña para: {} por {}", email, method);
+
+            Map<String, String> request = new HashMap<>();
+            request.put("email", email);
+            request.put("method", method);
+
+            ResponseEntity<ApiResponseWrapper<String>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<String>>() {
+                    });
+
+            logger.info("Solicitud de recuperación enviada para: {} por {}", email, method);
+
+            if (response.getBody() != null && response.getBody().getMessage() != null) {
+                return response.getBody().getMessage();
+            } else {
+                return "Se ha enviado un código de verificación";
+            }
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en forgot-password para {}: {} - {}", email, e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("El correo electrónico no está registrado");
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor en forgot-password: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado en forgot-password: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al solicitar recuperación de contraseña");
+        }
+    }
+
+    /**
+     * Verifica qué métodos de recuperación están disponibles para un usuario
+     */
+    public Map<String, Object> checkRecoveryMethods(String email) {
+        try {
+            String url = apiUrl + "/auth/check-recovery-methods";
+            logger.debug("Verificando métodos de recuperación para: {}", email);
+
+            Map<String, String> request = new HashMap<>();
+            request.put("email", email);
+
+            ResponseEntity<ApiResponseWrapper<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<Map<String, Object>>>() {
+                    });
+
+            return response.getBody().getData();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error verificando métodos: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error al verificar métodos de recuperación");
+        } catch (Exception e) {
+            logger.error("Error inesperado verificando métodos: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al verificar métodos de recuperación");
+        }
+    }
+
+    /**
+     * Resetea la contraseña con un token válido
+     */
+    public String resetPassword(String token, String newPassword) {
+        try {
+            String url = apiUrl + "/auth/reset-password";
+            logger.debug("Reseteando contraseña con token");
+
+            Map<String, String> request = new HashMap<>();
+            request.put("token", token);
+            request.put("newPassword", newPassword);
+
+            ResponseEntity<ApiResponseWrapper<String>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<String>>() {
+                    });
+
+            logger.info("Contraseña reseteada exitosamente");
+
+            if (response.getBody() != null && response.getBody().getMessage() != null) {
+                return response.getBody().getMessage();
+            } else {
+                return "Contraseña actualizada exitosamente";
+            }
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en reset-password: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("Token inválido o expirado");
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor en reset-password: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado en reset-password: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al resetear contraseña: " + e.getMessage());
+        }
+    }
+
     // === VENTAS (CLIENTE) ===
 
     public void realizarCheckout(Long usuarioId, List<CartItem> carrito) {
