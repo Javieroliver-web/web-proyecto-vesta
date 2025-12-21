@@ -3,7 +3,9 @@ package com.vesta.web.controller;
 import com.vesta.web.dto.AuthResponseDTO;
 import com.vesta.web.service.ApiService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,10 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    @Autowired
-    private ApiService apiService;
+    private final ApiService apiService;
 
     // CAMBIO: Ahora la página de login se sirve en /login-page
     // La raíz "/" queda libre para el HomeController (Landing Page)
@@ -43,7 +46,7 @@ public class LoginController {
     @ResponseBody
     public ResponseEntity<?> processLogin(@RequestBody LoginRequest request, HttpSession session) {
         try {
-            System.out.println("🔐 Procesando login para: " + request.getEmail());
+            logger.info("🔐 Procesando login para: {}", request.getEmail());
 
             // Validar que los campos no estén vacíos
             if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
@@ -70,13 +73,12 @@ public class LoginController {
             session.setAttribute("usuarioId", response.getId());
 
             // Logging detallado para diagnóstico
-            System.out.println(
-                    "✅ Login exitoso. Sesión creada para: " + response.getNombre() + " (ID: " + response.getId() + ")");
-            System.out.println("📋 Datos guardados en sesión:");
-            System.out.println("   - Token: " + (response.getToken() != null ? "✓ Presente" : "✗ NULL"));
-            System.out.println("   - Rol: " + response.getRol());
-            System.out.println("   - Nombre: " + response.getNombre());
-            System.out.println("   - ID: " + response.getId());
+            logger.info("✅ Login exitoso. Sesión creada para: {} (ID: {})", response.getNombre(), response.getId());
+            logger.debug("📋 Datos guardados en sesión:");
+            logger.debug("   - Token: {}", (response.getToken() != null ? "✓ Presente" : "✗ NULL"));
+            logger.debug("   - Rol: {}", response.getRol());
+            logger.debug("   - Nombre: {}", response.getNombre());
+            logger.debug("   - ID: {}", response.getId());
 
             // Determinar URL de redirección según el rol
             String redirectUrl;
@@ -86,7 +88,7 @@ public class LoginController {
                 redirectUrl = "/cliente/dashboard";
             }
 
-            System.out.println("🔀 URL de redirección: " + redirectUrl);
+            logger.debug("🔀 URL de redirección: {}", redirectUrl);
 
             // Crear respuesta con URL de redirección
             Map<String, Object> responseData = new HashMap<>();
@@ -99,7 +101,7 @@ public class LoginController {
             return ResponseEntity.ok(responseData);
 
         } catch (RuntimeException e) {
-            System.err.println("❌ Error en login: " + e.getMessage());
+            logger.error("❌ Error en login: {}", e.getMessage());
 
             // Devolver error en formato JSON
             Map<String, String> error = new HashMap<>();
@@ -107,8 +109,7 @@ public class LoginController {
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         } catch (Exception e) {
-            System.err.println("❌ Error inesperado: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("❌ Error inesperado en login", e);
 
             // Error genérico
             Map<String, String> error = new HashMap<>();
@@ -120,7 +121,7 @@ public class LoginController {
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        System.out.println("🚪 Cerrando sesión");
+        logger.info("🚪 Cerrando sesión");
         session.invalidate();
         return "redirect:/"; // Al salir, volvemos a la Landing Page
     }

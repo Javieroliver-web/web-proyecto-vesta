@@ -3,7 +3,9 @@ package com.vesta.web.controller;
 import com.vesta.web.dto.CartItem;
 import com.vesta.web.service.ApiService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,23 +16,25 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/cliente/carrito")
+@RequiredArgsConstructor
 public class CartController {
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
-    @Autowired
-    private ApiService apiService;
+    private final ApiService apiService;
 
     @GetMapping
     public String verCarrito(HttpSession session, Model model) {
         // Verificar sesión
-        if (session.getAttribute("token") == null) return "redirect:/";
+        if (session.getAttribute("token") == null)
+            return "redirect:/";
 
         List<CartItem> carrito = obtenerCarrito(session);
         BigDecimal total = calcularTotal(carrito);
-        
+
         model.addAttribute("carrito", carrito);
         model.addAttribute("total", total);
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        
+
         return "cliente/carrito";
     }
 
@@ -38,7 +42,7 @@ public class CartController {
     @ResponseBody // Respuesta JSON para el fetch de JS
     public String agregarItem(@RequestBody CartItem item, HttpSession session) {
         List<CartItem> carrito = obtenerCarrito(session);
-        
+
         boolean existe = false;
         for (CartItem i : carrito) {
             if (i.getSeguroId().equals(item.getSeguroId())) {
@@ -47,12 +51,12 @@ public class CartController {
                 break;
             }
         }
-        
+
         if (!existe) {
             item.setCantidad(1);
             carrito.add(item);
         }
-        
+
         return "OK";
     }
 
@@ -69,20 +73,20 @@ public class CartController {
     public String procesarCheckout(HttpSession session) {
         Long usuarioId = (Long) session.getAttribute("usuarioId");
         List<CartItem> carrito = obtenerCarrito(session);
-        
+
         if (carrito.isEmpty()) {
             return "redirect:/cliente/carrito?error=empty";
         }
 
         try {
             apiService.realizarCheckout(usuarioId, carrito);
-            
+
             // Vaciar carrito tras compra exitosa
             session.setAttribute("carrito", new ArrayList<>());
             return "redirect:/cliente/dashboard?success=checkout";
-            
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error procesando checkout", e);
             return "redirect:/cliente/carrito?error=api_fail";
         }
     }

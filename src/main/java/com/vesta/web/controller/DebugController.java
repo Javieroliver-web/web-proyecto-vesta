@@ -1,6 +1,9 @@
 package com.vesta.web.controller;
 
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +14,13 @@ import java.util.Map;
 /**
  * Controlador de diagnóstico para verificar sesiones HTTP
  * TEMPORAL - Solo para debugging
+ * IMPORTANTE: Solo disponible en perfil 'dev' por seguridad
  */
 @RestController
 @RequestMapping("/debug")
+@Profile("dev")
 public class DebugController {
+    private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
 
     @GetMapping("/session")
     public Map<String, Object> checkSession(HttpSession session) {
@@ -32,10 +38,10 @@ public class DebugController {
         info.put("usuarioNombre", session.getAttribute("usuarioNombre"));
         info.put("usuarioId", session.getAttribute("usuarioId"));
 
-        System.out.println("🔍 DEBUG - Verificación de sesión:");
-        System.out.println("   Session ID: " + session.getId());
-        System.out.println("   Token: " + (session.getAttribute("token") != null ? "✓" : "✗"));
-        System.out.println("   Rol: " + session.getAttribute("rol"));
+        logger.debug("🔍 DEBUG - Verificación de sesión:");
+        logger.debug("   Session ID: {}", session.getId());
+        logger.debug("   Token: {}", (session.getAttribute("token") != null ? "✓" : "✗"));
+        logger.debug("   Rol: {}", session.getAttribute("rol"));
 
         return info;
     }
