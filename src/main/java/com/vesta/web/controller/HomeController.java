@@ -148,4 +148,20 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
+
+    /**
+     * Página de Preguntas Frecuentes
+     */
+    @GetMapping("/faq")
+    public String faq() {
+        return "faq";
+    }
+
+    /**
+     * Página de Seguros Disponibles
+     */
+    @GetMapping("/seguros")
+    public String seguros() {
+        return "seguros";
+    }
 }

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguros Disponibles - Vesta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        :root {
+            --vesta-gold: #f1a61c;
+            --vesta-navy: #282c3f;
+        }
+        body {
+            background: #f8f9fa;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);
+            color: white;
+            padding: 4rem 0 3rem;
+            margin-bottom: 3rem;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        .filter-btn {
+            border: 2px solid #e9ecef;
+            background: white;
+            color: #6c757d;
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--vesta-gold);
+            background: linear-gradient(135deg, var(--vesta-gold) 0%, #f4b94c 100%);
+            color: white;
+        }
+        .insurance-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .insurance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 185, 76, 0.15), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+        .insurance-card:hover::before {
+            left: 100%;
+        }
+        .insurance-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .badge-category {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%);
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(241, 166, 28, 0.3);
+            z-index: 2;
+            font-size: 0.85rem;
+        }
+        .price-tag {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f1a61c 0%, #f4b94c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feature-list li i {
+            color: var(--vesta-gold);
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1>Seguros Disponibles</h1>
+            <p class="lead">Protección instantánea para cada momento de tu vida</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="filter-bar">
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <span class="fw-bold text-muted me-2">Filtrar por:</span>
+                <button class="filter-btn active" onclick="filterCategory('all')">Todos</button>
+                <button class="filter-btn" onclick="filterCategory('viaje')">Viaje</button>
+                <button class="filter-btn" onclick="filterCategory('tecnologia')">Tecnología</button>
+                <button class="filter-btn" onclick="filterCategory('entretenimiento')">Entretenimiento</button>
+                <button class="filter-btn" onclick="filterCategory('hogar')">Hogar</button>
+                <button class="filter-btn" onclick="filterCategory('mascotas')">Mascotas</button>
+            </div>
+        </div>
+
+        <div class="row g-4" id="insuranceGrid">
+            <!-- Seguro de Viaje -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="viaje">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500" class="card-img-top" alt="Viaje" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Viaje</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Viaje</h5>
+                        <p class="text-muted small">Protección completa durante tus vacaciones y viajes de negocios.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Asistencia médica 24/7</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Cancelación de vuelos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Pérdida de equipaje</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$15.99<span class="fs-6 text-muted fw-normal">/día</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seguro de Dispositivos -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="tecnologia">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500" class="card-img-top" alt="Móvil" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Tecnología</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Dispositivos</h5>
+                        <p class="text-muted small">Protege tu smartphone, tablet y otros gadgets contra daños y robos.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Rotura de pantalla</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Daños por líquidos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Robo y hurto</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$9.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seguro de Eventos -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="entretenimiento">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img th:src="@{/images/eventos.png}" class="card-img-top" alt="Eventos" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Entretenimiento</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Eventos</h5>
+                        <p class="text-muted small">Asegura tus entradas a conciertos, festivales y eventos deportivos.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Cancelación del evento</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Imposibilidad de asistir</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Reembolso total</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$5.99<span class="fs-6 text-muted fw-normal">/evento</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seguro de Hogar Temporal -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="hogar">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500" class="card-img-top" alt="Hogar" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Hogar</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Hogar Temporal</h5>
+                        <p class="text-muted small">Protección para alquileres vacacionales y estancias temporales.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Daños a la propiedad</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Robo de pertenencias</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$12.99<span class="fs-6 text-muted fw-normal">/día</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seguro de Mascotas -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="mascotas">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=500" class="card-img-top" alt="Mascotas" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Mascotas</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Mascotas</h5>
+                        <p class="text-muted small">Cobertura veterinaria y responsabilidad civil para tu mejor amigo.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Gastos veterinarios</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Cirugías de emergencia</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$19.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seguro de Alquiler de Vehículos -->
+            <div class="col-md-6 col-lg-4 insurance-item" data-category="viaje">
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=500" class="card-img-top" alt="Vehículos" style="height: 200px; object-fit: cover;">
+                        <span class="badge-category">Viaje</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Seguro de Alquiler de Vehículos</h5>
+                        <p class="text-muted small">Protección completa para vehículos de alquiler durante tus viajes.</p>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Daños al vehículo</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Robo del vehículo</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">$8.99<span class="fs-6 text-muted fw-normal">/día</span></div>
+                            </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <div class="alert alert-info d-inline-block">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>¿Necesitas ayuda?</strong> Nuestro equipo está disponible para asesorarte en la elección del seguro perfecto para ti.
+                <a href="/faq" class="alert-link ms-2">Ver Preguntas Frecuentes</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filterCategory(category) {
+            const items = document.querySelectorAll('.insurance-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter items
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
