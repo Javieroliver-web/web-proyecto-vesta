@@ -226,7 +226,7 @@
             <!-- Left Column: Product Info -->
             <div class="col-lg-7">
                 <div class="product-image-container mb-4">
-                    <img id="productImage" src="" alt="Producto" class="product-image-large">
+                    <img id="productImage" src="" alt="Producto" class="product-image-large" onerror="handleImageError(this)">
                     <span id="categoryBadge" class="category-badge-large"></span>
                 </div>
 
@@ -295,7 +295,7 @@
     <script src="/static/js/modal-utils.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const authToken = [[${session.token}]];
+        const authToken = /*[[${session.token}]]*/ null;
         /*]]>*/
         
         const API_URL = window.location.hostname === 'localhost' 
@@ -347,6 +347,25 @@
         window.onload = function() {
             cargarProducto();
         };
+
+        // Función para obtener imagen por defecto según categoría (Igual que en marketplace)
+        function getDefaultImage(categoria) {
+            const imageMap = {
+                'Viaje': '/images/productos/viaje.png',
+                'Tecnología': '/images/productos/tecnologia.png',
+                'Entretenimiento': '/images/productos/Entretenimiento.jpg',
+                'Movilidad': '/images/productos/movilidad.png',
+                'Mascotas': '/images/productos/mascotas.png'
+            };
+            return imageMap[categoria] || '/images/productos/viaje.png';
+        }
+
+        function handleImageError(img) {
+            img.onerror = null; // Prevenir loop infinito
+            if (productoActual) {
+                img.src = getDefaultImage(productoActual.categoria);
+            }
+        }
 
         async function cargarProducto() {
             try {

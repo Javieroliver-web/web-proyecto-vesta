@@ -11,6 +11,6 @@ public class VestaWebApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(VestaWebApplication.class, args);
-        logger.info("🌐 WEB Vesta iniciada en el puerto 80");
+        logger.info("WEB Vesta iniciada en el puerto 8081");
     }
 }

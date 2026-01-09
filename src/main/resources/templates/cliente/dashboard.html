@@ -44,32 +44,34 @@
             box-shadow: 0 2px 8px rgba(241, 166, 28, 0.2);
         }
         .chat-bot { 
-            background-color: #f8f9fa; 
-            color: #282c3f; 
+            background-color: var(--theme-bg-secondary, #f8f9fa); 
+            color: var(--theme-text-main, #282c3f); 
             align-self: flex-start; 
             border-bottom-left-radius: 4px;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--theme-border, #e9ecef);
         }
         
         .ai-recommendation-card {
-            background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+            background: linear-gradient(135deg, var(--theme-card-bg, #e3f2fd) 0%, var(--theme-bg-secondary, #ffffff) 100%);
             border-left: 4px solid #f1a61c;
             border-radius: 12px;
             animation: slideInDown 0.5s ease-out;
+            color: var(--theme-text-main, #212529);
         }
         
         .policy-card {
             transition: all 0.3s ease;
             border-left: 4px solid #f1a61c;
+            background-color: var(--theme-card-bg, white);
         }
         
         .policy-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-lg);
         }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
     <div th:replace="~{fragments/header :: header-nav}"></div>
 
@@ -78,13 +80,13 @@
         <div id="aiRecommendation" class="alert ai-recommendation-card border-0 shadow-sm d-none align-items-center mb-4" role="alert">
             <div class="fs-1 me-3">🌦️</div>
             <div class="flex-grow-1">
-                <h6 class="fw-bold mb-1" style="color: #282c3f;">💡 Sugerencia Inteligente Vesta</h6>
+                <h6 class="fw-bold mb-1">💡 Sugerencia Inteligente Vesta</h6>
                 <span id="recText" class="text-muted">Analizando previsión meteorológica y tu perfil...</span>
             </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold" style="color: #282c3f;">
+            <h4 class="fw-bold">
                 <i class="bi bi-shield-check text-primary me-2"></i>Mis Pólizas Activas
             </h4>
             <button class="btn btn-outline-primary btn-sm" onclick="cargarRecomendacion()">
@@ -104,13 +106,12 @@
 
         <div class="mb-4">
             <h5 class="text-secondary fw-bold mb-3">
-                <i class="bi bi-grid-3x3-gap me-2"></i>Explorar Catálogo
+                <i class="bi bi-grid-3x3-gap me-2"></i>Te recomendamos
             </h5>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm p-4 text-center" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 4px solid #f4b94c !important;">
-                        <i class="bi bi-hourglass-split text-primary fs-1 mb-3"></i>
-                        <p class="text-muted fw-semibold">Próximamente más seguros...</p>
+            <div id="recommendedContainer" class="row g-4">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando recomendaciones...</span>
                     </div>
                 </div>
             </div>
@@ -128,12 +129,12 @@
                     <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Asistente Legal Vesta</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body d-flex flex-column" id="chatBody" style="height: 350px; background-color: #fff;">
+                <div class="modal-body d-flex flex-column" id="chatBody" style="height: 350px;">
                     <div class="chat-message chat-bot">
                         Hola, soy la IA de Vesta. Pregúntame sobre coberturas o dudas legales.
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+                <div class="modal-footer">
                     <div class="input-group">
                         <input type="text" id="chatInput" class="form-control border-0" placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter') enviarMensaje()">
                         <button class="btn btn-primary" onclick="enviarMensaje()"><i class="bi bi-send-fill"></i></button>
@@ -183,7 +184,7 @@
     
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const authToken = [[${session.token}]];
+        const authToken = /*[[${session.token}]]*/ null;
         /*]]>*/
         // Detectar si estamos en Docker o local
         const API_URL = window.location.hostname === 'localhost' 
@@ -204,6 +205,18 @@
                     document.getElementById('aiRecommendation').classList.add('d-flex');
                 }
             } catch (e) { console.error("Error IA Recomendación", e); }
+        }
+
+        // Función para obtener imagen por defecto según categoría
+        function getDefaultImage(categoria) {
+            const imageMap = {
+                'Viaje': '/images/productos/viaje.png',
+                'Tecnología': '/images/productos/tecnologia.png',
+                'Entretenimiento': '/images/productos/Entretenimiento.jpg',
+                'Movilidad': '/images/productos/movilidad.png',
+                'Mascotas': '/images/productos/mascotas.png'
+            };
+            return imageMap[categoria] || '/images/productos/viaje.png';
         }
 
         // NUEVO: Cargar pólizas del usuario
@@ -235,10 +248,11 @@
                                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                                     <div>
                                         <div class="d-flex align-items-center gap-2 mb-2">
-                                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f4b94c 0%, #f1a61c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="bi bi-phone-fill text-white fs-5"></i>
-                                            </div>
-                                            <h5 class="card-title fw-bold mb-0" style="color: #282c3f;">${poliza.producto.nombre}</h5>
+                                            <img src="${poliza.producto.imagenUrl}" 
+                                                 alt="${poliza.producto.nombre}"
+                                                 style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover;"
+                                                 onerror="this.onerror=null; this.src=getDefaultImage('${poliza.producto.categoria}');">
+                                            <h5 class="card-title fw-bold mb-0">${poliza.producto.nombre}</h5>
                                         </div>
                                         <p class="mb-0 text-muted small mt-2">
                                             <i class="bi bi-calendar-check me-1"></i>Vence: ${poliza.fechaFin} • 
@@ -248,9 +262,9 @@
                                     <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#siniestroModal" onclick="setPoliza(${poliza.id})">
                                         <i class="bi bi-exclamation-triangle me-1"></i> Reportar
                                     </button>
-                                }
                             </div>
                         </div>
+                    </div>
                     `).join('');
                 } else {
                     console.error('Error al cargar pólizas');
@@ -272,10 +286,58 @@
             }
         }
 
-        // Cargar ambos al iniciar
+        // 3. CARGAR CATÁLOGO RECOMENDADO (3 ALEATORIOS)
+        async function cargarRecomendacionesCatalogo() {
+            try {
+                const res = await fetch(`${API_URL}/productos`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                if (res.ok) {
+                    let productos = await res.json();
+                    
+                    // Barajar array (Fisher-Yates shuffle)
+                    for (let i = productos.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [productos[i], productos[j]] = [productos[j], productos[i]];
+                    }
+                    
+                    // Tomar los primeros 3
+                    const recomendados = productos.slice(0, 3);
+                    
+                    const container = document.getElementById('recommendedContainer');
+                    if(recomendados.length === 0) {
+                         container.innerHTML = '<p class="text-muted">No hay recomendaciones disponibles por el momento.</p>';
+                         return;
+                    }
+
+                    container.innerHTML = recomendados.map(p => `
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm p-3 hover-lift" onclick="window.location.href='/cliente/producto/${p.id}'" style="cursor: pointer;">
+                                <img src="${p.imagenUrl || '/images/default.png'}" class="card-img-top rounded mb-3" style="height: 150px; object-fit: cover;" 
+                                     onerror="this.onerror=null; this.src=getDefaultImage('${p.categoria}');">
+                                <h6 class="fw-bold mb-2">${p.nombre}</h6>
+                                <p class="text-muted small mb-2 text-truncate">${p.descripcion}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="text-primary fw-bold">$${p.precioBase}/día</span>
+                                    <span class="badge bg-light text-dark border">Ver más</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                }
+            } catch (e) {
+                console.error("Error al cargar recomendaciones de catálogo", e);
+                document.getElementById('recommendedContainer').innerHTML = '<p class="text-muted">No se pudieron cargar recomendaciones.</p>';
+            }
+        }
+
+        // Cargar todo al iniciar
         window.onload = function() {
             cargarRecomendacion();
             cargarPolizas();
+            cargarRecomendacionesCatalogo();
         };
 
         // 2. CHATBOT

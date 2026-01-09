@@ -3,14 +3,52 @@
 <body>
     <nav th:fragment="header-nav" class="navbar navbar-expand-lg shadow-sm" style="background: linear-gradient(135deg, #282c3f 0%, #3c425e 100%); border-bottom: 3px solid #f1a61c;">
         
-        <script>
-            (function() {
-                const savedTheme = localStorage.getItem('theme');
-                if (savedTheme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            })();
-        </script>
+    <script th:inline="javascript">
+        (function() {
+            // 1. Aplicar Local Storage inmediatamente (para evitar flash)
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+
+            // 2. Sincronizar con BD (si hay sesión activa)
+            // Nota: Thymeleaf inyectará los valores solo si existen en la sesión
+            /*<![CDATA[*/
+            const userId = /*[[${session.usuarioId}]]*/ null;
+            const token = /*[[${session.token}]]*/ null;
+            /*]]>*/
+
+            if (userId && token) {
+                const apiBase = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:8080/api' 
+                    : 'http://vesta-api:8080/api';
+
+                // Fetch silencioso para actualizar preferencia
+                fetch(`${apiBase}/usuarios/${userId}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(res => {
+                    if(res.ok) return res.json();
+                    throw new Error("Auth Error");
+                })
+                .then(user => {
+                    if (user.tema) {
+                        const currentLocal = localStorage.getItem('theme');
+                        // Si la BD tiene un tema diferente, actualizamos el navegador
+                        if (user.tema !== currentLocal) {
+                            console.log("Syncing theme from DB:", user.tema);
+                            localStorage.setItem('theme', user.tema);
+                            document.documentElement.setAttribute('data-theme', user.tema);
+                        }
+                    }
+                })
+                .catch(err => {
+                    // Silenciar errores de conexión para no molestar al usuario
+                    // console.debug("Theme sync skipped");
+                });
+            }
+        })();
+    </script>
 
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/cliente/marketplace" style="color: #f4b94c; font-size: 1.5rem; letter-spacing: 2px; transition: all 0.3s ease;">
@@ -20,6 +58,9 @@
             <div class="d-flex align-items-center gap-3 w-100" th:if="${session.token != null}">
                 <!-- Navegación principal -->
                 <div class="d-none d-lg-flex gap-3 ms-4">
+                    <a href="/cliente/dashboard" class="nav-link text-white fw-semibold" style="transition: color 0.3s;">
+                        <i class="bi bi-house-door me-1"></i> Inicio
+                    </a>
                     <a href="/cliente/marketplace" class="nav-link text-white fw-semibold" style="transition: color 0.3s;">
                         <i class="bi bi-shop me-1"></i> Marketplace
                     </a>
