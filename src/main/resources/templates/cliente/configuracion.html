@@ -57,10 +57,12 @@
                                 <form id="locationForm">
                                     <div class="mb-3">
                                         <label class="form-label">Ciudad Predeterminada</label>
-                                        <div class="input-group">
+                                        <div class="input-group position-relative">
                                             <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                            <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES">
+                                            <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES" autocomplete="off">
                                             <button class="btn btn-primary" type="submit">Guardar</button>
+                                            <!-- Lista de Autocompletado -->
+                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 200px; overflow-y: auto;"></div>
                                         </div>
                                         <div class="form-text">Usado para la previsión meteorológica del Dashboard.</div>
                                     </div>
@@ -100,8 +102,44 @@
                                 <div id="msgBox" class="mt-3" style="display:none"></div>
                             </div>
                         </div>
+
+                        <!-- ZONA DE PELIGRO -->
+                        <div class="card border-danger shadow-sm mt-4">
+                            <div class="card-header bg-danger-subtle text-danger border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Zona de Peligro</h5>
+                            </div>
+                            <div class="card-body px-4 pb-4">
+                                <p class="text-muted">Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate.</p>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    Eliminar Cuenta
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">¿Estás absolutamente seguro?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Esta acción <strong>no se puede deshacer</strong>. Esto eliminará permanentemente tu cuenta, tus pólizas contratadas y tus siniestros registrados.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Escribe <strong>BORRAR</strong> para confirmar:</label>
+                        <input type="text" class="form-control" id="deleteConfirmInput" onkeyup="verificarBorrado()" placeholder="Escribe BORRAR aquí">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnDeleteFinal" disabled onclick="eliminarCuenta()">Eliminar esta cuenta</button>
                 </div>
             </div>
         </div>
@@ -150,9 +188,7 @@
         // === LÓGICA CAMBIO CONTRASEÑA ===
         const userId = [[${usuarioId}]];
         const token = [[${session.token}]];
-        const apiBaseUrl = window.location.hostname === 'localhost' 
-             ? 'http://localhost:8080/api/usuarios' 
-             : 'http://vesta-api:8080/api/usuarios';
+        const apiBaseUrl = window.location.protocol + '//' + window.location.hostname + ':8080/api/usuarios';
 
         // 1. CARGAR DATOS USUARIO
         async function loadUserData() {
@@ -205,15 +241,87 @@
                 if (res.ok) {
                     msgBox.style.display = 'block';
                     msgBox.className = 'alert alert-success mt-2';
-                    msgBox.innerText = 'Ubicación actualizada correctamente.';
+                    msgBox.innerText = 'Ubicación verificada y guardada correctamente.';
                     setTimeout(() => msgBox.style.display = 'none', 3000);
+                    // Actualizar localStorage para el dashboard
+                    loadUserData(); 
                 } else {
-                    throw new Error("Error Updating");
+                    const err = await res.json();
+                    msgBox.style.display = 'block';
+                    msgBox.className = 'alert alert-danger mt-2';
+                    msgBox.innerText = err.message || 'Error al validar la ubicación.';
+                    setTimeout(() => msgBox.style.display = 'none', 3000);
                 }
             } catch (e) {
+                console.error(e);
                 msgBox.style.display = 'block';
                 msgBox.className = 'alert alert-danger mt-2';
-                msgBox.innerText = 'Error al guardar ubicación.';
+                msgBox.innerText = 'Error de conexión con el servidor.';
+                setTimeout(() => msgBox.style.display = 'none', 3000);
+            }
+        });
+
+        // === AUTOCOMPLETADO DE CIUDADES ===
+        const ciudadInput = document.getElementById('ciudadInput');
+        const cityList = document.getElementById('cityList');
+        let debounceTimer;
+
+        // Base URL para Clima
+        const weatherApiUrl = apiBaseUrl.replace('/usuarios', '/clima');
+
+        ciudadInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const query = this.value;
+            if (query.length < 3) {
+                cityList.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    // Usar token si fuera necesario, pero el endpoint es público/autenticado segun config
+                    // Asumimos que requiere token si está segura
+                    const res = await fetch(`${weatherApiUrl}/buscar?q=${query}`, {
+                         headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (res.ok) {
+                        const cities = await res.json();
+                        renderCities(cities);
+                    }
+                } catch(e) { console.error("Error fetching cities", e); }
+            }, 400);
+        });
+
+        function renderCities(cities) {
+            cityList.innerHTML = '';
+            if (!cities || cities.length === 0) {
+                cityList.style.display = 'none';
+                return;
+            }
+
+            cities.forEach(city => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action text-start';
+                const country = city.country ? `, ${city.country}` : '';
+                const state = city.state ? ` (${city.state})` : '';
+                const fullName = `${city.name}${state}${country}`;
+                
+                item.innerHTML = `<i class="bi bi-geo-alt me-2 text-primary"></i>${fullName}`;
+                item.onclick = () => {
+                    ciudadInput.value = `${city.name}${country}`; // Guardamos "Nombre, Pais"
+                    cityList.style.display = 'none';
+                };
+                cityList.appendChild(item);
+            });
+            cityList.style.display = 'block';
+        }
+
+        // Ocultar lista al hacer click fuera
+        document.addEventListener('click', function(e) {
+            if (e.target !== ciudadInput && e.target !== cityList) {
+                cityList.style.display = 'none';
             }
         });
 
@@ -267,6 +375,45 @@
                 msgBox.textContent = text;
             }
         });
+
+        // === BORRADO DE CUENTA ===
+        function verificarBorrado() {
+            const input = document.getElementById('deleteConfirmInput');
+            const btn = document.getElementById('btnDeleteFinal');
+            // Validar que sea exactamente "BORRAR" (Match Case)
+            if (input.value === 'BORRAR') {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        async function eliminarCuenta() {
+            const btn = document.getElementById('btnDeleteFinal');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${apiBaseUrl}/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (res.ok) {
+                    alert('Tu cuenta ha sido eliminada correctamente. Lamentamos verte partir.');
+                    window.location.href = '/logout'; 
+                } else {
+                    alert('Error al eliminar la cuenta. Inténtalo de nuevo.');
+                    btn.innerText = 'Eliminar esta cuenta';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de conexión.');
+                btn.innerText = 'Eliminar esta cuenta';
+                btn.disabled = false;
+            }
+        }
     </script>
     <script src="/static/js/voice-assistant.js"></script>
 </body>

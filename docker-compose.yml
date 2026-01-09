@@ -13,6 +13,7 @@ services:
       API_URL: http://vesta-api:8080/api  # Actualizado
     volumes:
       - ./src/main/resources/static/images:/app/images
+      - ./logs/web:/logs
     networks:
       - vesta_net
 
