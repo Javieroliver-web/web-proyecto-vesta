@@ -30,26 +30,23 @@ public class RestTemplateConfig {
     private int readTimeout;
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        logger.info("Configurando RestTemplate con timeout de conexión: {}ms, timeout de lectura: {}ms",
-                connectionTimeout, readTimeout);
+    public RestTemplate restTemplate() {
+        logger.info("Configurando RestTemplate MANUAL con timeout conn: {}ms, read: {}ms", connectionTimeout,
+                readTimeout);
 
-        // Configurar timeouts
+        // 1. Factory Base (Simple)
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(connectionTimeout);
         requestFactory.setReadTimeout(readTimeout);
+        requestFactory.setOutputStreaming(false); // Importante para buffering en algunos casos
 
-        // Usar BufferingClientHttpRequestFactory para permitir leer el body múltiples
-        // veces
+        // 2. Decorador Buffering (Clave para leer body mÃºltiples veces)
         BufferingClientHttpRequestFactory bufferingFactory = new BufferingClientHttpRequestFactory(requestFactory);
 
-        RestTemplate restTemplate = builder
-                .setConnectTimeout(Duration.ofMillis(connectionTimeout))
-                .setReadTimeout(Duration.ofMillis(readTimeout))
-                .requestFactory(() -> bufferingFactory)
-                .build();
+        // 3. Instancia directa (sin Builder para evitar magias)
+        RestTemplate restTemplate = new RestTemplate(bufferingFactory);
 
-        // Añadir interceptor para logging
+        // 4. Interceptor con Logging del Body DE RESPUESTA
         List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new LoggingInterceptor());
         restTemplate.setInterceptors(interceptors);
@@ -70,15 +67,26 @@ public class RestTemplateConfig {
                 byte[] body,
                 org.springframework.http.client.ClientHttpRequestExecution execution) throws java.io.IOException {
 
-            long startTime = System.currentTimeMillis();
+            log.debug(">>> Request: {} {}", request.getMethod(), request.getURI());
 
-            log.debug("Request: {} {}", request.getMethod(), request.getURI());
-
+            // Ejecutar request
             org.springframework.http.client.ClientHttpResponse response = execution.execute(request, body);
 
-            long duration = System.currentTimeMillis() - startTime;
-            log.debug("Response: {} {} - Status: {} - Duration: {}ms",
-                    request.getMethod(), request.getURI(), response.getStatusCode(), duration);
+            // Leer respuesta (seguro porque usamos BufferingClientHttpRequestFactory)
+            StringBuilder inputStringBuilder = new StringBuilder();
+            try (java.io.BufferedReader bufferedReader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    inputStringBuilder.append(line);
+                }
+            } catch (Exception e) {
+                log.error("Error leyendo body en interceptor: {}", e.getMessage());
+            }
+
+            String responseBody = inputStringBuilder.toString();
+            log.debug("<<< Response: {} {} - Status: {} - Body: {}",
+                    request.getMethod(), request.getURI(), response.getStatusCode(), responseBody);
 
             return response;
         }

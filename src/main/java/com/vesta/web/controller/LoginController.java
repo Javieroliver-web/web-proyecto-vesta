@@ -101,7 +101,8 @@ public class LoginController {
             return ResponseEntity.ok(responseData);
 
         } catch (RuntimeException e) {
-            logger.error("❌ Error en login: {}", e.getMessage());
+            logger.error("❌ Error en login para {}: {} (Causa: {})", request.getEmail(), e.getMessage(),
+                    e.getClass().getSimpleName());
 
             // Devolver error en formato JSON
             Map<String, String> error = new HashMap<>();
@@ -124,6 +125,31 @@ public class LoginController {
         logger.info("🚪 Cerrando sesión");
         session.invalidate();
         return "redirect:/"; // Al salir, volvemos a la Landing Page
+    }
+
+    // Endpoint para solicitar reenvío de confirmación
+    @PostMapping("/resend-confirmation")
+    @ResponseBody
+    public ResponseEntity<?> resendConfirmation(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.isEmpty()) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "El email es obligatorio");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            String message = apiService.resendConfirmation(email);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", message);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     // DTO interno para recibir el JSON del frontend

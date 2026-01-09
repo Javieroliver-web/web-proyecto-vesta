@@ -454,6 +454,30 @@
                     // Error en las credenciales
                     console.error('❌ Error de login:', data);
                     errorMessage.textContent = data.message || 'Credenciales incorrectas';
+                    
+                    // Si es error de cuenta no verificada, añadir link de reenvío
+                    if (data.message && (data.message.includes('no verificada') || data.message.includes('confirmar'))) {
+                        const link = document.createElement('a');
+                        link.id = 'resendLink';
+                        link.href = '#';
+                        link.style.display = 'block';
+                        link.style.marginTop = '0.5rem';
+                        link.style.color = '#c33';
+                        link.style.fontWeight = 'bold';
+                        link.textContent = '¿No recibiste el correo? Reenviar';
+                        link.onclick = (e) => {
+                            e.preventDefault();
+                            solicitarReenvio(email);
+                        };
+                        
+                        // Limpiar contenido previo si ya existe un link
+                        const existingLink = errorAlert.querySelector('#resendLink');
+                        if (existingLink) existingLink.remove();
+                        
+                        errorAlert.appendChild(link);
+                    }
+                    
+                
                     errorAlert.classList.add('show');
                 }
             } catch (error) {
@@ -467,6 +491,37 @@
                 btnSpinner.style.display = 'none';
             }
         });
+
+        // Función para reenviar confirmación
+        function solicitarReenvio(email) {
+            if (!email) return;
+
+            const link = document.getElementById('resendLink');
+            link.innerHTML = '<span class="spinner"></span> Enviando...';
+            link.style.pointerEvents = 'none';
+
+            fetch('/resend-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message && (data.message.includes('reenviado') || data.message.includes('EMAIL_SENT'))) {
+                    alert('✅ Correo reenviado. Por favor revisa tu bandeja de entrada.');
+                } else {
+                    alert('❌ ' + (data.message || 'Error al reenviar'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('❌ Error de conexión');
+            })
+            .finally(() => {
+                link.innerHTML = 'Reenviar correo de confirmación';
+                link.style.pointerEvents = 'auto';
+            });
+        }
     </script>
 
 </body>

@@ -68,9 +68,8 @@ public class ApiService {
             }
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en login para {}: {} - {}", email, e.getStatusCode(),
-                    e.getResponseBodyAsString());
-            throw new RuntimeException("Error en login: " + e.getMessage());
+            logger.error("Error de cliente en login para {}: {}", email, e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en login: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
@@ -93,10 +92,9 @@ public class ApiService {
             logger.info("Registro exitoso para: {}", registro.getCorreoElectronico());
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en registro para {}: {} - {}", registro.getCorreoElectronico(),
-                    e.getStatusCode(),
+            logger.error("Error de cliente en registro para {}: {}", registro.getCorreoElectronico(),
                     e.getResponseBodyAsString());
-            throw new RuntimeException("Error en registro: " + e.getMessage());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en registro: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
@@ -136,9 +134,8 @@ public class ApiService {
             }
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en forgot-password para {}: {} - {}", email, e.getStatusCode(),
-                    e.getResponseBodyAsString());
-            throw new RuntimeException("El correo electrónico no está registrado");
+            logger.error("Error de cliente en forgot-password para {}: {}", email, e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en forgot-password: {} - {}", e.getStatusCode(),
                     e.getResponseBodyAsString());
@@ -180,9 +177,8 @@ public class ApiService {
             }
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en forgot-password para {}: {} - {}", email, e.getStatusCode(),
-                    e.getResponseBodyAsString());
-            throw new RuntimeException("El correo electrónico no está registrado");
+            logger.error("Error de cliente en forgot-password para {}: {}", email, e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en forgot-password: {} - {}", e.getStatusCode(),
                     e.getResponseBodyAsString());
@@ -217,11 +213,44 @@ public class ApiService {
             return response.getBody().getData();
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error verificando métodos: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Error al verificar métodos de recuperación");
+            logger.error("Error verificando métodos: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (Exception e) {
             logger.error("Error inesperado verificando métodos: {}", e.getMessage(), e);
             throw new RuntimeException("Error al verificar métodos de recuperación");
+        }
+    }
+
+    /**
+     * Solicita el reenvío del correo de confirmación
+     */
+    public String resendConfirmation(String email) {
+        try {
+            String url = apiUrl + "/auth/resend-confirmation";
+            logger.debug("Solicitando reenvío de confirmación para: {}", email);
+
+            Map<String, String> request = new HashMap<>();
+            request.put("email", email);
+
+            ResponseEntity<ApiResponseWrapper<String>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<String>>() {
+                    });
+
+            if (response.getBody() != null && response.getBody().getMessage() != null) {
+                return response.getBody().getMessage();
+            } else {
+                return "Correo de confirmación reenviado";
+            }
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en reenvío: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (Exception e) {
+            logger.error("Error inesperado en reenvío: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al reenviar correo");
         }
     }
 
@@ -253,9 +282,8 @@ public class ApiService {
             }
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en reset-password: {} - {}", e.getStatusCode(),
-                    e.getResponseBodyAsString());
-            throw new RuntimeException("Token inválido o expirado");
+            logger.error("Error de cliente en reset-password: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en reset-password: {} - {}", e.getStatusCode(),
                     e.getResponseBodyAsString());
@@ -292,8 +320,8 @@ public class ApiService {
             logger.info("Checkout exitoso para usuario: {}", usuarioId);
 
         } catch (HttpClientErrorException e) {
-            logger.error("Error de cliente en checkout: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Error checkout: " + e.getMessage());
+            logger.error("Error de cliente en checkout: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
             logger.error("Error de servidor en checkout: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
@@ -370,6 +398,28 @@ public class ApiService {
     }
 
     // === UTILIDADES ===
+
+    private String extractErrorMessage(HttpClientErrorException e) {
+        String responseBody = e.getResponseBodyAsString();
+        logger.error("🔴 Error Raw Body: {}", responseBody); // DIAGNÓSTICO
+
+        try {
+            // Intentar parsear el JSON de error
+            // La estructura es {"status": "error", "message": "...", "data": ...}
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            ApiResponseWrapper<?> errorResponse = mapper.readValue(e.getResponseBodyAsString(),
+                    ApiResponseWrapper.class);
+            if (errorResponse != null && errorResponse.getMessage() != null) {
+                return errorResponse.getMessage();
+            }
+        } catch (Exception parseException) {
+            // Si falla el parseo, devolver el mensaje original o el cuerpo
+            logger.warn("No se pudo parsear el error de la API: {}", parseException.getMessage());
+        }
+
+        // Si no se pudo extraer un mensaje limpio, devolver algo útil
+        return "Error " + e.getStatusCode() + ": " + e.getResponseBodyAsString();
+    }
 
     private HttpHeaders getHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
