@@ -400,16 +400,45 @@
                 });
 
                 if (res.ok) {
-                    alert('Tu cuenta ha sido eliminada correctamente. Lamentamos verte partir.');
-                    window.location.href = '/logout'; 
+                    // Feedback visual en el botón antes de redirigir
+                    btn.className = 'btn btn-success';
+                    btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Cuenta eliminada';
+                    
+                    // Pequeña espera para que el usuario lea
+                    setTimeout(() => {
+                        window.location.href = '/logout'; 
+                    }, 1500);
                 } else {
-                    alert('Error al eliminar la cuenta. Inténtalo de nuevo.');
+                    const errorMsg = await res.json();
+                    
+                    // Mostrar error dentro del modal sin usar alert
+                    const modalBody = document.querySelector('#deleteModal .modal-body');
+                    // Crear o recuperar alerta dentro del modal
+                    let alertDiv = document.getElementById('deleteErrorAlert');
+                    if (!alertDiv) {
+                        alertDiv = document.createElement('div');
+                        alertDiv.id = 'deleteErrorAlert';
+                        alertDiv.className = 'alert alert-danger mt-3 mb-0';
+                        modalBody.appendChild(alertDiv);
+                    }
+                    alertDiv.textContent = errorMsg.message || 'Error al eliminar la cuenta. Inténtalo de nuevo.';
+                    
                     btn.innerText = 'Eliminar esta cuenta';
                     btn.disabled = false;
                 }
             } catch (e) {
                 console.error(e);
-                alert('Error de conexión.');
+                 // Mostrar error de conexión
+                 const modalBody = document.querySelector('#deleteModal .modal-body');
+                 let alertDiv = document.getElementById('deleteErrorAlert');
+                 if (!alertDiv) {
+                     alertDiv = document.createElement('div');
+                     alertDiv.id = 'deleteErrorAlert';
+                     alertDiv.className = 'alert alert-danger mt-3 mb-0';
+                     modalBody.appendChild(alertDiv);
+                 }
+                 alertDiv.textContent = 'Error de conexión.';
+                 
                 btn.innerText = 'Eliminar esta cuenta';
                 btn.disabled = false;
             }

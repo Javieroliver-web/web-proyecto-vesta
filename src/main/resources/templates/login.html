@@ -675,6 +675,19 @@
                 btn.disabled = false;
             });
         }
+
+        // Comprobación de mensajes URL al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('confirmed') === 'true') {
+                showToast('¡Cuenta activada con éxito! Ya puedes iniciar sesión.', 'success');
+            }
+            
+            if (urlParams.get('error') === 'token_invalid') {
+                showToast('El enlace de activación es inválido o ha expirado.', 'error');
+            }
+        });
     </script>
 
 </body>
