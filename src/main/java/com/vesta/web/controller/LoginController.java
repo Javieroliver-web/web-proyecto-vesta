@@ -64,6 +64,16 @@ public class LoginController {
             // Intentar hacer login
             AuthResponseDTO response = apiService.login(request.getEmail(), request.getPassword());
 
+            // 2FA CHECK
+            if (response.isRequires2fa()) {
+                // Caso 2FA: Devolver token temporal y flag
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("requires2fa", true);
+                responseData.put("tempToken", response.getToken());
+                // No creamos sesión HTTP completa aún
+                return ResponseEntity.ok(responseData);
+            }
+
             // Guardar en sesión HTTP
             session.setAttribute("token", response.getToken());
             session.setAttribute("rol", response.getRol());
@@ -71,14 +81,10 @@ public class LoginController {
 
             // Guardar el ID del usuario en la sesión para usarlo en RGPD
             session.setAttribute("usuarioId", response.getId());
+            session.setAttribute("usuarioEmail", request.getEmail());
 
             // Logging detallado para diagnóstico
             logger.info("✅ Login exitoso. Sesión creada para: {} (ID: {})", response.getNombre(), response.getId());
-            logger.debug("📋 Datos guardados en sesión:");
-            logger.debug("   - Token: {}", (response.getToken() != null ? "✓ Presente" : "✗ NULL"));
-            logger.debug("   - Rol: {}", response.getRol());
-            logger.debug("   - Nombre: {}", response.getNombre());
-            logger.debug("   - ID: {}", response.getId());
 
             // Determinar URL de redirección según el rol
             String redirectUrl;
@@ -88,14 +94,9 @@ public class LoginController {
                 redirectUrl = "/cliente/dashboard";
             }
 
-            logger.debug("🔀 URL de redirección: {}", redirectUrl);
-
             // Crear respuesta con URL de redirección
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("token", response.getToken());
-            responseData.put("rol", response.getRol());
-            responseData.put("nombre", response.getNombre());
-            responseData.put("id", response.getId());
+            responseData.put("requires2fa", false);
             responseData.put("redirectUrl", redirectUrl);
 
             return ResponseEntity.ok(responseData);
@@ -117,6 +118,36 @@ public class LoginController {
             error.put("message", "Error al procesar el login. Verifica que la API esté funcionando.");
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @PostMapping("/login/verify-2fa")
+    @ResponseBody
+    public ResponseEntity<?> verify2fa(@RequestBody Map<String, String> request, HttpSession session) {
+        try {
+            String tempToken = request.get("tempToken");
+            String code = request.get("code");
+
+            AuthResponseDTO response = apiService.verify2fa(tempToken, code);
+
+            // Guardar en sesión HTTP
+            session.setAttribute("token", response.getToken());
+            session.setAttribute("rol", response.getRol());
+            session.setAttribute("usuarioNombre", response.getNombre());
+            session.setAttribute("usuarioId", response.getId());
+
+            // Determinar URL de redirección
+            String redirectUrl = "ADMIN".equals(response.getRol()) ? "/admin/dashboard" : "/cliente/dashboard";
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("redirectUrl", redirectUrl);
+
+            return ResponseEntity.ok(result);
+
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
 

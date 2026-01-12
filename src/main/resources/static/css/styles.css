@@ -57,6 +57,34 @@
     --theme-input-bg: #0f1118;
 }
 
+/* Overrides de Utilidades Bootstrap para Dark Mode */
+[data-theme="dark"] .text-dark {
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .text-secondary {
+    color: #adb5bd !important;
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: #282c3f !important;
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .bg-white {
+    background-color: #1a1d2e !important;
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .border {
+    border-color: #282c3f !important;
+}
+
+[data-theme="dark"] .shadow-sm, 
+[data-theme="dark"] .shadow {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
 /* ===== RESET Y BASE ===== */
 * {
     margin: 0;
@@ -349,7 +377,7 @@ body {
 
 /* ===== NAVBAR ===== */
 .navbar {
-    background: var(--gradient-navy) !important;
+    background: var(--gradient-dark) !important;
     border-bottom: 3px solid var(--vesta-gold);
     box-shadow: var(--shadow-md);
     padding: 1rem 0;

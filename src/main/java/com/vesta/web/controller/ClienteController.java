@@ -26,6 +26,7 @@ public class ClienteController {
 
         String nombre = (String) session.getAttribute("usuarioNombre");
         model.addAttribute("nombreUsuario", nombre != null ? nombre : "Cliente");
+        model.addAttribute("usuarioEmail", session.getAttribute("usuarioEmail"));
 
         return "cliente/dashboard";
     }

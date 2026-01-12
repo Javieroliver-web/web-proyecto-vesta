@@ -78,7 +78,7 @@
     <div class="container mt-4">
 
         <div id="aiRecommendation" class="alert ai-recommendation-card border-0 shadow-sm d-none align-items-center mb-4" role="alert">
-            <div class="fs-1 me-3">🌦️</div>
+            <div id="weatherIcon" class="fs-1 me-3">🌦️</div>
             <div class="flex-grow-1">
                 <h6 class="fw-bold mb-1">💡 Sugerencia Inteligente Vesta</h6>
                 <span id="recText" class="text-muted">Analizando previsión meteorológica y tu perfil...</span>
@@ -185,6 +185,7 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const authToken = /*[[${session.token}]]*/ null;
+        const userEmail = /*[[${usuarioEmail}]]*/ 'test@vesta.es';
         /*]]>*/
         // Detectar si estamos en Docker o local
         const API_URL = window.location.hostname === 'localhost' 
@@ -194,13 +195,24 @@
         // 1. RECOMENDADOR
         async function cargarRecomendacion() {
             try {
-                const res = await fetch(`${API_URL}/innovation/recommendation?email=test@vesta.es`, {
+                // Usar email dinámico del usuario logueado
+                const emailQuery = userEmail ? `?email=${userEmail}` : '?email=test@vesta.es';
+                const res = await fetch(`${API_URL}/innovation/recommendation${emailQuery}`, {
                     method: 'GET',
                     headers: { 'Authorization': 'Bearer ' + authToken }
                 });
                 if(res.ok) {
                     const data = await res.json();
                     document.getElementById('recText').innerText = data.mensaje;
+                    
+                    // Icono Dinámico
+                    const iconMap = {
+                        'SUN': '☀️',
+                        'RAIN': '🌧️',
+                        'CLOUD': '☁️'
+                    };
+                    document.getElementById('weatherIcon').innerText = iconMap[data.icono] || '🌤️';
+
                     document.getElementById('aiRecommendation').classList.remove('d-none');
                     document.getElementById('aiRecommendation').classList.add('d-flex');
                 }
@@ -320,7 +332,9 @@
                                 <p class="text-muted small mb-2 text-truncate">${p.descripcion}</p>
                                 <div class="d-flex justify-content-between align-items-center mt-auto">
                                     <span class="text-primary fw-bold">$${p.precioBase}/día</span>
-                                    <span class="badge bg-light text-dark border">Ver más</span>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </button>
                                 </div>
                             </div>
                         </div>

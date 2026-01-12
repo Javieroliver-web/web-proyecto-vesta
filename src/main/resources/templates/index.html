@@ -205,13 +205,10 @@
 <div th:replace="~{fragments/cookie-banner :: cookie-banner}"></div>
 <body>
 
-    <nav class="navbar navbar-expand-lg" style="background: #282c3f; border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%); border-bottom: 1px solid rgba(255,255,255,0.1);">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-                <div style="width: 32px; height: 32px; background: rgba(241,166,28,0.2); border: 2px solid #f1a61c; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    <i class="bi bi-shield-check" style="color: #f1a61c; font-size: 0.9rem;"></i>
-                </div>
-                <span style="color: white; font-weight: 700; letter-spacing: 1px;">VESTA</span>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/images/logo_vesta.png" alt="VESTA" style="height: 40px;">
             </a>
             <div class="d-flex gap-3">
                 <a href="/login-page" class="btn btn-outline-light btn-sm fw-bold px-4">Iniciar Sesión</a>
@@ -258,7 +255,7 @@
 
     <div class="container py-5 mt-5" id="features">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="font-size: 2.5rem; color: #282c3f;">¿Por qué elegir Vesta?</h2>
+            <h2 class="fw-bold" style="font-size: 2.5rem; color: var(--theme-text-main);">¿Por qué elegir Vesta?</h2>
             <p class="text-muted fs-5">Protección inteligente diseñada para tu estilo de vida</p>
         </div>
         <div class="row text-center g-5">
@@ -266,21 +263,21 @@
                 <div class="feature-icon">
                     <i class="bi bi-lightning-charge-fill"></i>
                 </div>
-                <h4 class="fw-bold mb-3" style="color: #282c3f;">Activación Instantánea</h4>
+                <h4 class="fw-bold mb-3" style="color: var(--theme-text-main);">Activación Instantánea</h4>
                 <p class="text-muted">Activa tu seguro cuando lo necesites, sin trámites complicados ni esperas. En segundos estás protegido.</p>
             </div>
             <div class="col-md-4 feature-card">
                 <div class="feature-icon">
                     <i class="bi bi-phone-fill"></i>
                 </div>
-                <h4 class="fw-bold mb-3" style="color: #282c3f;">100% Digital</h4>
+                <h4 class="fw-bold mb-3" style="color: var(--theme-text-main);">100% Digital</h4>
                 <p class="text-muted">Gestiona todos tus seguros desde tu dispositivo, sin papeleos. Todo en la palma de tu mano.</p>
             </div>
             <div class="col-md-4 feature-card">
                 <div class="feature-icon">
                     <i class="bi bi-wallet2"></i>
                 </div>
-                <h4 class="fw-bold mb-3" style="color: #282c3f;">Paga Solo lo que Usas</h4>
+                <h4 class="fw-bold mb-3" style="color: var(--theme-text-main);">Paga Solo lo que Usas</h4>
                 <p class="text-muted">Sin compromisos a largo plazo. Activa y desactiva según necesites. Máxima flexibilidad.</p>
             </div>
         </div>

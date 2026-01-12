@@ -597,40 +597,37 @@
                 console.log('📡 Respuesta del servidor:', data);
                 
                 if (response.ok) {
-                    // Login exitoso
-                    console.log('✅ Login exitoso');
-                    console.log('🔀 Redirigiendo a:', data.redirectUrl);
-                    
-                    // Usar la URL de redirección que nos da el servidor
-                    window.location.href = data.redirectUrl || '/cliente/dashboard';
+                    if (data.requires2fa) {
+                        // 2FA Requerido - Mostrar Modal
+                        show2FAModal(data.tempToken);
+                    } else {
+                        // Login exitoso normal
+                        console.log('✅ Login exitoso');
+                        window.location.href = data.redirectUrl || '/cliente/dashboard';
+                    }
                 } else {
                     // Error en las credenciales
                     console.error('❌ Error de login:', data);
                     errorMessage.textContent = data.message || 'Credenciales incorrectas';
                     
-                    // Si es error de cuenta no verificada, añadir botón de reenvío BONITO
+                    // Si es error de cuenta no verificada
                     if (data.message && (data.message.toLowerCase().includes('no verificada') || data.message.toLowerCase().includes('confirmar'))) {
                         const actionDiv = document.createElement('div');
-                        actionDiv.className = 'resend-action mt-2 pt-2 border-top border-danger-subtle d-flex align-items-center justify-content-between gap-3'; // AÑADIDO: gap-3
-                        
+                        actionDiv.className = 'resend-action mt-2 pt-2 border-top border-danger-subtle d-flex align-items-center justify-content-between gap-3';
                         const helpText = document.createElement('span');
                         helpText.className = 'small text-danger';
                         helpText.textContent = '¿No recibiste el correo?';
-                        
                         const btn = document.createElement('button');
-                        btn.className = 'btn btn-sm btn-outline-danger fw-bold text-nowrap'; // AÑADIDO: text-nowrap
+                        btn.className = 'btn btn-sm btn-outline-danger fw-bold text-nowrap';
                         btn.innerHTML = '<i class="bi bi-send"></i> Reenviar';
                         btn.onclick = (e) => {
                             e.preventDefault();
                             solicitarReenvio(email, btn);
                         };
-                        
                         actionDiv.appendChild(helpText);
                         actionDiv.appendChild(btn);
-                        
                         errorAlert.appendChild(actionDiv);
                     }
-                    
                     errorAlert.classList.add('show');
                 }
             } catch (error) {
@@ -638,7 +635,7 @@
                 errorMessage.textContent = 'Error de conexión. Verifica que el servidor esté activo.';
                 errorAlert.classList.add('show');
             } finally {
-                // Restaurar botón
+                // Restaurar botón solo si no es 2FA, si es 2FA dejamos que el modal maneje
                 loginBtn.disabled = false;
                 btnText.style.display = 'inline';
                 btnSpinner.style.display = 'none';
@@ -686,6 +683,53 @@
             
             if (urlParams.get('error') === 'token_invalid') {
                 showToast('El enlace de activación es inválido o ha expirado.', 'error');
+            }
+        });
+        });
+
+        // 2FA Functions
+        let currentTempToken = null;
+        const modal2FA = new bootstrap.Modal(document.getElementById('modal2FA'));
+
+        function show2FAModal(token) {
+            currentTempToken = token;
+            modal2FA.show();
+            setTimeout(() => document.getElementById('code2fa').focus(), 500);
+        }
+
+        document.getElementById('btnVerify2FA').addEventListener('click', async () => {
+            const code = document.getElementById('code2fa').value;
+            const errorDiv = document.getElementById('error2fa');
+            const btn = document.getElementById('btnVerify2FA');
+
+            if (code.length < 6) {
+                errorDiv.textContent = 'Código incompleto';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Verificando...';
+            errorDiv.textContent = '';
+
+            try {
+                const res = await fetch('/login/verify-2fa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tempToken: currentTempToken, code: code })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    errorDiv.textContent = data.message || 'Código incorrecto';
+                    btn.disabled = false;
+                    btn.innerText = 'Verificar';
+                }
+            } catch (e) {
+                errorDiv.textContent = 'Error de conexión';
+                btn.disabled = false;
+                btn.innerText = 'Verificar';
             }
         });
     </script>

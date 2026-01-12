@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <nav th:fragment="header-nav" class="navbar navbar-expand-lg shadow-sm" style="background: linear-gradient(135deg, #282c3f 0%, #3c425e 100%); border-bottom: 3px solid #f1a61c;">
+    <nav th:fragment="header-nav" class="navbar navbar-expand-lg shadow-sm" style="border-bottom: 3px solid #f1a61c;">
         
     <script th:inline="javascript">
         (function() {
@@ -51,8 +51,8 @@
     </script>
 
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/cliente/marketplace" style="color: #f4b94c; font-size: 1.5rem; letter-spacing: 2px; transition: all 0.3s ease;">
-                <i class="bi bi-shield-check"></i> VESTA
+            <a class="navbar-brand d-flex align-items-center" href="/cliente/marketplace" style="transition: all 0.3s ease;">
+                <img src="/images/logo_vesta.png" alt="VESTA" style="height: 40px;">
             </a>
             
             <div class="d-flex align-items-center gap-3 w-100" th:if="${session.token != null}">

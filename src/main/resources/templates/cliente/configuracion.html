@@ -3,7 +3,9 @@
 <head>
     <title>Configuración - Vesta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -49,7 +51,7 @@
                         </div>
 
                         <!-- SECCIÓN UBICACIÓN (NUEVO) -->
-                        <div class="card border-0 shadow-sm">
+                        <div class="card border-0 shadow-sm" style="overflow: visible;">
                             <div class="card-header bg-transparent border-0 pt-4 px-4">
                                 <h5 class="fw-bold mb-0">Ubicación y Clima</h5>
                             </div>
@@ -57,14 +59,16 @@
                                 <form id="locationForm">
                                     <div class="mb-3">
                                         <label class="form-label">Ciudad Predeterminada</label>
-                                        <div class="input-group position-relative">
-                                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                            <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES" autocomplete="off">
-                                            <button class="btn btn-primary" type="submit">Guardar</button>
+                                        <div class="position-relative">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                                <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES" autocomplete="off">
+                                                <button class="btn btn-primary" type="submit">Guardar</button>
+                                            </div>
                                             <!-- Lista de Autocompletado -->
-                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 175px; overflow-y: auto;"></div>
+                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 200px; overflow-y: auto;"></div>
                                         </div>
-                                        <div class="form-text">Usado para la previsión meteorológica del Dashboard.</div>
+                                        <div class="form-text" style="color: var(--theme-text-muted);">Usado para la previsión meteorológica del Dashboard.</div>
                                     </div>
                                 </form>
                                 <div id="locMsgBox" class="mt-2" style="display:none"></div>
@@ -100,6 +104,49 @@
                                 </form>
                                 
                                 <div id="msgBox" class="mt-3" style="display:none"></div>
+                            </div>
+                        </div>
+
+                                <div id="msgBox" class="mt-3" style="display:none"></div>
+                            </div>
+                        </div>
+
+                        <!-- 2FA SECTION -->
+                        <div class="card border-0 shadow-sm mt-4">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-0">Autenticación en Dos Pasos (2FA)</h5>
+                            </div>
+                            <div class="card-body px-4 pb-4">
+                                <div id="2faStatusSection">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <p class="mb-0 text-muted">Protege tu cuenta con Google Authenticator o similar.</p>
+                                            <span id="2faBadge" class="badge bg-secondary mt-2">Desactivado</span>
+                                        </div>
+                                        <button id="btnToggle2FA" class="btn btn-outline-primary" onclick="toggle2FA()">Configurar</button>
+                                    </div>
+                                </div>
+
+                                <!-- 2FA Setup Area -->
+                                <div id="2faSetupArea" class="mt-4 p-4 bg-light rounded-3" style="display:none;">
+                                    <h6 class="fw-bold">Configuración 2FA</h6>
+                                    <p class="small text-muted">Escanea el código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.).</p>
+                                    
+                                    <div class="text-center my-3">
+                                        <canvas id="qrCanvas"></canvas>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Código de verificación</label>
+                                        <input type="text" class="form-control" id="verify2faInput" placeholder="123456" maxlength="6">
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary w-100" onclick="verifyAndEnable2FA()">Activar 2FA</button>
+                                        <button class="btn btn-outline-secondary w-100" onclick="cancel2FASetup()">Cancelar</button>
+                                    </div>
+                                    <div id="2faMsg" class="mt-2 text-danger small"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -442,6 +489,122 @@
                 btn.innerText = 'Eliminar esta cuenta';
                 btn.disabled = false;
             }
+        }
+                btn.innerText = 'Eliminar esta cuenta';
+                btn.disabled = false;
+            }
+        }
+
+        // === 2FA LOGIC ===
+        const apiTwoFactorUrl = window.location.protocol + '//' + window.location.hostname + ':8080/api/auth/2fa';
+
+        // Check Status on Load
+        async function check2FAStatus() {
+            try {
+                const res = await fetch(`${apiTwoFactorUrl}/status`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const isEnabled = data.data; // ApiResponse<Boolean>
+                    update2FAUI(isEnabled);
+                }
+            } catch (e) { console.error("Error checking 2FA", e); }
+        }
+        check2FAStatus();
+
+        function update2FAUI(isEnabled) {
+            const badge = document.getElementById('2faBadge');
+            const btn = document.getElementById('btnToggle2FA');
+            
+            if (isEnabled) {
+                badge.className = 'badge bg-success mt-2';
+                badge.innerText = 'Activado';
+                btn.className = 'btn btn-outline-danger';
+                btn.innerText = 'Desactivar';
+                btn.onclick = disable2FA;
+            } else {
+                badge.className = 'badge bg-secondary mt-2';
+                badge.innerText = 'Desactivado';
+                btn.className = 'btn btn-outline-primary';
+                btn.innerText = 'Configurar';
+                btn.onclick = setup2FA;
+            }
+        }
+
+        async function setup2FA() {
+            const setupArea = document.getElementById('2faSetupArea');
+            const msg = document.getElementById('2faMsg');
+            msg.innerText = '';
+
+            try {
+                const res = await fetch(`${apiTwoFactorUrl}/setup`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    setupArea.style.display = 'block';
+                    // Generate QR
+                    new QRious({
+                        element: document.getElementById('qrCanvas'),
+                        value: data.data.qrCodeUrl,
+                        size: 200
+                    });
+                } else {
+                    alert(data.message);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function cancel2FASetup() {
+             document.getElementById('2faSetupArea').style.display = 'none';
+        }
+
+        async function verifyAndEnable2FA() {
+            const code = document.getElementById('verify2faInput').value;
+            const msg = document.getElementById('2faMsg');
+            
+            if (code.length < 6) {
+                msg.innerText = 'Ingresa el código de 6 dígitos.';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${apiTwoFactorUrl}/verify-setup`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token 
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    cancel2FASetup();
+                    update2FAUI(true);
+                    alert('¡2FA Activado correctamente!');
+                } else {
+                    msg.innerText = data.message || 'Error al verificar código';
+                }
+            } catch (e) {
+                msg.innerText = 'Error de conexión';
+            }
+        }
+
+        async function disable2FA() {
+            if (!confirm('¿Seguro que quieres desactivar la autenticación en dos pasos? Tu cuenta será menos segura.')) return;
+            
+            try {
+                const res = await fetch(`${apiTwoFactorUrl}/disable`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    update2FAUI(false);
+                }
+            } catch (e) { alert('Error al desactivar 2FA'); }
         }
     </script>
     <script src="/static/js/voice-assistant.js"></script>

@@ -82,6 +82,37 @@ public class ApiService {
         }
     }
 
+    public AuthResponseDTO verify2fa(String tempToken, String code) {
+        try {
+            String url = apiUrl + "/auth/2fa/validate-login";
+            logger.debug("Verificando código 2FA");
+
+            Map<String, String> request = new HashMap<>();
+            request.put("code", code);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + tempToken);
+
+            ResponseEntity<ApiResponseWrapper<AuthResponseDTO>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, headers),
+                    new ParameterizedTypeReference<ApiResponseWrapper<AuthResponseDTO>>() {
+                    });
+
+            if (response.getBody() != null && response.getBody().getData() != null) {
+                return response.getBody().getData();
+            } else {
+                throw new RuntimeException("Respuesta 2FA vacía");
+            }
+
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (Exception e) {
+            throw new RuntimeException("Error en 2FA: " + e.getMessage());
+        }
+    }
+
     public void registrar(RegisterDTO registro) {
         try {
             String url = apiUrl + "/auth/register";
