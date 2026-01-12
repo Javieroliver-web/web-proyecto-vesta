@@ -62,7 +62,7 @@
                                             <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES" autocomplete="off">
                                             <button class="btn btn-primary" type="submit">Guardar</button>
                                             <!-- Lista de Autocompletado -->
-                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 200px; overflow-y: auto;"></div>
+                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 175px; overflow-y: auto;"></div>
                                         </div>
                                         <div class="form-text">Usado para la previsión meteorológica del Dashboard.</div>
                                     </div>
@@ -272,7 +272,7 @@
         ciudadInput.addEventListener('input', function() {
             clearTimeout(debounceTimer);
             const query = this.value;
-            if (query.length < 3) {
+            if (query.length < 1) {
                 cityList.style.display = 'none';
                 return;
             }
