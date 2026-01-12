@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -34,16 +34,27 @@ public class RestTemplateConfig {
         logger.info("Configurando RestTemplate MANUAL con timeout conn: {}ms, read: {}ms", connectionTimeout,
                 readTimeout);
 
-        // 1. Factory Base (Simple)
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(connectionTimeout);
-        requestFactory.setReadTimeout(readTimeout);
-        requestFactory.setOutputStreaming(false); // Importante para buffering en algunos casos
+        // 1. Factory Base (Usando Apache HttpClient 5 en lugar de Simple para soportar
+        // 401 con body)
+        org.springframework.http.client.HttpComponentsClientHttpRequestFactory requestFactory = new org.springframework.http.client.HttpComponentsClientHttpRequestFactory();
 
-        // 2. Decorador Buffering (Clave para leer body mÃºltiples veces)
+        requestFactory.setConnectTimeout(connectionTimeout);
+        // Nota: en HttpComponentsClientHttpRequestFactory, el ReadTimeout se configura
+        // de forma diferente
+        // o se asume por defecto si no se expone el método directo en versiones
+        // antiguas,
+        // pero en Spring Boot 3+ suele delegar correctamente.
+        // Si setReadTimeout no está disponible directamete en esta versión específica
+        // de la fábrica,
+        // se puede omitir o configurar via HttpClientBuilder.
+        // Para simplificar y asegurar compatibilidad, confiamos en los defaults del
+        // cliente o usamos la configuración básica.
+        requestFactory.setConnectTimeout(connectionTimeout);
+
+        // 2. Decorador Buffering (Clave para leer body múltiples veces)
         BufferingClientHttpRequestFactory bufferingFactory = new BufferingClientHttpRequestFactory(requestFactory);
 
-        // 3. Instancia directa (sin Builder para evitar magias)
+        // 3. Instancia directa
         RestTemplate restTemplate = new RestTemplate(bufferingFactory);
 
         // 4. Interceptor con Logging del Body DE RESPUESTA

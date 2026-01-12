@@ -30,8 +30,9 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow-y: auto;
+            overflow-x: hidden; /* IMPORTANTE: Oculta desbordamiento horizontal de halos */
             padding: 2rem 0;
+            margin: 0;
         }
 
         body::before {
@@ -336,8 +337,11 @@
 
             <!-- Mensaje de Error -->
             <div id="errorAlert" class="alert-custom">
-                <i class="bi bi-exclamation-circle-fill"></i>
-                <span id="errorMessage">Credenciales incorrectas</span>
+                <!-- Wrapper para icono y mensaje -->
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
+                    <span id="errorMessage">Credenciales incorrectas</span>
+                </div>
             </div>
 
             <form id="loginForm">
@@ -400,11 +404,131 @@
     </div>
 
     <!-- Botón de Ayuda Flotante -->
-    <div class="help-button" title="¿Necesitas ayuda?">
+    <div class="help-button" title="¿Necesitas ayuda?" data-bs-toggle="modal" data-bs-target="#helpModal">
         <i class="bi bi-question-lg"></i>
     </div>
 
+    <!-- Modal de Ayuda -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-0">
+                    <h5 class="modal-title fw-bold text-dark" id="helpModalLabel">
+                        <i class="bi bi-life-preserver text-warning me-2"></i>Centro de Ayuda
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="accordion accordion-flush" id="faqAccordion">
+                        
+                        <!-- Item 1 -->
+                        <div class="accordion-item rounded-3 mb-2 border">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    <i class="bi bi-envelope-x me-2 text-muted"></i> No recibí el correo de confirmación
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary small">
+                                    <p>Primero, revisa tu carpeta de <strong>Spam o Correo no deseado</strong>. Si no está allí, intenta iniciar sesión con tus credenciales; si tu cuenta no está activada, verás un mensaje de error con un botón para <strong>"Reenviar"</strong> el correo.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="accordion-item rounded-3 mb-2 border">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    <i class="bi bi-key me-2 text-muted"></i> Olvidé mi contraseña
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary small">
+                                    <p>Haz clic en el enlace <strong>"¿Olvidaste tu contraseña?"</strong> debajo del botón de inicio de sesión. Te enviaremos un código o enlace a tu correo para que puedas crear una nueva.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="accordion-item rounded-3 mb-2 border">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    <i class="bi bi-person-plus me-2 text-muted"></i> ¿Cómo me registro?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary small">
+                                    <p>Si aún no tienes cuenta, pulsa en el enlace <strong>"Regístrate aquí"</strong> al final del formulario. Necesitarás proporcionar un correo electrónico válido y crear una contraseña segura.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div class="accordion-item rounded-3 border">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    <i class="bi bi-shield-lock me-2 text-muted"></i> Mi cuenta está bloqueada
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-secondary small">
+                                    <p>Por seguridad, tras varios intentos fallidos la cuenta puede bloquearse temporalmente. Espera unos minutos e inténtalo de nuevo, o restablece tu contraseña si la has olvidado.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <p class="small text-muted mb-1">¿Sigues teniendo problemas?</p>
+                        <a href="mailto:soporte@vesta.com" class="btn btn-sm btn-outline-secondary rounded-pill px-4">
+                            Contactar Soporte
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container para notificaciones -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i id="toastIcon" class="bi"></i>
+                    <span id="toastMessage"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Función para mostrar Toast
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = toastEl.querySelector('.toast-body');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Configurar colores e íconos
+            if (type === 'success') {
+                toastEl.classList.remove('bg-danger');
+                toastEl.classList.add('bg-success');
+                toastIcon.className = 'bi bi-check-circle-fill fs-5';
+            } else {
+                toastEl.classList.remove('bg-success');
+                toastEl.classList.add('bg-danger');
+                toastIcon.className = 'bi bi-x-circle-fill fs-5';
+            }
+            
+            toastMessage.textContent = message;
+            
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 }); // 3 segundos
+            toast.show();
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -416,6 +540,9 @@
             
             // Ocultar errores previos
             errorAlert.classList.remove('show');
+            // Limpiar botón de reenvío previo si existe
+            const existingLink = errorAlert.querySelector('.resend-action');
+            if (existingLink) existingLink.remove();
             
             // Mostrar spinner
             loginBtn.disabled = true;
@@ -455,29 +582,29 @@
                     console.error('❌ Error de login:', data);
                     errorMessage.textContent = data.message || 'Credenciales incorrectas';
                     
-                    // Si es error de cuenta no verificada, añadir link de reenvío
-                    if (data.message && (data.message.includes('no verificada') || data.message.includes('confirmar'))) {
-                        const link = document.createElement('a');
-                        link.id = 'resendLink';
-                        link.href = '#';
-                        link.style.display = 'block';
-                        link.style.marginTop = '0.5rem';
-                        link.style.color = '#c33';
-                        link.style.fontWeight = 'bold';
-                        link.textContent = '¿No recibiste el correo? Reenviar';
-                        link.onclick = (e) => {
+                    // Si es error de cuenta no verificada, añadir botón de reenvío BONITO
+                    if (data.message && (data.message.toLowerCase().includes('no verificada') || data.message.toLowerCase().includes('confirmar'))) {
+                        const actionDiv = document.createElement('div');
+                        actionDiv.className = 'resend-action mt-2 pt-2 border-top border-danger-subtle d-flex align-items-center justify-content-between gap-3'; // AÑADIDO: gap-3
+                        
+                        const helpText = document.createElement('span');
+                        helpText.className = 'small text-danger';
+                        helpText.textContent = '¿No recibiste el correo?';
+                        
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm btn-outline-danger fw-bold text-nowrap'; // AÑADIDO: text-nowrap
+                        btn.innerHTML = '<i class="bi bi-send"></i> Reenviar';
+                        btn.onclick = (e) => {
                             e.preventDefault();
-                            solicitarReenvio(email);
+                            solicitarReenvio(email, btn);
                         };
                         
-                        // Limpiar contenido previo si ya existe un link
-                        const existingLink = errorAlert.querySelector('#resendLink');
-                        if (existingLink) existingLink.remove();
+                        actionDiv.appendChild(helpText);
+                        actionDiv.appendChild(btn);
                         
-                        errorAlert.appendChild(link);
+                        errorAlert.appendChild(actionDiv);
                     }
                     
-                
                     errorAlert.classList.add('show');
                 }
             } catch (error) {
@@ -493,12 +620,12 @@
         });
 
         // Función para reenviar confirmación
-        function solicitarReenvio(email) {
+        function solicitarReenvio(email, btn) {
             if (!email) return;
 
-            const link = document.getElementById('resendLink');
-            link.innerHTML = '<span class="spinner"></span> Enviando...';
-            link.style.pointerEvents = 'none';
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
 
             fetch('/resend-confirmation', {
                 method: 'POST',
@@ -507,19 +634,19 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data.message && (data.message.includes('reenviado') || data.message.includes('EMAIL_SENT'))) {
-                    alert('✅ Correo reenviado. Por favor revisa tu bandeja de entrada.');
+                if (data.message && (data.message.includes('reenviado') || data.message.includes('EMAIL_SENT') || data.message.includes('éxito'))) {
+                    showToast('Correo reenviado correctamente. Revisa tu bandeja.', 'success');
                 } else {
-                    alert('❌ ' + (data.message || 'Error al reenviar'));
+                    showToast('Error: ' + (data.message || 'No se pudo reenviar'), 'error');
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert('❌ Error de conexión');
+                showToast('Error de conexión al reenviar', 'error');
             })
             .finally(() => {
-                link.innerHTML = 'Reenviar correo de confirmación';
-                link.style.pointerEvents = 'auto';
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
             });
         }
     </script>

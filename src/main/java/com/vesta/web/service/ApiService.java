@@ -405,20 +405,33 @@ public class ApiService {
 
         try {
             // Intentar parsear el JSON de error
-            // La estructura es {"status": "error", "message": "...", "data": ...}
+            // La estructura es {"success": false, "message": "...", ...}
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            ApiResponseWrapper<?> errorResponse = mapper.readValue(e.getResponseBodyAsString(),
-                    ApiResponseWrapper.class);
-            if (errorResponse != null && errorResponse.getMessage() != null) {
-                return errorResponse.getMessage();
+            // Usamos TypeReference o Map para mayor flexibilidad si el wrapper falla
+            Map<String, Object> errorMap = mapper.readValue(responseBody,
+                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+                    });
+
+            if (errorMap != null && errorMap.containsKey("message")) {
+                return (String) errorMap.get("message");
             }
         } catch (Exception parseException) {
             // Si falla el parseo, devolver el mensaje original o el cuerpo
             logger.warn("No se pudo parsear el error de la API: {}", parseException.getMessage());
         }
 
-        // Si no se pudo extraer un mensaje limpio, devolver algo útil
-        return "Error " + e.getStatusCode() + ": " + e.getResponseBodyAsString();
+        // Si no se pudo extraer un mensaje limpio, devolver algo útil pero limpio
+        // Evitar devolver todo el JSON crudo si es posible
+        if (responseBody != null && responseBody.contains("\"message\":\"")) {
+            // Fallback muy básico por si falla Jackson
+            int start = responseBody.indexOf("\"message\":\"") + 11;
+            int end = responseBody.indexOf("\"", start);
+            if (end > start) {
+                return responseBody.substring(start, end);
+            }
+        }
+
+        return "Error " + e.getStatusCode();
     }
 
     private HttpHeaders getHeaders(String token) {
