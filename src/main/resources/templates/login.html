@@ -30,32 +30,44 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow-x: hidden; /* IMPORTANTE: Oculta desbordamiento horizontal de halos */
-            padding: 2rem 0;
             margin: 0;
+            padding: 2rem 0;
+            overflow-x: hidden; /* Seguridad extra */
         }
 
-        body::before {
-            content: '';
+        /* Contenedor separado para evitar scrollbars por los orbes */
+        .background-decorations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb {
             position: absolute;
+            border-radius: 50%;
+            filter: blur(2px); /* Suaviza bordes */
+        }
+
+        .orb-1 {
             width: 500px;
             height: 500px;
             background: radial-gradient(circle, rgba(241, 166, 28, 0.1) 0%, transparent 70%);
             top: -250px;
             right: -250px;
-            border-radius: 50%;
             animation: pulse 8s ease-in-out infinite;
         }
 
-        body::after {
-            content: '';
-            position: absolute;
+        .orb-2 {
             width: 400px;
             height: 400px;
             background: radial-gradient(circle, rgba(241, 166, 28, 0.08) 0%, transparent 70%);
             bottom: -200px;
             left: -200px;
-            border-radius: 50%;
             animation: pulse 10s ease-in-out infinite reverse;
         }
 
@@ -137,8 +149,11 @@
         }
 
         .input-group-custom {
-            position: relative;
             margin-bottom: 1.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
         }
 
         .input-icon {
@@ -149,6 +164,7 @@
             color: #adb5bd;
             font-size: 1.1rem;
             z-index: 5;
+            pointer-events: none; /* Icono no clickeable para no bloquear input */
         }
 
         .form-control-custom {
@@ -318,6 +334,12 @@
 <div th:replace="~{fragments/cookie-banner :: cookie-banner}"></div>
 <body>
 
+    <!-- Decoraciones de fondo (Aisladas para no causar scroll) -->
+    <div class="background-decorations">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
     <div class="login-container">
         <!-- Logo -->
         <div class="logo-container">
@@ -348,31 +370,35 @@
                 <!-- Email -->
                 <div class="input-group-custom">
                     <label class="form-label">Correo Electrónico</label>
-                    <i class="bi bi-envelope input-icon"></i>
-                    <input 
-                        type="email" 
-                        class="form-control-custom" 
-                        id="email" 
-                        name="correoElectronico" 
-                        placeholder="tu@email.com" 
-                        required 
-                        autocomplete="email"
-                    >
+                    <div class="input-wrapper">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input 
+                            type="email" 
+                            class="form-control-custom" 
+                            id="email" 
+                            name="correoElectronico" 
+                            placeholder="tu@email.com" 
+                            required 
+                            autocomplete="email"
+                        >
+                    </div>
                 </div>
 
                 <!-- Contraseña -->
                 <div class="input-group-custom">
                     <label class="form-label">Contraseña</label>
-                    <i class="bi bi-lock input-icon"></i>
-                    <input 
-                        type="password" 
-                        class="form-control-custom" 
-                        id="password" 
-                        name="contrasena" 
-                        placeholder="••••••••" 
-                        required 
-                        autocomplete="current-password"
-                    >
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            class="form-control-custom" 
+                            id="password" 
+                            name="contrasena" 
+                            placeholder="••••••••" 
+                            required 
+                            autocomplete="current-password"
+                        >
+                    </div>
                 </div>
 
                 <!-- Badge Demo -->
