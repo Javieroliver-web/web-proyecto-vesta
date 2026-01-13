@@ -516,6 +516,32 @@
         </div>
     </div>
 
+    <!-- Modal 2FA (Requerido para la autenticación) -->
+    <div class="modal fade" id="modal2FA" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg text-center p-4">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Autenticación de Dos Pasos</h4>
+                    <p class="text-muted mb-4">Ingresa el código de 6 dígitos de tu aplicación de autenticación para continuar.</p>
+                    
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control text-center fs-4 letter-spacing-2" id="code2fa" placeholder="000000" maxlength="6" autocomplete="one-time-code">
+                        <label for="code2fa">Código de Verificación</label>
+                    </div>
+                    
+                    <div id="error2fa" class="text-danger small mb-3" style="min-height: 20px;"></div>
+                    
+                    <button class="btn btn-primary w-100 py-2 fw-bold" id="btnVerify2FA">Verificar</button>
+                    <!-- Opción de cancelar eliminada para forzar 2FA si se requiere, o se puede permitir cerrar y volver al login -->
+                    <button class="btn btn-link text-muted mt-2" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container para notificaciones -->
     <div class="toast-container position-fixed top-0 end-0 p-3">
         <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -688,49 +714,69 @@
 
         // 2FA Functions
         let currentTempToken = null;
-        const modal2FA = new bootstrap.Modal(document.getElementById('modal2FA'));
+        let modal2FA = null;
+
+        // Inicialización segura del Modal
+        document.addEventListener('DOMContentLoaded', () => {
+             const modalEl = document.getElementById('modal2FA');
+             if (modalEl) {
+                 modal2FA = new bootstrap.Modal(modalEl);
+             } else {
+                 console.error("CRITICAL: modal2FA element not found in DOM");
+             }
+        });
 
         function show2FAModal(token) {
             currentTempToken = token;
-            modal2FA.show();
-            setTimeout(() => document.getElementById('code2fa').focus(), 500);
+            if (modal2FA) {
+                modal2FA.show();
+                setTimeout(() => {
+                    const input = document.getElementById('code2fa');
+                    if(input) input.focus();
+                }, 500);
+            } else {
+                alert("Error: No se pudo cargar la ventana de 2FA. Recarga la página.");
+            }
         }
 
-        document.getElementById('btnVerify2FA').addEventListener('click', async () => {
-            const code = document.getElementById('code2fa').value;
-            const errorDiv = document.getElementById('error2fa');
-            const btn = document.getElementById('btnVerify2FA');
+        const btnVerify = document.getElementById('btnVerify2FA');
+        if (btnVerify) {
+            btnVerify.addEventListener('click', async () => {
+                const codeInput = document.getElementById('code2fa');
+                const code = codeInput ? codeInput.value : '';
+                const errorDiv = document.getElementById('error2fa');
 
-            if (code.length < 6) {
-                errorDiv.textContent = 'Código incompleto';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = 'Verificando...';
-            errorDiv.textContent = '';
-
-            try {
-                const res = await fetch('/login/verify-2fa', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tempToken: currentTempToken, code: code })
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    window.location.href = data.redirectUrl;
-                } else {
-                    errorDiv.textContent = data.message || 'Código incorrecto';
-                    btn.disabled = false;
-                    btn.innerText = 'Verificar';
+                if (code.length < 6) {
+                    if(errorDiv) errorDiv.textContent = 'Código incompleto';
+                    return;
                 }
-            } catch (e) {
-                errorDiv.textContent = 'Error de conexión';
-                btn.disabled = false;
-                btn.innerText = 'Verificar';
-            }
-        });
+
+                btnVerify.disabled = true;
+                btnVerify.innerHTML = 'Verificando...';
+                if(errorDiv) errorDiv.textContent = '';
+
+                try {
+                    const res = await fetch('/login/verify-2fa', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tempToken: currentTempToken, code: code })
+                    });
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        window.location.href = data.redirectUrl || '/cliente/dashboard';
+                    } else {
+                        if(errorDiv) errorDiv.textContent = data.message || 'Código incorrecto';
+                        btnVerify.disabled = false;
+                        btnVerify.innerText = 'Verificar';
+                    }
+                } catch (e) {
+                    if(errorDiv) errorDiv.textContent = 'Error de conexión';
+                    btnVerify.disabled = false;
+                    btnVerify.innerText = 'Verificar';
+                }
+            });
+        }
     </script>
 
 </body>

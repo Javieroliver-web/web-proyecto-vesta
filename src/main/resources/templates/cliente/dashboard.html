@@ -89,9 +89,7 @@
             <h4 class="fw-bold">
                 <i class="bi bi-shield-check text-primary me-2"></i>Mis Pólizas Activas
             </h4>
-            <button class="btn btn-outline-primary btn-sm" onclick="cargarRecomendacion()">
-                <i class="bi bi-arrow-clockwise me-1"></i> Actualizar IA
-            </button>
+
         </div>
         
         <!-- Contenedor dinámico para pólizas del usuario -->
@@ -352,6 +350,9 @@
             cargarRecomendacion();
             cargarPolizas();
             cargarRecomendacionesCatalogo();
+            
+            // Actualizar IA cada 5 minutos (300,000 ms)
+            setInterval(cargarRecomendacion, 300000);
         };
 
         // 2. CHATBOT
