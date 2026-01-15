@@ -44,11 +44,12 @@
             box-shadow: 0 2px 8px rgba(241, 166, 28, 0.2);
         }
         .chat-bot { 
-            background-color: var(--theme-bg-secondary, #f8f9fa); 
+            background-color: #ffffff; 
             color: var(--theme-text-main, #282c3f); 
             align-self: flex-start; 
             border-bottom-left-radius: 4px;
-            border: 1px solid var(--theme-border, #e9ecef);
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .ai-recommendation-card {
@@ -116,26 +117,52 @@
         </div>
     </div>
 
+    <!-- DOOM EASTER EGG MODAL & TOAST -->
+    <div class="modal fade" id="doomModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark border-danger border-3">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title font-monospace text-danger fw-bold">☠️ DOOM 1993 ☠️</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopDoom()"></button>
+                </div>
+                <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black" style="height: 80vh;">
+                    <iframe id="doomFrame" src="" style="width: 800px; height: 600px; max-width: 100%; max-height: 100%; border: none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-50 start-50 translate-middle p-3" style="z-index: 2000">
+        <div id="doomToast" class="toast align-items-center text-bg-danger border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fs-4 fw-bold font-monospace">
+                    <i class="bi bi-trophy-fill me-2"></i> LOGRO DESBLOQUEADO: DOOM SLAYER
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <button class="btn btn-primary chat-btn" data-bs-toggle="modal" data-bs-target="#chatModal">
         <i class="bi bi-chat-dots-fill fs-3"></i>
     </button>
 
     <div class="modal fade" id="chatModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="bi bi-robot me-2"></i>Asistente Legal Vesta</h5>
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-warning border-bottom border-warning">
+                    <h5 class="modal-title"><i class="bi bi-stars me-2"></i>Asistente Vesta</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body d-flex flex-column" id="chatBody" style="height: 350px;">
-                    <div class="chat-message chat-bot">
+                <div class="modal-body d-flex flex-column bg-light" id="chatBody" style="height: 350px;">
+                    <div class="chat-message chat-bot shadow-sm">
                         Hola, soy la IA de Vesta. Pregúntame sobre coberturas o dudas legales.
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer bg-white border-top-0">
                     <div class="input-group">
-                        <input type="text" id="chatInput" class="form-control border-0" placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter') enviarMensaje()">
-                        <button class="btn btn-primary" onclick="enviarMensaje()"><i class="bi bi-send-fill"></i></button>
+                        <input type="text" id="chatInput" class="form-control bg-light border-0" placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter') enviarMensaje()">
+                        <button class="btn btn-warning text-white" onclick="enviarMensaje()"><i class="bi bi-send-fill"></i></button>
                     </div>
                 </div>
             </div>
@@ -143,36 +170,40 @@
     </div>
 
     <div class="modal fade" id="siniestroModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Reportar Siniestro (Perito IA)</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-danger border-bottom border-danger">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-shield-exclamation me-2"></i>Reportar Siniestro</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body bg-light">
+                    <div class="alert alert-warning border-0 shadow-sm mb-3">
+                        <small><i class="bi bi-info-circle me-1"></i> El <strong>Perito IA</strong> analizará tu imagen en tiempo real.</small>
+                    </div>
                     <form id="formSiniestro">
                         <input type="hidden" id="polizaId" value="1">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Describe qué pasó:</label>
-                            <textarea class="form-control" id="descSiniestro" rows="3" placeholder="Ej: Se me cayó el móvil y se rompió la pantalla..." required></textarea>
+                            <label class="form-label fw-bold small text-uppercase text-muted">¿Qué ha ocurrido?</label>
+                            <textarea class="form-control border-0 shadow-sm" id="descSiniestro" rows="3" placeholder="Describe los detalles del incidente..." style="resize: none;" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Sube una foto del daño:</label>
-                            <div class="p-4 border border-2 border-dashed rounded text-center bg-light">
-                                <i class="bi bi-camera fs-1 text-muted"></i>
-                                <input type="file" class="form-control mt-2" id="fotoSiniestro" accept="image/*" required>
-                                <small class="text-muted d-block mt-1">La IA analizará esta imagen automáticamente.</small>
+                            <label class="form-label fw-bold small text-uppercase text-muted">Evidencia Fotográfica</label>
+                            <div class="p-4 border-2 border-dashed rounded text-center bg-white position-relative hover-lift transition-all" style="border-color: #dee2e6; border-style: dashed;">
+                                <i class="bi bi-camera-fill fs-1 text-secondary mb-2"></i>
+                                <p class="small text-muted mb-2">Arrastra tu foto aquí o haz clic</p>
+                                <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" id="fotoSiniestro" accept="image/*" style="cursor: pointer;" required>
                             </div>
                         </div>
                     </form>
-                    <div id="analisisResult" class="alert alert-warning d-none mt-3">
-                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Analizando imagen con Inteligencia Artificial...
+                    <div id="analisisResult" class="d-none mt-3">
+                        <!-- Dynamic Content -->
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btnEnviarSiniestro" class="btn btn-danger" onclick="enviarSiniestro()">Enviar Reporte</button>
+                <div class="modal-footer bg-white border-top-0">
+                    <button type="button" class="btn btn-outline-secondary border-0" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnEnviarSiniestro" class="btn btn-danger px-4 rounded-pill shadow-sm" onclick="enviarSiniestro()">
+                        <i class="bi bi-send-fill me-2"></i>Enviar Reporte
+                    </button>
                 </div>
             </div>
         </div>
@@ -441,6 +472,59 @@
                 // SI FALLA, MOSTRAR EL BOTÓN DE NUEVO PARA QUE PUEDA REINTENTAR
                 btnEnviar.style.display = 'block';
             }
+        }
+
+        // --- DOOM EASTER EGG LOGIC ---
+        let dCounter = 0;
+        let lastDTime = 0;
+        const DOOM_TIMEOUT = 500; // ms
+
+        document.addEventListener('keydown', (e) => {
+            // Ignorar si estamos escribiendo en un input o textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (e.key.toLowerCase() === 'd') {
+                const now = Date.now();
+                if (now - lastDTime < DOOM_TIMEOUT) {
+                    dCounter++;
+                } else {
+                    dCounter = 1;
+                }
+                lastDTime = now;
+
+                if (dCounter === 3) {
+                    triggerDoom();
+                    dCounter = 0;
+                }
+            } else {
+                dCounter = 0;
+            }
+        });
+
+        function triggerDoom() {
+            // Mostrar Toast
+            const toastEl = document.getElementById('doomToast');
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            toast.show();
+
+            // Abrir Modal después de un breve delay
+            setTimeout(() => {
+                const modalEl = document.getElementById('doomModal');
+                const modal = new bootstrap.Modal(modalEl);
+                // URL corregida (versión MS-DOS estable)
+                document.getElementById('doomFrame').src = "https://archive.org/embed/doom_dos?autoplay=1";
+                modal.show();
+            }, 1000);
+        }
+
+        function stopDoom() {
+            document.getElementById('doomFrame').src = "";
+        }
+        
+        // Asegurar que el sonido pare si se cierra el modal
+        const doomModal = document.getElementById('doomModal');
+        if (doomModal) {
+            doomModal.addEventListener('hidden.bs.modal', stopDoom);
         }
     </script>
     <script src="/static/js/voice-assistant.js"></script>

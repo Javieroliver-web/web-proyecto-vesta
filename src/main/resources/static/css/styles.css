@@ -47,42 +47,96 @@
 }
 
 /* ===== TEMA OSCURO ===== */
+/* ===== TEMA OSCURO PREMIUM ===== */
 [data-theme="dark"] {
-    --theme-bg: #141620;
-    --theme-bg-secondary: #282c3f;
-    --theme-card-bg: #1a1d2e;
-    --theme-text-main: #f8f9fa;
-    --theme-text-muted: #adb5bd;
-    --theme-border: #282c3f;
-    --theme-input-bg: #0f1118;
+    --theme-bg: #0f111a;
+    --theme-bg-secondary: #161b22;
+    --theme-card-bg: #1e2330;
+    --theme-text-main: #e2e8f0;
+    --theme-text-muted: #94a3b8;
+    --theme-border: #2d3748;
+    --theme-input-bg: #0d1117;
 }
 
 /* Overrides de Utilidades Bootstrap para Dark Mode */
-[data-theme="dark"] .text-dark {
-    color: #f8f9fa !important;
-}
-
-[data-theme="dark"] .text-secondary {
-    color: #adb5bd !important;
-}
+[data-theme="dark"] .text-dark { color: #e2e8f0 !important; }
+[data-theme="dark"] .text-secondary { color: #94a3b8 !important; }
+[data-theme="dark"] .text-muted { color: #64748b !important; }
 
 [data-theme="dark"] .bg-light {
-    background-color: #282c3f !important;
-    color: #f8f9fa !important;
+    background-color: var(--theme-bg-secondary) !important;
+    color: var(--theme-text-main) !important;
 }
 
 [data-theme="dark"] .bg-white {
-    background-color: #1a1d2e !important;
-    color: #f8f9fa !important;
+    background-color: var(--theme-card-bg) !important;
+    color: var(--theme-text-main) !important;
 }
 
 [data-theme="dark"] .border {
-    border-color: #282c3f !important;
+    border-color: var(--theme-border) !important;
 }
 
 [data-theme="dark"] .shadow-sm, 
 [data-theme="dark"] .shadow {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Tablas en Dark Mode */
+[data-theme="dark"] .table {
+    color: var(--theme-text-main);
+    border-color: var(--theme-border);
+}
+
+[data-theme="dark"] .table-light {
+    background-color: #2d3748;
+    color: var(--theme-text-main);
+}
+
+[data-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent;
+    border-color: var(--theme-border);
+    color: var(--theme-text-main);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255,255,255, 0.03);
+    color: var(--theme-text-main);
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+    background-color: rgba(241, 166, 28, 0.1);
+    color: #fff;
+}
+
+/* Input Styles Dark Mode */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--theme-input-bg);
+    border-color: var(--theme-border);
+    color: #fff;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: #0f111a;
+    border-color: var(--vesta-gold);
+    box-shadow: 0 0 0 4px rgba(241, 166, 28, 0.15);
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--theme-card-bg);
+    border: 1px solid var(--theme-border);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--theme-border);
+    background-color: rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 /* ===== RESET Y BASE ===== */
@@ -670,8 +724,35 @@ body {
 }
 
 .skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: var(--radius);
+}
+
+/* ===== SIDEBAR (ADMIN) ===== */
+.sidebar {
+    background-color: var(--vesta-navy);
+    color: white;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 0.25rem;
+}
+
+.sidebar .nav-link:hover {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.sidebar .nav-link.active {
+    background-color: #0d6efd !important; /* Bootstrap Primary Blue to match user preference in screenshot */
+    color: white !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1rem;
 }

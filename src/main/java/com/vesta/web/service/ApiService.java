@@ -428,6 +428,89 @@ public class ApiService {
         }
     }
 
+    // === GESTIÓN DE USUARIOS ===
+    public List<Map<String, Object>> obtenerTodosLosUsuarios(String token) {
+        String url = apiUrl + "/usuarios";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener usuarios: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    public void actualizarEstadoUsuario(Long userId, boolean activo, String token) {
+        String url = apiUrl + "/usuarios/" + userId;
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("activo", activo);
+
+        try {
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(updates, getHeaders(token)),
+                    String.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar estado de usuario: " + e.getMessage());
+        }
+    }
+
+    public List<Map<String, Object>> obtenerTodasLasPolizas(String token) {
+        String url = apiUrl + "/polizas";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener pólizas: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    // === AUDITORÍA ===
+    public List<Map<String, Object>> obtenerLogsAuditoria(String token) {
+        String url = apiUrl + "/auditoria";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener logs: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    // === ESTADÍSTICAS ===
+    public Map<String, Object> obtenerEstadisticas(String token) {
+        String url = apiUrl + "/admin/estadisticas";
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener estadísticas: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
     // === UTILIDADES ===
 
     private String extractErrorMessage(HttpClientErrorException e) {

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión Catálogo - Vesta Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div th:replace="~{admin/fragments/sidebar :: sidebar(activeTab='catalogo')}"></div>
+
+        <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-warning">📑 Gestión de Seguros</h2>
+            <button class="btn btn-primary" onclick="openProductModal()">
+                <i class="bi bi-plus-lg me-2"></i>Nuevo Producto
+            </button>
+        </div>
+
+        <!-- TABLA PRODUCTOS -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">ID</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- JS content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- MODAL PRODUCTO -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Nuevo Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="prodId">
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nombre</label>
+                                <input type="text" class="form-control" id="prodNombre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Categoría</label>
+                                <select class="form-select" id="prodCategoria" required>
+                                    <option value="Mascota">Mascota</option>
+                                    <option value="Movilidad">Movilidad</option>
+                                    <option value="Tecnología">Tecnología</option>
+                                    <option value="Hogar">Hogar</option>
+                                    <option value="Viaje">Viaje</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Descripción</label>
+                                <textarea class="form-control" id="prodDescripcion" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Precio Base (€/mes)</label>
+                                <input type="number" class="form-control" id="prodPrecio" step="0.01" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">URL Imagen</label>
+                                <input type="url" class="form-control" id="prodImagen" placeholder="https://..." required oninput="updateImagePreview()">
+                            </div>
+                            <!-- Vista Previa Imagen -->
+                            <div class="col-12 text-center" id="previewContainer" style="display: none;">
+                                <label class="form-label small text-muted d-block">Vista Previa</label>
+                                <img id="prodPreview" src="" class="img-fluid rounded shadow-sm border" style="max-height: 150px; object-fit: contain;">
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check form-switch p-3 bg-light rounded bg-opacity-10 d-flex align-items-center gap-2">
+                                    <input class="form-check-input ms-0" type="checkbox" id="prodActivo" checked>
+                                    <label class="form-check-label fw-bold ms-2" for="prodActivo">Producto Activo (Visible en tienda)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="saveProduct()">Guardar Producto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i id="toastIcon" class="bi"></i>
+                    <strong id="toastMessage" class="me-auto"></strong>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const token = [[${session.token}]];
+        const apiBaseUrl = window.location.protocol + '//' + window.location.hostname + ':8080/api/productos';
+        let productModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            productModal = new bootstrap.Modal(document.getElementById('productModal'));
+            loadProducts();
+        });
+
+        async function loadProducts() {
+            try {
+                const res = await fetch(apiBaseUrl, { headers: { 'Authorization': 'Bearer ' + token } });
+                if(!res.ok) throw new Error("Error loading");
+                const products = await res.json();
+                renderTable(products);
+            } catch(e) {
+                console.error(e);
+                showToast('Error cargando productos', 'error');
+            }
+        }
+
+        function renderTable(products) {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4 fw-bold text-muted">#${p.id}</td>
+                    <td>
+                        <img src="${p.imagenUrl}" 
+                             class="rounded shadow-sm" 
+                             style="width: 40px; height: 40px; object-fit: cover;"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-secondary bg-opacity-10 rounded d-flex align-items-center justify-content-center text-secondary\' style=\'width:40px;height:40px\'><i class=\'bi bi-image\'></i></div>'">
+                    </td>
+                    <td class="fw-bold">${p.nombre}</td>
+                    <td><span class="badge bg-light text-dark border">${p.categoria}</span></td>
+                    <td class="font-monospace fw-bold text-primary">${p.precioBase.toFixed(2)}€</td>
+                    <td>
+                        <span class="badge ${p.activo ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">
+                            ${p.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick='editProduct(${JSON.stringify(p)})'><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openProductModal() {
+            document.getElementById('productForm').reset();
+            document.getElementById('prodId').value = '';
+            document.getElementById('modalTitle').innerText = 'Nuevo Producto';
+            document.getElementById('prodActivo').checked = true;
+            productModal.show();
+        }
+
+        function editProduct(p) {
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodNombre').value = p.nombre;
+            document.getElementById('prodCategoria').value = p.categoria;
+            document.getElementById('prodDescripcion').value = p.descripcion;
+            document.getElementById('prodPrecio').value = p.precioBase;
+            document.getElementById('prodImagen').value = p.imagenUrl;
+            document.getElementById('prodActivo').checked = p.activo;
+            
+            document.getElementById('modalTitle').innerText = 'Editar Producto';
+            
+            // Actualizar vista previa
+            updateImagePreview();
+            
+            productModal.show();
+        }
+
+        function updateImagePreview() {
+            const url = document.getElementById('prodImagen').value;
+            const container = document.getElementById('previewContainer');
+            const img = document.getElementById('prodPreview');
+            
+            if (url && url.length > 10) {
+                img.src = url;
+                img.onerror = function() { container.style.display = 'none'; };
+                img.onload = function() { container.style.display = 'block'; };
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        async function saveProduct() {
+            const id = document.getElementById('prodId').value;
+            const data = {
+                nombre: document.getElementById('prodNombre').value,
+                categoria: document.getElementById('prodCategoria').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                precioBase: parseFloat(document.getElementById('prodPrecio').value),
+                imagenUrl: document.getElementById('prodImagen').value,
+                activo: document.getElementById('prodActivo').checked
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiBaseUrl}/${id}` : apiBaseUrl;
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(data)
+                });
+
+                if(res.ok) {
+                    showToast('Producto guardado correctamente', 'success');
+                    productModal.hide();
+                    loadProducts();
+                } else {
+                    showToast('Error al guardar', 'error');
+                }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm('¿Seguro que quieres eliminar este producto?')) return;
+            try {
+                const res = await fetch(`${apiBaseUrl}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if(res.ok) {
+                    showToast('Producto eliminado', 'success');
+                    loadProducts();
+                } else {
+                    showToast('Error al eliminar', 'error');
+                }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+
+        function showToast(msg, type) {
+            const el = document.getElementById('liveToast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMessage');
+            
+            el.className = 'toast align-items-center text-white border-0 shadow-lg';
+            if(type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
+            else { el.classList.add('bg-danger'); icon.className = 'bi bi-x-circle-fill'; }
+            
+            text.innerText = msg;
+            new bootstrap.Toast(el).show();
+        }
+    </script>
+</body>
+</html>

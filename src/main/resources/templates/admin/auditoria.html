@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Auditoría de Acciones - Vesta Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div th:replace="~{admin/fragments/sidebar :: sidebar(activeTab='auditoria')}"></div>
+
+        <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-warning">🛡️ Auditoría de Seguridad</h2>
+                <div class="input-group w-25">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="searchLog" placeholder="Filtrar logs...">
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-terminal me-2"></i> System Logs
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 font-monospace" style="font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Detalle</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                            <tr th:each="log : ${logs}">
+                                <td class="text-muted" th:text="${#temporals.format(log.fecha, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 10:00:00</td>
+                                <td class="fw-bold text-primary" th:text="${log.usuarioEmail}">admin@vesta.com</td>
+                                <td>
+                                    <span th:class="${'badge ' + (log.accion.contains('DELETE') || log.accion.contains('BAN') ? 'bg-danger' : (log.accion.contains('UPDATE') ? 'bg-warning text-dark' : 'bg-info text-dark'))}" 
+                                          th:text="${log.accion}">LOGIN</span>
+                                </td>
+                                <td th:text="${log.detalle}">Detalles...</td>
+                                <td class="text-muted small" th:text="${log.ip}">127.0.0.1</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(logs)}">
+                                <td colspan="5" class="text-center py-5 text-muted">No hay registros de actividad recientes.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('searchLog').addEventListener('keyup', function() {
+            const value = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#logTableBody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(value) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

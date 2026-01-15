@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sidebar(activeTab)" class="sidebar p-3 d-flex flex-column flex-shrink-0" style="width: 250px; min-height: 100vh; background: #282c3f; color: white;">
+        <h4 class="mb-4 text-center fw-bold text-white">
+            <i class="bi bi-shield-check" style="color: #f1a61c;"></i> ADMIN
+        </h4>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''" th:href="@{/admin/dashboard}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''" th:href="@{/admin/usuarios}">
+                    <i class="bi bi-people me-2"></i> Usuarios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'polizas'} ? 'active' : ''" th:href="@{/admin/polizas}">
+                    <i class="bi bi-shield-check me-2"></i> Pólizas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'catalogo'} ? 'active' : ''" th:href="@{/admin/catalogo}">
+                    <i class="bi bi-journal-check me-2"></i> Catálogo
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'auditoria'} ? 'active' : ''" th:href="@{/admin/auditoria}">
+                    <i class="bi bi-clock-history me-2"></i> Auditoría
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'configuracion'} ? 'active' : ''" th:href="@{/admin/configuracion}">
+                    <i class="bi bi-gear me-2"></i> Configuración
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto pt-3 border-top border-secondary">
+            <div class="d-flex align-items-center mb-2 px-2 text-white small">
+                <i class="bi bi-person-circle me-2"></i>
+                <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Admin'}">Admin</span>
+            </div>
+            <a href="/logout" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
+        </div>
+        <script>
+            // Aplicar tema oscuro si está guardado
+            (function() {
+                const theme = localStorage.getItem('theme');
+                if (theme) {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            })();
+        </script>
+    </div>
+</body>
+</html>
