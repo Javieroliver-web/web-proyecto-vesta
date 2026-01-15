@@ -146,6 +146,32 @@
                             </div>
                         </div>
 
+                        <!-- CUENTAS VINCULADAS -->
+                        <div class="card border-0 shadow-sm mt-4">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-0">Cuentas Vinculadas</h5>
+                            </div>
+                            <div class="card-body px-4 pb-4">
+                                <p class="text-muted small">Inicia sesión rápidamente con tus cuentas sociales.</p>
+                                
+                                <!-- Google -->
+                                <div class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-white p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="24" height="24">
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">Google</h6>
+                                            <small class="text-muted" id="status-google">No vinculado</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary" id="btn-google" onclick="toggleLink('google')">Vincular</button>
+                                </div>
+
+                                <!-- Apple Eliminado -->
+                            </div>
+                        </div>
+
                         <!-- ZONA DE PELIGRO -->
                         <div class="card border-danger shadow-sm mt-4">
                             <div class="card-header bg-danger-subtle text-danger border-0 pt-4 px-4">
@@ -682,6 +708,60 @@
                     showToast('Error al desactivar 2FA', 'danger');
                 }
             } catch (e) { showToast('Error de conexión', 'danger'); }
+        }
+
+        // === CUENTAS VINCULADAS LOGIC (MOCK) ===
+        function loadLinkedAccounts() {
+            const provider = localStorage.getItem('social_login_provider');
+            if (provider) {
+                updateLinkUI(provider, true);
+            }
+        }
+        loadLinkedAccounts();
+
+        function updateLinkUI(provider, isLinked) {
+            const statusEl = document.getElementById(`status-${provider}`);
+            const btnEl = document.getElementById(`btn-${provider}`);
+            
+            if (isLinked) {
+                statusEl.innerText = 'Vinculado';
+                statusEl.className = 'text-success fw-bold';
+                btnEl.innerText = 'Desvincular';
+                btnEl.className = 'btn btn-sm btn-outline-danger';
+            } else {
+                statusEl.innerText = 'No vinculado';
+                statusEl.className = provider === 'apple' ? 'text-white-50' : 'text-muted';
+                btnEl.innerText = 'Vincular';
+                btnEl.className = provider === 'apple' ? 'btn btn-sm btn-light' : 'btn btn-sm btn-outline-primary';
+            }
+        }
+
+        function toggleLink(provider) {
+            const isLinked = localStorage.getItem('social_login_provider') === provider;
+
+            if (isLinked) {
+                // Desvincular
+                if (confirm(`¿Estás seguro de desvincular tu cuenta de ${provider}?`)) {
+                    localStorage.removeItem('social_login_provider');
+                    localStorage.removeItem('social_login_user');
+                    updateLinkUI(provider, false);
+                    showToast(`Cuenta de ${provider} desvinculada.`, 'success');
+                }
+            } else {
+                // Vincular (Simulado)
+                const btn = document.getElementById(`btn-${provider}`);
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Conectando...';
+
+                setTimeout(() => {
+                    localStorage.setItem('social_login_provider', provider);
+                    localStorage.setItem('social_login_user', 'Usuario Demo ' + provider);
+                    updateLinkUI(provider, true);
+                    showToast(`Cuenta de ${provider} vinculada exitosamente.`, 'success');
+                    btn.disabled = false;
+                }, 1500);
+            }
         }
     </script>
     <script src="/static/js/voice-assistant.js"></script>

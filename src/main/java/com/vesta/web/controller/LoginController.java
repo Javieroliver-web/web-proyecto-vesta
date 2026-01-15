@@ -151,6 +151,25 @@ public class LoginController {
         }
     }
 
+    // NEW EXPLICIT ENDPOINT FOR SOCIAL LOGIN MOCK
+    @PostMapping("/login/mock-social-session")
+    @ResponseBody
+    public ResponseEntity<?> createMockSocialSession(@RequestBody Map<String, String> request, HttpSession session) {
+        String provider = request.get("provider");
+        logger.info("🎭 Creando sesión mock para: {}", provider);
+
+        // Simular un token y usuario de demo
+        session.setAttribute("token", "mock-token-" + provider);
+        session.setAttribute("rol", "USUARIO");
+        session.setAttribute("usuarioNombre", "Usuario Demo " + provider);
+        session.setAttribute("usuarioId", 999L);
+        session.setAttribute("usuarioEmail", "demo-" + provider + "@vesta.com");
+
+        Map<String, String> result = new HashMap<>();
+        result.put("redirectUrl", "/cliente/dashboard");
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         logger.info("🚪 Cerrando sesión");

@@ -343,13 +343,7 @@
     <div class="login-container">
         <!-- Logo -->
         <div class="logo-container">
-            <div class="logo-shield">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 3.18l7 3.12v4.7c0 4.31-2.99 8.34-7 9.27-4.01-.93-7-4.96-7-9.27V7.3l7-3.12z"/>
-                    <path d="M12 6c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2s2-.9 2-2V8c0-1.1-.9-2-2-2zm0 2v2h-.01V8H12zm-4 4l2 4 2-2 2 2 2-4H8z"/>
-                </svg>
-            </div>
-            <div class="logo-text">VESTA</div>
+            <img th:src="@{/images/logo_vesta.png}" alt="Vesta Logo" style="max-width: 200px; height: auto;">
         </div>
 
         <!-- Card de Login -->
@@ -367,19 +361,19 @@
             </div>
 
             <form id="loginForm">
-                <!-- Email -->
+                <!-- Email o Teléfono -->
                 <div class="input-group-custom">
-                    <label class="form-label">Correo Electrónico</label>
+                    <label class="form-label">Correo Electrónico o Teléfono</label>
                     <div class="input-wrapper">
-                        <i class="bi bi-envelope input-icon"></i>
+                        <i class="bi bi-person input-icon"></i>
                         <input 
-                            type="email" 
+                            type="text" 
                             class="form-control-custom" 
                             id="email" 
                             name="correoElectronico" 
-                            placeholder="tu@email.com" 
+                            placeholder="tu@email.com o 600123456" 
                             required 
-                            autocomplete="email"
+                            autocomplete="username"
                         >
                     </div>
                 </div>
@@ -411,6 +405,21 @@
                     <span id="btnText">Iniciar Sesión</span>
                     <span id="btnSpinner" style="display: none;"><span class="spinner"></span> Iniciando...</span>
                 </button>
+
+                <!-- Social Login -->
+                <div class="position-relative my-4 text-center">
+                    <hr style="border-color: #dee2e6;">
+                    <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small" style="z-index: 1;">O continúa con</span>
+                </div>
+
+                <div class="d-grid mb-4">
+                    <!-- Google Button -->
+                    <a href="/oauth2/authorization/google" class="btn btn-light border py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="text-decoration: none;">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
+                        <span class="fw-semibold text-secondary">Continuar con Google</span>
+                    </a>
+                </div>
+
             </form>
 
             <!-- Links adicionales -->
@@ -777,6 +786,8 @@
                 }
             });
         }
+
+
     </script>
 
 </body>

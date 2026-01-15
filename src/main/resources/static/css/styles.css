@@ -62,6 +62,8 @@
 [data-theme="dark"] .text-dark { color: #e2e8f0 !important; }
 [data-theme="dark"] .text-secondary { color: #94a3b8 !important; }
 [data-theme="dark"] .text-muted { color: #64748b !important; }
+/* Excepción para badges brillantes (Warning/Info) que necesitan texto oscuro */
+[data-theme="dark"] .badge.text-dark { color: #212529 !important; }
 
 [data-theme="dark"] .bg-light {
     background-color: var(--theme-bg-secondary) !important;

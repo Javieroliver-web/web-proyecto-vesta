@@ -5,6 +5,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <!-- Librería para Exportación -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="d-flex">
@@ -13,10 +15,45 @@
 
         <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold text-warning">👥 Gestión de Usuarios</h2>
-                <div class="input-group w-25">
-                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0 ps-0" id="searchUser" placeholder="Buscar por email...">
+                <div>
+                   <h2 class="fw-bold text-warning mb-0">👥 Gestión de Usuarios</h2>
+                   <p class="text-muted small mb-0">Gestiona accesos y exporta el listado de clientes</p>
+                </div>
+                <button class="btn btn-success" onclick="exportToExcel()">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Exportar Excel
+                </button>
+            </div>
+
+            <!-- Toolbar de Filtros -->
+            <div class="card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-body py-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-white"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" id="searchUser" placeholder="Buscar por Nombre, Email...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterRol" onchange="applyFilters()">
+                                <option value="">Todos los Roles</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="USER">Usuario</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                             <select class="form-select" id="filterStatus" onchange="applyFilters()">
+                                <option value="">Estado</option>
+                                <option value="ACTIVO">Activo</option>
+                                <option value="BLOQUEADO">Bloqueado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="bi bi-x-circle me-1"></i>Limpiar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -27,7 +64,9 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Usuario</th>
-                                <th>Email</th>
+                                <th>Contacto</th>
+                                <th>Ubicación</th>
+                                <th>Edad</th>
                                 <th>Rol</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -41,10 +80,27 @@
                                         <div class="avatar-circle bg-light text-primary me-2 rounded-circle d-flex align-items-center justify-content-center" style="width:35px;height:35px;">
                                             <i class="bi bi-person-fill"></i>
                                         </div>
-                                        <span th:text="${u.nombreCompleto}">Nombre</span>
+                                        <div>
+                                            <div class="fw-bold" th:text="${u.nombreCompleto}">Nombre</div>
+                                            <small class="text-muted" th:if="${u.fechaCreacionObj}" th:text="'Reg: ' + ${#temporals.format(u.fechaCreacionObj, 'dd/MM/yyyy')}">01/01/2024</small>
+<small class="text-muted" th:unless="${u.fechaCreacionObj}" th:text="'Reg: ' + ${u.fechaCreacion}">01/01/2024</small>
+                                        </div>
                                     </div>
                                 </td>
-                                <td th:text="${u.email}">email@example.com</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <small><i class="bi bi-envelope me-1"></i> <span th:text="${u.email}">email</span></small>
+                                        <small class="text-muted" th:if="${u.movil}"><i class="bi bi-phone me-1"></i> <span th:text="${u.movil}">600...</span></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:if="${u.ciudad}" th:text="${u.ciudad}">Sevilla</span>
+                                    <span th:unless="${u.ciudad}" class="text-muted">-</span>
+                                </td>
+                                <td>
+                                    <span th:if="${u.edad}" th:text="${u.edad} + ' años'">25 años</span>
+                                    <span th:unless="${u.fechaNacimiento}" class="text-muted">-</span>
+                                </td>
                                 <td>
                                     <span th:class="${'badge ' + (u.rol == 'ADMIN' ? 'bg-warning text-dark' : 'bg-info bg-opacity-10 text-info border border-info')}" 
                                           th:text="${u.rol}">USER</span>
@@ -54,7 +110,8 @@
                                     <span th:if="${u.activo == false}" class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1" th:onclick="verDetalle([[${u.id}]], [[${u.nombreCompleto}]], [[${u.email}]], [[${u.ciudad}]], [[${u.rol}]])">
+                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                            th:onclick="verDetalle([[${u.id}]], [[${u.nombreCompleto}]], [[${u.email}]], [[${u.ciudad}]], [[${u.rol}]], [[${u.movil}]], [[${u.fechaNacimiento}]], [[${u.direccion}]])">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                     
@@ -96,7 +153,12 @@
                     <div class="row text-start bg-light p-3 rounded mx-2">
                         <div class="col-6 mb-2"><small class="text-muted d-block">ID</small> <span id="detailId" class="fw-bold"></span></div>
                         <div class="col-6 mb-2"><small class="text-muted d-block">Rol</small> <span id="detailRol" class="fw-bold"></span></div>
-                        <div class="col-12"><small class="text-muted d-block">Ciudad</small> <span id="detailCiudad"></span></div>
+                        
+                        <div class="col-6 mb-2"><small class="text-muted d-block">Teléfono</small> <span id="detailMovil"></span></div>
+                        <div class="col-6 mb-2"><small class="text-muted d-block">Nacimiento</small> <span id="detailNacimiento"></span></div>
+                        
+                        <div class="col-6 mb-2"><small class="text-muted d-block">Ciudad</small> <span id="detailCiudad"></span></div>
+                        <div class="col-12"><small class="text-muted d-block">Dirección</small> <span id="detailDireccion"></span></div>
                     </div>
                 </div>
             </div>
@@ -112,21 +174,57 @@
         const apiBaseUrl = 'http://localhost:8080/api';
 
         // Filtro de búsqueda
-        document.getElementById('searchUser').addEventListener('keyup', function() {
-            const value = this.value.toLowerCase();
+        // --- FILTROS ---
+        document.getElementById('searchUser').addEventListener('keyup', applyFilters);
+
+        function applyFilters() {
+            const searchText = document.getElementById('searchUser').value.toLowerCase();
+            const rolFilter = document.getElementById('filterRol').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+
             const rows = document.querySelectorAll('#userTableBody tr');
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(value) ? '' : 'none';
-            });
-        });
+                
+                // Rol en columna 6 (index 5) - OJO: Indices cambiaron al añadir columnas
+                const rolCell = row.cells[5].innerText.trim();
+                // Estado en columna 7 (index 6)
+                const statusCell = row.cells[6].innerText.trim();
 
-        function verDetalle(id, nombre, email, ciudad, rol) {
+                let matchesSearch = text.includes(searchText);
+                let matchesRol = rolFilter === '' || rolCell === rolFilter;
+                let matchesStatus = statusFilter === '' || statusCell === statusFilter;
+
+                row.style.display = (matchesSearch && matchesRol && matchesStatus) ? '' : 'none';
+            });
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchUser').value = '';
+            document.getElementById('filterRol').value = '';
+            document.getElementById('filterStatus').value = '';
+            applyFilters();
+        }
+
+        // --- EXPORTAR ---
+        function exportToExcel() {
+            const table = document.querySelector("table");
+            const wb = XLSX.utils.table_to_book(table, {sheet: "Usuarios"});
+            XLSX.writeFile(wb, "Reporte_Usuarios_Vesta.xlsx");
+        }
+
+        function verDetalle(id, nombre, email, ciudad, rol, movil, nacimiento, direccion) {
             document.getElementById('detailId').innerText = '#' + id;
             document.getElementById('detailNombre').innerText = nombre;
             document.getElementById('detailEmail').innerText = email;
+            
             document.getElementById('detailCiudad').innerText = ciudad || 'No registrada';
             document.getElementById('detailRol').innerText = rol;
+            
+            document.getElementById('detailMovil').innerText = movil || '-';
+            document.getElementById('detailNacimiento').innerText = nacimiento || '-';
+            document.getElementById('detailDireccion').innerText = direccion || '-';
+
             new bootstrap.Modal(document.getElementById('modalUsuario')).show();
         }
 

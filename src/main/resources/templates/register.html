@@ -550,20 +550,64 @@
                     </div>
 
                     <div>
+                        <label class="form-label">Fecha de Nacimiento</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar-event text-muted"></i></span>
+                            <input type="date" class="form-control" id="fechaNacimiento" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid two-cols" style="margin-top: 1rem;">
+                    <div>
                         <label class="form-label">Teléfono Móvil</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-phone text-muted"></i></span>
                             <input type="tel" class="form-control" id="movil" required placeholder="+34 600 000 000">
                         </div>
                     </div>
-                </div>
-
-                <div class="form-grid" style="margin-top: 1rem;">
                     <div>
                         <label class="form-label">Correo Electrónico</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
                             <input type="email" class="form-control" id="email" required placeholder="tu@email.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Dirección</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt text-muted"></i></span>
+                            <input type="text" class="form-control" id="direccion" required placeholder="Calle Ejemplo 123">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid two-cols" style="margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Ciudad</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building text-muted"></i></span>
+                            <input type="text" class="form-control" id="ciudad" required placeholder="Sevilla">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Código Postal</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-mailbox text-muted"></i></span>
+                            <input type="text" class="form-control" id="codigoPostal" required placeholder="41001">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-grid" style="margin-top: 1rem;">
+                     <div>
+                        <label class="form-label">País</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-globe text-muted"></i></span>
+                            <input type="text" class="form-control" id="pais" value="España" placeholder="España">
                         </div>
                     </div>
                 </div>
@@ -666,12 +710,31 @@
                 return;
             }
 
+            // Validación de Edad (18+)
+            const fechaNacimiento = new Date(document.getElementById('fechaNacimiento').value);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+            const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+                edad--;
+            }
+            
+            if (edad < 18) {
+                showError("Debes tener al menos 18 años para registrarte.");
+                return;
+            }
+
             // Datos del formulario
             const data = {
                 nombreCompleto: document.getElementById('nombre').value,
-                correoElectronico: document.getElementById('email').value, // CAMBIO: email -> correoElectronico
+                correoElectronico: document.getElementById('email').value,
                 movil: document.getElementById('movil').value,
-                contrasena: pass, // CAMBIO: password -> contrasena
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                direccion: document.getElementById('direccion').value,
+                codigoPostal: document.getElementById('codigoPostal').value,
+                ciudad: document.getElementById('ciudad').value,
+                pais: document.getElementById('pais').value,
+                contrasena: pass,
                 aceptaTerminos: document.getElementById('checkTerms').checked,
                 aceptaPrivacidad: document.getElementById('checkPrivacy').checked,
                 aceptaMarketing: document.getElementById('checkMarketing').checked

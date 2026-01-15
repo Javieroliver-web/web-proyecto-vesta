@@ -113,6 +113,34 @@ public class ApiService {
         }
     }
 
+    public AuthResponseDTO socialLogin(String email, String name, String provider) {
+        try {
+            String url = apiUrl + "/auth/social-login";
+            logger.debug("Procesando login social para: {}", email);
+
+            Map<String, String> request = new HashMap<>();
+            request.put("email", email);
+            request.put("nombre", name);
+            request.put("proveedor", provider);
+
+            ResponseEntity<ApiResponseWrapper<AuthResponseDTO>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    new ParameterizedTypeReference<ApiResponseWrapper<AuthResponseDTO>>() {
+                    });
+
+            if (response.getBody() != null && response.getBody().getData() != null) {
+                return response.getBody().getData();
+            } else {
+                throw new RuntimeException("Respuesta de API vacía en social login");
+            }
+        } catch (Exception e) {
+            logger.error("Error en social login: {}", e.getMessage());
+            throw new RuntimeException("Error al procesar login social");
+        }
+    }
+
     public void registrar(RegisterDTO registro) {
         try {
             String url = apiUrl + "/auth/register";

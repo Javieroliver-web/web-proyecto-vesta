@@ -1,6 +1,8 @@
 package com.vesta.web.controller;
 
 import com.vesta.web.service.ApiService;
+import java.util.List;
+import java.util.Map;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,9 @@ public class AdminController {
 
         // === NUEVO: Cargar lista de siniestros ===
         model.addAttribute("siniestros", apiService.obtenerSiniestros(token));
+
+        // === NUEVO: Cargar lista de usuarios (para pestaña usuarios) ===
+        model.addAttribute("usuarios", apiService.obtenerTodosLosUsuarios(token));
 
         // --- ESTADÍSTICAS REALES ---
         java.util.Map<String, Object> stats = apiService.obtenerEstadisticas(token);
@@ -112,7 +117,38 @@ public class AdminController {
         if (token == null || !"ADMIN".equals(rol))
             return "redirect:/";
 
-        model.addAttribute("usuarios", apiService.obtenerTodosLosUsuarios(token));
+        List<Map<String, Object>> usuarios = apiService.obtenerTodosLosUsuarios(token);
+
+        // Procesar usuarios para calcular edad y manejar fechas correctamente
+        for (Map<String, Object> u : usuarios) {
+            try {
+                // Calcular Edad
+                if (u.get("fechaNacimiento") != null) {
+                    String fechaNacStr = u.get("fechaNacimiento").toString();
+                    java.time.LocalDate fechaNac = java.time.LocalDate.parse(fechaNacStr);
+                    int edad = java.time.Period.between(fechaNac, java.time.LocalDate.now()).getYears();
+                    u.put("edad", edad);
+                    u.put("fechaNacimientoObj", fechaNac); // Guardar objeto para formateo si es necesario
+                }
+
+                // Convertir fechaCreacion a objeto si es String
+                if (u.get("fechaCreacion") != null && u.get("fechaCreacion") instanceof String) {
+                    String fechaCreacionStr = u.get("fechaCreacion").toString();
+                    // Asumiendo formato ISO yyyy-MM-dd que es el default de LocalDate
+                    // Si viene con hora, habrá que ajustar. Generalmente toString() de JSON es
+                    // simple.
+                    try {
+                        u.put("fechaCreacionObj", java.time.LocalDate.parse(fechaCreacionStr.substring(0, 10)));
+                    } catch (Exception e) {
+                        // Si falla, dejamos el original
+                    }
+                }
+            } catch (Exception e) {
+                // Si falla algo, simplemente no mostramos el dato calculado
+            }
+        }
+
+        model.addAttribute("usuarios", usuarios);
         return "admin/usuarios";
     }
 
