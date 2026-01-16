@@ -115,9 +115,22 @@
 </head>
 <body>
     <div class="hero-section">
-        <div class="container text-center">
-            <h1>Seguros Disponibles</h1>
-            <p class="lead">Protección instantánea para cada momento de tu vida</p>
+        <div class="container position-relative">
+            <!-- Back Button -->
+            <a href="/" class="text-white text-decoration-none fw-bold position-absolute top-50 start-0 translate-middle-y d-none d-md-flex align-items-center" style="opacity: 0.8; transition: opacity 0.3s;">
+                <i class="bi bi-arrow-left me-2"></i> Volver
+            </a>
+            <!-- Mobile Back Button -->
+            <div class="d-md-none text-start mb-3">
+                 <a href="/" class="text-white text-decoration-none fw-bold d-flex align-items-center">
+                    <i class="bi bi-arrow-left me-2"></i> Volver
+                </a>
+            </div>
+
+            <div class="text-center">
+                <h1>Seguros Disponibles</h1>
+                <p class="lead">Protección instantánea para cada momento de tu vida</p>
+            </div>
         </div>
     </div>
 
@@ -128,181 +141,83 @@
                 <button class="filter-btn active" onclick="filterCategory('all')">Todos</button>
                 <button class="filter-btn" onclick="filterCategory('viaje')">Viaje</button>
                 <button class="filter-btn" onclick="filterCategory('tecnologia')">Tecnología</button>
-                <button class="filter-btn" onclick="filterCategory('entretenimiento')">Entretenimiento</button>
+                <button class="filter-btn" onclick="filterCategory('movilidad')">Movilidad</button>
                 <button class="filter-btn" onclick="filterCategory('hogar')">Hogar</button>
-                <button class="filter-btn" onclick="filterCategory('mascotas')">Mascotas</button>
+                <button class="filter-btn" onclick="filterCategory('mascota')">Mascota</button>
             </div>
         </div>
 
-        <div class="row g-4" id="insuranceGrid">
-            <!-- Seguro de Viaje -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="viaje">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500" class="card-img-top" alt="Viaje" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Viaje</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Viaje</h5>
-                        <p class="text-muted small">Protección completa durante tus vacaciones y viajes de negocios.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Asistencia médica 24/7</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Cancelación de vuelos</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Pérdida de equipaje</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$15.99<span class="fs-6 text-muted fw-normal">/día</span></div>
-                            </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
+            <div class="row g-4" id="insuranceGrid">
+                <!-- Dynamic Products Loop -->
+                <div th:each="p : ${productos}" 
+                     th:if="${p.activo}"
+                     class="col-md-6 col-lg-4 insurance-item" 
+                     th:with="catLower=${#strings.toLowerCase(p.categoria).replace('í','i').replace('ó','o').replace('á','a').replace('é','e').replace('ú','u')}"
+                     th:attr="data-category=${catLower}">
+                    
+                    <div class="card insurance-card h-100 border-0">
+                        <div class="position-relative">
+                            <img th:src="${p.imagenUrl}" class="card-img-top" th:alt="${p.nombre}" 
+                                 style="height: 200px; object-fit: cover;"
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500'">
+                            <span class="badge-category" th:text="${p.categoria}">Categoría</span>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="card-body">
+                            <h5 class="fw-bold" th:text="${p.nombre}">Nombre del Seguro</h5>
+                            <p class="text-muted small" th:text="${p.descripcion}">Descripción del seguro</p>
+                            
+                            <!-- Features based on Category -->
+                            <ul class="feature-list">
+                                <th:block th:switch="${p.categoria}">
+                                    <th:block th:case="'Viaje'">
+                                        <li><i class="bi bi-check-circle-fill"></i> Asistencia médica 24/7</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Cancelación de vuelos</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Pérdida de equipaje</li>
+                                    </th:block>
+                                    <th:block th:case="'Tecnología'">
+                                        <li><i class="bi bi-check-circle-fill"></i> Rotura de pantalla</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Daños por líquidos</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Robo y hurto</li>
+                                    </th:block>
+                                    <th:block th:case="'Hogar'">
+                                        <li><i class="bi bi-check-circle-fill"></i> Daños a la propiedad</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Robo de pertenencias</li>
+                                    </th:block>
+                                    <th:block th:case="'Mascota'">
+                                        <li><i class="bi bi-check-circle-fill"></i> Gastos veterinarios</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Cirugías de emergencia</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                    </th:block>
+                                    <th:block th:case="'Movilidad'">
+                                        <li><i class="bi bi-check-circle-fill"></i> Daños al vehículo</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Asistencia en carretera</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                    </th:block>
+                                    <th:block th:case="*">
+                                        <li><i class="bi bi-check-circle-fill"></i> Cobertura completa</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Atención 24/7</li>
+                                        <li><i class="bi bi-check-circle-fill"></i> Cancelación flexible</li>
+                                    </th:block>
+                                </th:block>
+                            </ul>
 
-            <!-- Seguro de Dispositivos -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="tecnologia">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500" class="card-img-top" alt="Móvil" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Tecnología</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Dispositivos</h5>
-                        <p class="text-muted small">Protege tu smartphone, tablet y otros gadgets contra daños y robos.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Rotura de pantalla</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Daños por líquidos</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Robo y hurto</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$9.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
+                            <div class="d-flex justify-content-between align-items-end mt-4">
+                                <div>
+                                    <span class="small text-muted fw-semibold">Desde</span>
+                                    <div class="price-tag">
+                                        $<span th:text="${p.precioBase}">0.00</span>
+                                        <span class="fs-6 text-muted fw-normal">/mes</span>
+                                    </div>
+                                </div>
+                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                    Contratar <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Seguro de Eventos -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="entretenimiento">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img th:src="@{/images/eventos.png}" class="card-img-top" alt="Eventos" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Entretenimiento</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Eventos</h5>
-                        <p class="text-muted small">Asegura tus entradas a conciertos, festivales y eventos deportivos.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Cancelación del evento</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Imposibilidad de asistir</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Reembolso total</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$5.99<span class="fs-6 text-muted fw-normal">/evento</span></div>
-                            </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seguro de Hogar Temporal -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="hogar">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500" class="card-img-top" alt="Hogar" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Hogar</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Hogar Temporal</h5>
-                        <p class="text-muted small">Protección para alquileres vacacionales y estancias temporales.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Daños a la propiedad</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Robo de pertenencias</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$12.99<span class="fs-6 text-muted fw-normal">/día</span></div>
-                            </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seguro de Mascotas -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="mascotas">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=500" class="card-img-top" alt="Mascotas" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Mascotas</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Mascotas</h5>
-                        <p class="text-muted small">Cobertura veterinaria y responsabilidad civil para tu mejor amigo.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Gastos veterinarios</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Cirugías de emergencia</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$19.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
-                            </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seguro de Alquiler de Vehículos -->
-            <div class="col-md-6 col-lg-4 insurance-item" data-category="viaje">
-                <div class="card insurance-card h-100 border-0">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=500" class="card-img-top" alt="Vehículos" style="height: 200px; object-fit: cover;">
-                        <span class="badge-category">Viaje</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="fw-bold">Seguro de Alquiler de Vehículos</h5>
-                        <p class="text-muted small">Protección completa para vehículos de alquiler durante tus viajes.</p>
-                        <ul class="feature-list">
-                            <li><i class="bi bi-check-circle-fill"></i> Daños al vehículo</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Robo del vehículo</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                        </ul>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <div>
-                                <span class="small text-muted fw-semibold">Desde</span>
-                                <div class="price-tag">$8.99<span class="fs-6 text-muted fw-normal">/día</span></div>
-                            </div>
-                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                Contratar <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="text-center mt-5">
             <div class="alert alert-info d-inline-block">

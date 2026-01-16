@@ -539,6 +539,23 @@ public class ApiService {
         }
     }
 
+    // === PRODUCTOS (PÚBLICO) ===
+    public List<Map<String, Object>> getProductos() {
+        String url = apiUrl + "/productos";
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null, // No auth headers required
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener productos: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
     // === UTILIDADES ===
 
     private String extractErrorMessage(HttpClientErrorException e) {

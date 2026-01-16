@@ -378,7 +378,8 @@
                 });
                 
                 if (res.ok) {
-                    todosLosProductos = await res.json();
+                    const rawProducts = await res.json();
+                    todosLosProductos = rawProducts.filter(p => p.activo === true);
                     renderizarProductos(todosLosProductos);
                 } else {
                     mostrarError('Error al cargar productos');

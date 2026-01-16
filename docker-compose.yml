@@ -5,12 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vesta-web  # Sin guiones bajos
+    container_name: vesta-web # Sin guiones bajos
     restart: unless-stopped
     ports:
       - "8081:80"
     environment:
-      API_URL: http://vesta-api:8080/api  # Actualizado
+      API_URL: http://vesta-api:8080/api
+      GOOGLE_CLIENT_ID: "249929311715-e9qf6foamkq5dftrpijv9phha1fltd29.apps.googleusercontent.com"
+      GOOGLE_CLIENT_SECRET: "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"
     volumes:
       - ./src/main/resources/static/images:/app/images
       - ./logs/web:/logs

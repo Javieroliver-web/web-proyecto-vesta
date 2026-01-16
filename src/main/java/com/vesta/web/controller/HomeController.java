@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -161,7 +162,8 @@ public class HomeController {
      * Página de Seguros Disponibles
      */
     @GetMapping("/seguros")
-    public String seguros() {
+    public String seguros(Model model) {
+        model.addAttribute("productos", apiService.getProductos());
         return "seguros";
     }
 }
