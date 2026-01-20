@@ -634,14 +634,14 @@
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="checkTerms" required>
                         <label class="form-check-label" for="checkTerms">
-                            He leído y acepto los <a href="/terminos" class="legal-link" target="_blank">Términos y Condiciones</a> <span class="text-danger">*</span>
+                            He leído y acepto los <a th:href="@{/terminos}" class="legal-link" target="_blank">Términos y Condiciones</a> <span class="text-danger">*</span>
                         </label>
                     </div>
 
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="checkPrivacy" required>
                         <label class="form-check-label" for="checkPrivacy">
-                            He leído y acepto la <a href="/privacidad" class="legal-link" target="_blank">Política de Privacidad</a> <span class="text-danger">*</span>
+                            He leído y acepto la <a th:href="@{/privacidad}" class="legal-link" target="_blank">Política de Privacidad</a> <span class="text-danger">*</span>
                         </label>
                     </div>
 
@@ -660,9 +660,9 @@
 
             <div class="form-footer">
                 <p>¿Ya tienes cuenta?</p>
-                <a href="/login-page">Inicia sesión aquí</a>
+                <a th:href="@{/login-page}">Inicia sesión aquí</a>
                 <div>
-                    <a href="/" class="back-link">
+                    <a th:href="@{/}" class="back-link">
                         <i class="bi bi-arrow-left"></i>
                         Volver al inicio
                     </a>
@@ -692,7 +692,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const registerUrl = /*[[@{/register}]]*/ '/register';
+        const loginPageUrl = /*[[@{/login-page}]]*/ '/login-page';
+        /*]]>*/
+
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -744,7 +749,7 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creando cuenta...';
 
             try {
-                const response = await fetch('/register', {
+                const response = await fetch(registerUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -754,7 +759,7 @@
 
                 if (response.ok) {
                     showSuccess();
-                    setTimeout(() => window.location.href = '/login-page', 2000);
+                    setTimeout(() => window.location.href = loginPageUrl, 2000);
                 } else {
                     showError(result.message || "Error al crear la cuenta.");
                     btn.disabled = false;

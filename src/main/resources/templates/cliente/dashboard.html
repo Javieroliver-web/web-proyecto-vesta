@@ -219,7 +219,7 @@
         // Detectar si estamos en Docker o local
         const API_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8080/api' 
-            : 'http://vesta-api:8080/api';
+            : '/vesta-api/api';
 
         // 1. RECOMENDADOR
         async function cargarRecomendacion() {

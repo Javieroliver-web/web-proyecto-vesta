@@ -83,7 +83,7 @@
                                         <div>
                                             <div class="fw-bold" th:text="${u.nombreCompleto}">Nombre</div>
                                             <small class="text-muted" th:if="${u.fechaCreacionObj}" th:text="'Reg: ' + ${#temporals.format(u.fechaCreacionObj, 'dd/MM/yyyy')}">01/01/2024</small>
-<small class="text-muted" th:unless="${u.fechaCreacionObj}" th:text="'Reg: ' + ${u.fechaCreacion}">01/01/2024</small>
+                                            <small class="text-muted" th:unless="${u.fechaCreacionObj}" th:text="${u.fechaCreacion != null} ? ('Reg: ' + u.fechaCreacion) : '-'">-</small>
                                         </div>
                                     </div>
                                 </td>
@@ -232,31 +232,50 @@
             const accion = nuevoEstado ? 'DESBLOQUEAR' : 'BLOQUEAR';
             const color = nuevoEstado ? 'success' : 'danger';
             
-            showConfirmModal(
-                `Confirmar Acción`, 
-                `¿Estás seguro de que deseas <b>${accion}</b> al usuario <b>${nombre}</b>?`,
-                async () => {
-                    try {
-                        const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + token
-                            },
-                            body: JSON.stringify({ activo: nuevoEstado })
-                        });
-
-                        if(res.ok) {
-                            showSuccessModal('Éxito', `Usuario ${accion.toLowerCase()} correctamente.`);
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            showErrorModal('Error', 'No se pudo actualizar el estado.');
-                        }
-                    } catch(e) {
-                         showErrorModal('Error', 'Error de conexión.');
+            if (nuevoEstado === false) { 
+                // BLOQUEAR REQUIERE CONFIRMACIÓN SEGURA
+                showSafeDeleteModal(
+                    'Confirmar Bloqueo',
+                    `Para bloquear el acceso a <b>${nombre}</b>, escribe "BLOQUEAR" a continuación:`,
+                    'BLOQUEAR',
+                    async () => {
+                        await ejecutarCambio(id, nuevoEstado, accion);
                     }
+                );
+            } else {
+                // DESBLOQUEAR PUEDE SER ESTÁNDAR O SEGURO (USARÉ ESTÁNDAR PARA AGILIDAD, O SEGURO PARA CONSISTENCIA)
+                // Usaré seguro para consistencia con el requisito de "edición/borrado seguro"
+                showSafeDeleteModal(
+                    'Confirmar Desbloqueo',
+                    `Para reactivar a <b>${nombre}</b>, escribe "DESBLOQUEAR" a continuación:`,
+                    'DESBLOQUEAR',
+                    async () => {
+                         await ejecutarCambio(id, nuevoEstado, accion);
+                    }
+                );
+            }
+
+            async function ejecutarCambio(id, estado, accionTxt) {
+                try {
+                    const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ activo: estado })
+                    });
+
+                    if(res.ok) {
+                        showSuccessModal('Éxito', `Usuario ${accionTxt.toLowerCase()} correctamente.`);
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showErrorModal('Error', 'No se pudo actualizar el estado.');
+                    }
+                } catch(e) {
+                        showErrorModal('Error', 'Error de conexión.');
                 }
-            );
+            }
         }
     </script>
 </body>

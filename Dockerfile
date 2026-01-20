@@ -11,7 +11,7 @@ COPY src ./src
 
 # Construir la aplicación
 RUN mvn clean package -DskipTests && \
-    mv target/*.jar app.jar
+    mv target/*.war app.war
 
 # ===================================
 # Stage 2: Runtime
@@ -23,8 +23,8 @@ WORKDIR /app
 # Crear usuario no-root para seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
 
-# Copiar JAR desde stage de build
-COPY --from=build /app/app.jar app.jar
+# Copiar WAR desde stage de build
+COPY --from=build /app/app.war app.war
 
 # Cambiar a usuario no-root
 USER spring:spring
@@ -33,4 +33,4 @@ USER spring:spring
 EXPOSE 80
 
 # Ejecutar aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.war"]

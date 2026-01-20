@@ -208,11 +208,11 @@
     <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%); border-bottom: 1px solid rgba(255,255,255,0.1);">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="/images/logo_vesta.png" alt="VESTA" style="height: 40px;">
+                <img th:src="@{/images/logo_vesta.png}" alt="VESTA" style="height: 40px;">
             </a>
             <div class="d-flex gap-3">
-                <a href="/login-page" class="btn btn-outline-light btn-sm fw-bold px-4">Iniciar Sesión</a>
-                <a href="/register" class="btn btn-primary btn-sm fw-bold px-4">Registrarse</a>
+                <a th:href="@{/login-page}" class="btn btn-outline-light btn-sm fw-bold px-4">Iniciar Sesión</a>
+                <a th:href="@{/register}" class="btn btn-primary btn-sm fw-bold px-4">Registrarse</a>
             </div>
         </div>
     </nav>
@@ -228,7 +228,7 @@
                     <h1 class="hero-title">Micro-seguros<br>On-Demand</h1>
                     <p class="hero-text">Protección instantánea cuando la necesitas. Activa y desactiva coberturas según tus necesidades, sin papeleos ni permanencia.</p>
                     <div class="d-flex gap-3 hero-buttons">
-                        <a href="/register" class="btn btn-primary btn-lg px-5">
+                        <a th:href="@{/register}" class="btn btn-primary btn-lg px-5">
                             <i class="bi bi-rocket-takeoff me-2"></i>Comenzar Ahora
                         </a>
                         <a href="#features" class="btn btn-outline-light btn-lg px-4">
@@ -287,7 +287,7 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <h3 class="fw-bold">Seguros destacados</h3>
-                <a href="/login-page" class="text-decoration-none fw-bold" style="color: #f1a61c;">Ver todos <i class="bi bi-arrow-right"></i></a>
+                <a th:href="@{/login-page}" class="text-decoration-none fw-bold" style="color: #f1a61c;">Ver todos <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
@@ -304,7 +304,7 @@
                                     <span class="small text-muted fw-semibold">Desde</span>
                                     <div class="price-tag">$15.99<span class="fs-6 text-muted fw-normal">/día</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                <a th:href="@{/login-page}" class="btn btn-primary btn-sm px-4">
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -325,7 +325,7 @@
                                     <span class="small text-muted fw-semibold">Desde</span>
                                     <div class="price-tag">$9.99<span class="fs-6 text-muted fw-normal">/mes</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                <a th:href="@{/login-page}" class="btn btn-primary btn-sm px-4">
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -346,7 +346,7 @@
                                     <span class="small text-muted fw-semibold">Desde</span>
                                     <div class="price-tag">$5.99<span class="fs-6 text-muted fw-normal">/evento</span></div>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                <a th:href="@{/login-page}" class="btn btn-primary btn-sm px-4">
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -376,18 +376,18 @@
                 <div class="col-lg-2 col-6">
                     <h6 class="fw-bold mb-3">Enlaces Rápidos</h6>
                     <ul class="list-unstyled d-flex flex-column gap-2 small">
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="/seguros">Seguros Disponibles</a></li>
-                        <li><a href="/faq">Preguntas Frecuentes</a></li>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li><a th:href="@{/seguros}">Seguros Disponibles</a></li>
+                        <li><a th:href="@{/faq}">Preguntas Frecuentes</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-6">
                     <h6 class="fw-bold mb-3">Legal</h6>
                     <ul class="list-unstyled d-flex flex-column gap-2 small">
-                        <li><a href="/privacidad">Política de Privacidad</a></li>
-                        <li><a href="/terminos">Términos y Condiciones</a></li>
-                        <li><a href="/cookies">Política de Cookies</a></li>
-                        <li><a href="/mis-datos">Gestión RGPD</a></li>
+                        <li><a th:href="@{/privacidad}">Política de Privacidad</a></li>
+                        <li><a th:href="@{/terminos}">Términos y Condiciones</a></li>
+                        <li><a th:href="@{/cookies}">Política de Cookies</a></li>
+                        <li><a th:href="@{/mis-datos}">Gestión RGPD</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4">

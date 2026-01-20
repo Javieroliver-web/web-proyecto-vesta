@@ -321,7 +321,7 @@
         
         const API_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8080/api' 
-            : 'http://vesta-api:8080/api';
+            : '/vesta-api/api';
 
         let productoActual = null;
         const productoId = window.location.pathname.split('/').pop();
@@ -390,7 +390,24 @@
 
         function getDays() {
             const val = parseInt(document.getElementById('duracionInput').value) || 0;
-            return currentMode === 'month' ? val * 30 : val * 365;
+            if (val <= 0) return 0;
+
+            const now = new Date();
+            const future = new Date(now);
+
+            if (currentMode === 'month') {
+                // Añadir 'val' meses reales
+                future.setMonth(now.getMonth() + val);
+            } else {
+                // Añadir 'val' años reales
+                future.setFullYear(now.getFullYear() + val);
+            }
+
+            // Calcular diferencia en milisegundos y convertir a días
+            const diffTime = Math.abs(future - now);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
         }
 
         // Función para obtener imagen por defecto según categoría

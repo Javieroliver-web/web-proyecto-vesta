@@ -49,10 +49,32 @@ public class AdminController {
         String[] meses = { "", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
 
         for (java.util.Map<String, Object> v : ventas) {
-            Integer mesNum = (Integer) v.get("mes");
+            Object mesObj = v.get("mes");
+            Object totalObj = v.get("total");
+
+            Integer mesNum = null;
+            if (mesObj instanceof Number) {
+                mesNum = ((Number) mesObj).intValue();
+            } else if (mesObj != null) {
+                try {
+                    mesNum = Integer.parseInt(mesObj.toString());
+                } catch (Exception e) {
+                }
+            }
+
             if (mesNum != null && mesNum >= 1 && mesNum <= 12) {
                 ventasLabels.add(meses[mesNum]);
-                ventasData.add(Double.valueOf(v.get("total").toString()));
+
+                Double totalVal = 0.0;
+                if (totalObj instanceof Number) {
+                    totalVal = ((Number) totalObj).doubleValue();
+                } else if (totalObj != null) {
+                    try {
+                        totalVal = Double.parseDouble(totalObj.toString());
+                    } catch (Exception e) {
+                    }
+                }
+                ventasData.add(totalVal);
             }
         }
 
@@ -124,27 +146,52 @@ public class AdminController {
             try {
                 // Calcular Edad
                 if (u.get("fechaNacimiento") != null) {
-                    String fechaNacStr = u.get("fechaNacimiento").toString();
-                    java.time.LocalDate fechaNac = java.time.LocalDate.parse(fechaNacStr);
-                    int edad = java.time.Period.between(fechaNac, java.time.LocalDate.now()).getYears();
-                    u.put("edad", edad);
-                    u.put("fechaNacimientoObj", fechaNac); // Guardar objeto para formateo si es necesario
+                    try {
+                        String fechaNacStr = u.get("fechaNacimiento").toString();
+                        if (fechaNacStr.length() >= 10) {
+                            java.time.LocalDate fechaNac = java.time.LocalDate.parse(fechaNacStr.substring(0, 10));
+                            int edad = java.time.Period.between(fechaNac, java.time.LocalDate.now()).getYears();
+                            u.put("edad", edad);
+                            u.put("fechaNacimientoObj", fechaNac);
+                        }
+                    } catch (Exception ex) {
+                        // Ignorar error de parseo de fecha nacimiento
+                    }
                 }
 
+                // Ensure keys exist to prevent EL1008E
+                if (!u.containsKey("edad"))
+                    u.put("edad", null);
+                if (!u.containsKey("fechaNacimientoObj"))
+                    u.put("fechaNacimientoObj", null);
+                if (!u.containsKey("fechaCreacionObj"))
+                    u.put("fechaCreacionObj", null);
+
                 // Convertir fechaCreacion a objeto si es String
-                if (u.get("fechaCreacion") != null && u.get("fechaCreacion") instanceof String) {
-                    String fechaCreacionStr = u.get("fechaCreacion").toString();
-                    // Asumiendo formato ISO yyyy-MM-dd que es el default de LocalDate
-                    // Si viene con hora, habrá que ajustar. Generalmente toString() de JSON es
-                    // simple.
+                if (u.get("fechaCreacion") != null) {
                     try {
-                        u.put("fechaCreacionObj", java.time.LocalDate.parse(fechaCreacionStr.substring(0, 10)));
+                        if (u.get("fechaCreacion") instanceof String) {
+                            String fechaCreacionStr = u.get("fechaCreacion").toString();
+                            // Intentar parsear ISO (yyyy-MM-dd)
+                            if (fechaCreacionStr.length() >= 10) {
+                                u.put("fechaCreacionObj", java.time.LocalDate.parse(fechaCreacionStr.substring(0, 10)));
+                            }
+                        } else if (u.get("fechaCreacion") instanceof java.util.List) {
+                            // Si viene como lista [yyyy, mm, dd...] (común en JSON de LocalTime)
+                            java.util.List<?> dateList = (java.util.List<?>) u.get("fechaCreacion");
+                            if (dateList.size() >= 3) {
+                                int year = Integer.parseInt(dateList.get(0).toString());
+                                int month = Integer.parseInt(dateList.get(1).toString());
+                                int day = Integer.parseInt(dateList.get(2).toString());
+                                u.put("fechaCreacionObj", java.time.LocalDate.of(year, month, day));
+                            }
+                        }
                     } catch (Exception e) {
                         // Si falla, dejamos el original
                     }
                 }
             } catch (Exception e) {
-                // Si falla algo, simplemente no mostramos el dato calculado
+                // Si falla algo global en el loop, continuar
             }
         }
 

@@ -167,9 +167,92 @@ function showConfirmModal(title, message, onConfirm, onCancel = null) {
     });
 }
 
+/**
+ * Muestra un modal de borrado seguro que requiere escribir una palabra clave
+ * @param {string} title - Título del modal
+ * @param {string} message - Mensaje explicativo
+ * @param {string} requiredText - Compalabra a escribir (ej: "ELIMINAR")
+ * @param {Function} onConfirm - Callback al confirmar
+ */
+function showSafeDeleteModal(title, message, requiredText, onConfirm) {
+    const modalId = `safeDelete${modalCounter++}`;
+    
+    const modalHTML = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg border-start border-4 border-danger">
+                    <div class="modal-header bg-light text-danger">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-octagon-fill me-2"></i>${title}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">${message}</p>
+                        <div class="alert alert-warning py-2 mb-3 small">
+                            <i class="bi bi-pencil-fill me-1"></i>
+                            Para confirmar, escribe <strong>"${requiredText}"</strong> abajo:
+                        </div>
+                        <input type="text" 
+                               class="form-control form-control-lg text-center fw-bold border-danger" 
+                               id="${modalId}Input" 
+                               placeholder="${requiredText}" 
+                               autocomplete="off">
+                    </div>
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger disabled" id="${modalId}Confirm" disabled>
+                            <i class="bi bi-trash-fill me-2"></i>Eliminar Definitivamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement);
+    const input = document.getElementById(`${modalId}Input`);
+    const confirmBtn = document.getElementById(`${modalId}Confirm`);
+
+    // Lógica de validación
+    input.addEventListener('input', (e) => {
+        if (e.target.value === requiredText) {
+            confirmBtn.classList.remove('disabled');
+            confirmBtn.removeAttribute('disabled');
+        } else {
+            confirmBtn.classList.add('disabled');
+            confirmBtn.setAttribute('disabled', 'true');
+        }
+    });
+
+    // Enter para enviar si está habilitado
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && input.value === requiredText) {
+            confirmBtn.click();
+        }
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if (onConfirm) onConfirm();
+        modal.hide();
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    });
+
+    modalElement.addEventListener('shown.bs.modal', () => {
+        input.focus();
+    });
+
+    modal.show();
+    return modal;
+}
+
 // Exportar funciones para uso global
 window.showInfoModal = showInfoModal;
 window.showSuccessModal = showSuccessModal;
 window.showErrorModal = showErrorModal;
 window.showWarningModal = showWarningModal;
 window.showConfirmModal = showConfirmModal;
+window.showSafeDeleteModal = showSafeDeleteModal;

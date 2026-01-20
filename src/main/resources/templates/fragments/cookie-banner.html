@@ -3,7 +3,7 @@
 <body>
     <!-- Banner de Cookies RGPD -->
     <div th:fragment="cookie-banner" id="cookieBanner" style="display: none;">
-        <div style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #282c3f 0%, #3c425e 100%); color: white; padding: 1.5rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.3); z-index: 9999;">
+        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1000px; background: rgba(40, 44, 63, 0.95); backdrop-filter: blur(10px); color: white; padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 9999;">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-8">
@@ -107,7 +107,8 @@
                 const usuarioId = sessionStorage.getItem('usuarioId');
                 if (usuarioId) {
                     try {
-                        await fetch('http://localhost:8080/api/cookies/consentimiento', {
+                        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/vesta-api/api';
+                        await fetch(`${apiBase}/cookies/consentimiento`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
