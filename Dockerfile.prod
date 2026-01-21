@@ -1,0 +1,18 @@
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Crear usuario no-root para seguridad
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Copiar WAR pre-construido
+COPY vesta-web.war app.war
+
+# Cambiar a usuario no-root
+USER spring:spring
+
+# Exponer puerto
+EXPOSE 80
+
+# Ejecutar aplicación
+ENTRYPOINT ["java", "-jar", "app.war"]
