@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de Favicon Vesta</title>
+</head>
+<body>
+    <canvas id="canvas" width="32" height="32" style="border: 1px solid #ccc; image-rendering: pixelated; width: 128px; height: 128px;"></canvas>
+    <br><br>
+    <button onclick="generateFavicon()">Generar Favicon</button>
+    <button onclick="downloadFavicon()">Descargar Favicon</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function generateFavicon() {
+            // Limpiar canvas
+            ctx.fillStyle = '#3c425e';
+            ctx.fillRect(0, 0, 32, 32);
+            
+            // Dibujar escudo simplificado
+            ctx.strokeStyle = '#f7cc7c';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            // Forma del escudo
+            ctx.moveTo(16, 4);
+            ctx.quadraticCurveTo(8, 4, 8, 12);
+            ctx.quadraticCurveTo(8, 20, 16, 28);
+            ctx.quadraticCurveTo(24, 20, 24, 12);
+            ctx.quadraticCurveTo(24, 4, 16, 4);
+            ctx.stroke();
+            
+            // León simplificado (cabeza)
+            ctx.beginPath();
+            ctx.arc(16, 14, 4, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Melena
+            ctx.beginPath();
+            ctx.arc(13, 12, 2, 0, Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(19, 12, 2, 0, Math.PI);
+            ctx.stroke();
+        }
+        
+        function downloadFavicon() {
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Generar automáticamente
+        generateFavicon();
+    </script>
+</body>
+</html>

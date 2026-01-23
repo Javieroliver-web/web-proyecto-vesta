@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Configuración - Vesta</title>
+    <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -261,7 +262,7 @@
         // === VARIABLES GLOBALES ===
         const userId = [[${usuarioId}]];
         const token = [[${session.token}]];
-        const apiBaseUrl = window.location.protocol + '//' + window.location.hostname + ':8080/api/usuarios';
+        const apiBaseUrl = '/vesta-web/usuario/api';
 
         // === LÓGICA TEMA OSCURO ===
         const toggle = document.getElementById('themeToggle');
@@ -290,9 +291,9 @@
                 await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'PUT',
                      headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token 
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ tema: newTheme })
                 });
             } catch (e) {
@@ -306,7 +307,7 @@
         async function loadUserData() {
             try {
                 const res = await fetch(`${apiBaseUrl}/${userId}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    credentials: 'include'
                 });
                 if (res.ok) {
                     const user = await res.json();
@@ -344,9 +345,9 @@
                 const res = await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'PUT',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token 
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ ciudad: ciudad })
                 });
 
@@ -460,9 +461,9 @@
                 const response = await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 
@@ -508,7 +509,7 @@
             try {
                 const res = await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    credentials: 'include'
                 });
 
                 if (res.ok) {
@@ -764,6 +765,6 @@
             }
         }
     </script>
-    <script src="/static/js/voice-assistant.js"></script>
+    <script src="/vesta-web/js/voice-assistant.js"></script>
 </body>
 </html>

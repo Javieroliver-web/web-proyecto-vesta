@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Detalles del Producto - Vesta Seguros</title>
+    <div th:replace="~{fragments/favicon :: favicon}"></div>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -229,7 +230,7 @@
     <div th:replace="~{fragments/header :: header-nav}"></div>
 
     <div class="container mt-4 mb-5">
-        <a href="/cliente/marketplace" class="breadcrumb-link">
+        <a href="/vesta-web/cliente/marketplace" class="breadcrumb-link">
             <i class="bi bi-arrow-left"></i> Volver al marketplace
         </a>
 
@@ -313,7 +314,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/modal-utils.js"></script>
+    <script src="/vesta-web/js/modal-utils.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
         const authToken = /*[[${session.token}]]*/ null;
@@ -413,13 +414,13 @@
         // Función para obtener imagen por defecto según categoría
         function getDefaultImage(categoria) {
             const imageMap = {
-                'Viaje': '/images/productos/viaje.png',
-                'Tecnología': '/images/productos/tecnologia.png',
-                'Entretenimiento': '/images/productos/Entretenimiento.jpg',
-                'Movilidad': '/images/productos/movilidad.png',
-                'Mascotas': '/images/productos/mascotas.png'
+                'Viaje': '/vesta-web/images/productos/viaje.png',
+                'Tecnología': '/vesta-web/images/productos/tecnologia.png',
+                'Entretenimiento': '/vesta-web/images/productos/Entretenimiento.jpg',
+                'Movilidad': '/vesta-web/images/productos/movilidad.png',
+                'Mascotas': '/vesta-web/images/productos/mascotas.png'
             };
-            return imageMap[categoria] || '/images/productos/viaje.png';
+            return imageMap[categoria] || '/vesta-web/images/productos/viaje.png';
         }
 
         function handleImageError(img) {
@@ -431,8 +432,8 @@
 
         async function cargarProducto() {
             try {
-                const res = await fetch(`${API_URL}/productos/${productoId}`, {
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                const res = await fetch(`/vesta-web/cliente/api/productos/${productoId}`, {
+                    credentials: 'include'
                 });
                 
                 if (res.ok) {
@@ -503,12 +504,12 @@
 
             try {
                 // Enviamos 'duracion' en días, que es lo que espera el Backend ahora
-                const res = await fetch(`${API_URL}/polizas/contratar`, {
+                const res = await fetch('/vesta-web/cliente/api/polizas/contratar', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + authToken
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         productoId: productoActual.id,
                         duracion: totalDias
@@ -519,7 +520,7 @@
                     showSuccessModal(
                         '¡Seguro Contratado!',
                         `Tu póliza de ${totalDias} días está activa. Puedes verla en "Mis Pólizas".`,
-                        () => window.location.href = '/cliente/mis-polizas'
+                        () => window.location.href = '/vesta-web/cliente/mis-polizas'
                     );
                 } else {
                     const error = await res.json();

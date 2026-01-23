@@ -1,0 +1,148 @@
+package com.vesta.web.controller;
+
+import com.vesta.web.service.ApiService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@Controller
+@RequestMapping("/admin")
+public class AdminApiController {
+
+    @Autowired
+    private ApiService apiService;
+
+    // === GESTIÓN DE USUARIOS ===
+    
+    @GetMapping("/api/usuarios")
+    @ResponseBody
+    public ResponseEntity<?> obtenerTodosLosUsuarios(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object usuarios = apiService.obtenerTodosLosUsuarios(token);
+            return ResponseEntity.ok(usuarios);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener usuarios: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @PutMapping("/api/usuarios/{id}")
+    @ResponseBody
+    public ResponseEntity<?> actualizarEstadoUsuario(@PathVariable Long id, @RequestBody Map<String, Object> updates, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Boolean activo = (Boolean) updates.get("activo");
+            if (activo != null) {
+                apiService.actualizarEstadoUsuario(id, activo, token);
+            }
+            return ResponseEntity.ok("{\"message\":\"Usuario actualizado correctamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // === GESTIÓN DE SINIESTROS ===
+    
+    @GetMapping("/api/siniestros")
+    @ResponseBody
+    public ResponseEntity<?> obtenerSiniestros(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object siniestros = apiService.obtenerSiniestros(token);
+            return ResponseEntity.ok(siniestros);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener siniestros: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @PutMapping("/api/siniestros/{id}/estado")
+    @ResponseBody
+    public ResponseEntity<?> actualizarEstadoSiniestro(@PathVariable Long id, @RequestBody Map<String, Object> updates, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object resultado = apiService.actualizarEstadoSiniestro(token, id, updates);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al actualizar siniestro: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // === ESTADÍSTICAS ===
+    
+    @GetMapping("/api/estadisticas")
+    @ResponseBody
+    public ResponseEntity<?> obtenerEstadisticas(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object estadisticas = apiService.obtenerEstadisticas(token);
+            return ResponseEntity.ok(estadisticas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener estadísticas: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // === GESTIÓN DE PRODUCTOS ===
+    
+    @GetMapping("/api/productos")
+    @ResponseBody
+    public ResponseEntity<?> obtenerProductosAdmin(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object productos = apiService.getProductos(); // Los productos son públicos
+            return ResponseEntity.ok(productos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener productos: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @DeleteMapping("/api/productos/{id}")
+    @ResponseBody
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long id, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            apiService.eliminarProducto(token, id);
+            return ResponseEntity.ok("{\"message\":\"Producto eliminado correctamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al eliminar producto: " + e.getMessage() + "\"}");
+        }
+    }
+}

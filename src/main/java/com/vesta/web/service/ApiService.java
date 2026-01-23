@@ -393,6 +393,407 @@ public class ApiService {
         }
     }
 
+    // === PÓLIZAS DEL USUARIO ===
+    
+    public List<Map<String, Object>> obtenerPolizasUsuario(String token) {
+        String url = apiUrl + "/polizas/usuario";
+        try {
+            logger.debug("Obteniendo pólizas del usuario");
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente al obtener pólizas del usuario: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor al obtener pólizas: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado al obtener pólizas: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al obtener pólizas: " + e.getMessage());
+        }
+    }
+
+    // === RECOMENDACIONES IA ===
+    
+    public Map<String, Object> obtenerRecomendacionIA(String token, String email) {
+        String url = apiUrl + "/innovation/recommendation";
+        if (email != null) {
+            url += "?email=" + email;
+        }
+        
+        try {
+            logger.debug("Obteniendo recomendación IA para: {}", email);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al obtener recomendación IA: {}", e.getMessage(), e);
+            // Devolver una recomendación por defecto en caso de error
+            Map<String, Object> defaultRecommendation = new HashMap<>();
+            defaultRecommendation.put("mensaje", "Protégete hoy con nuestros seguros personalizados");
+            defaultRecommendation.put("icono", "SUN");
+            return defaultRecommendation;
+        }
+    }
+
+    public Map<String, Object> chatIA(String token, String pregunta) {
+        String url = apiUrl + "/innovation/chat";
+        
+        try {
+            logger.debug("Enviando pregunta al chat IA");
+
+            Map<String, String> request = new HashMap<>();
+            request.put("pregunta", pregunta);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error en chat IA: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("respuesta", "Lo siento, no puedo procesar tu consulta en este momento. Por favor, intenta más tarde.");
+            return errorResponse;
+        }
+    }
+
+    // === CONTRATACIÓN DE PÓLIZAS ===
+    
+    public Map<String, Object> contratarPoliza(String token, Map<String, Object> request) {
+        String url = apiUrl + "/polizas/contratar";
+        
+        try {
+            logger.debug("Contratando póliza");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente al contratar póliza: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor al contratar póliza: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado al contratar póliza: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al contratar póliza: " + e.getMessage());
+        }
+    }
+
+    // === REPORTES PDF ===
+    
+    public byte[] generarReportePDF(String token) {
+        String url = apiUrl + "/reportes/polizas/pdf";
+        
+        try {
+            logger.debug("Generando reporte PDF de pólizas");
+
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    byte[].class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente al generar PDF: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor al generar PDF: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado al generar PDF: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al generar reporte: " + e.getMessage());
+        }
+    }
+
+    // === SINIESTROS ===
+    
+    public Map<String, Object> reportarSiniestro(String token, Map<String, Object> request) {
+        String url = apiUrl + "/siniestros";
+        
+        try {
+            logger.debug("Reportando siniestro");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente al reportar siniestro: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor al reportar siniestro: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
+        } catch (Exception e) {
+            logger.error("Error inesperado al reportar siniestro: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al reportar siniestro: " + e.getMessage());
+        }
+    }
+
+    // === GESTIÓN DE USUARIOS INDIVIDUALES ===
+    
+    public Map<String, Object> obtenerUsuario(String token, Long userId) {
+        String url = apiUrl + "/usuarios/" + userId;
+        
+        try {
+            logger.debug("Obteniendo usuario: {}", userId);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al obtener usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al obtener usuario: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> actualizarUsuario(String token, Long userId, Map<String, Object> updates) {
+        String url = apiUrl + "/usuarios/" + userId;
+        
+        try {
+            logger.debug("Actualizando usuario: {}", userId);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(updates, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al actualizar usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al actualizar usuario: " + e.getMessage());
+        }
+    }
+
+    public void eliminarUsuario(String token, Long userId) {
+        String url = apiUrl + "/usuarios/" + userId;
+        
+        try {
+            logger.debug("Eliminando usuario: {}", userId);
+
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(getHeaders(token)),
+                    String.class
+            );
+
+        } catch (Exception e) {
+            logger.error("Error al eliminar usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al eliminar usuario: " + e.getMessage());
+        }
+    }
+
+    // === DERECHOS RGPD ===
+    
+    public Map<String, Object> solicitarSupresionDatos(String token, Map<String, Object> request) {
+        String url = apiUrl + "/derechos/solicitar-supresion";
+        
+        try {
+            logger.debug("Solicitando supresión de datos");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al solicitar supresión: {}", e.getMessage());
+            throw new RuntimeException("Error al solicitar supresión: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> solicitarDerecho(String token, String endpoint, Map<String, Object> request) {
+        String url = apiUrl + "/derechos/" + endpoint;
+        
+        try {
+            logger.debug("Solicitando derecho: {}", endpoint);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al solicitar derecho {}: {}", endpoint, e.getMessage());
+            throw new RuntimeException("Error al procesar solicitud: " + e.getMessage());
+        }
+    }
+
+    public List<Map<String, Object>> obtenerSolicitudesUsuario(String token, Long userId) {
+        String url = apiUrl + "/derechos/mis-solicitudes/" + userId;
+        
+        try {
+            logger.debug("Obteniendo solicitudes del usuario: {}", userId);
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al obtener solicitudes del usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al obtener solicitudes: " + e.getMessage());
+        }
+    }
+
+    // === GESTIÓN DE SINIESTROS (ADMIN) ===
+    
+    public Map<String, Object> actualizarEstadoSiniestro(String token, Long siniestroId, Map<String, Object> updates) {
+        String url = apiUrl + "/siniestros/" + siniestroId + "/estado";
+        
+        try {
+            logger.debug("Actualizando estado de siniestro: {}", siniestroId);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(updates, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al actualizar siniestro {}: {}", siniestroId, e.getMessage());
+            throw new RuntimeException("Error al actualizar siniestro: " + e.getMessage());
+        }
+    }
+
+    // === GESTIÓN DE PRODUCTOS (ADMIN) ===
+    
+    public void eliminarProducto(String token, Long productoId) {
+        String url = apiUrl + "/productos/" + productoId;
+        
+        try {
+            logger.debug("Eliminando producto: {}", productoId);
+
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(getHeaders(token)),
+                    String.class
+            );
+
+        } catch (Exception e) {
+            logger.error("Error al eliminar producto {}: {}", productoId, e.getMessage());
+            throw new RuntimeException("Error al eliminar producto: " + e.getMessage());
+        }
+    }
+
+    // === GESTIÓN DE COOKIES ===
+    
+    public Map<String, Object> guardarConsentimientoCookies(String token, Map<String, Object> request) {
+        String url = apiUrl + "/cookies/consentimiento";
+        
+        try {
+            logger.debug("Guardando consentimiento de cookies");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al guardar consentimiento: {}", e.getMessage());
+            throw new RuntimeException("Error al guardar consentimiento: " + e.getMessage());
+        }
+    }
+
+    // === CONFIRMACIÓN DE CUENTA ===
+    
+    public void confirmarCuenta(String token) {
+        String url = apiUrl + "/auth/confirm-account?token=" + token;
+        
+        try {
+            logger.debug("Confirmando cuenta con token: {}", token);
+
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    String.class
+            );
+
+            logger.info("Cuenta confirmada exitosamente");
+
+        } catch (Exception e) {
+            logger.error("Error al confirmar cuenta: {}", e.getMessage());
+            throw new RuntimeException("Error al confirmar cuenta: " + e.getMessage());
+        }
+    }
+
     // === GESTIÓN (ADMIN) ===
 
     public List<Map<String, Object>> obtenerTodasLasOrdenes(String token) {
@@ -553,6 +954,22 @@ public class ApiService {
         } catch (Exception e) {
             logger.error("Error al obtener productos: {}", e.getMessage());
             return List.of();
+        }
+    }
+
+    public Map<String, Object> getProductoPorId(Long id) {
+        String url = apiUrl + "/productos/" + id;
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null, // No auth headers required
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener producto por ID {}: {}", id, e.getMessage());
+            return new HashMap<>();
         }
     }
 

@@ -202,6 +202,25 @@ public class LoginController {
         }
     }
 
+    // === CONFIRMACIÓN DE CUENTA ===
+    
+    @GetMapping("/api/auth/confirm-account")
+    public String confirmAccount(@RequestParam String token) {
+        try {
+            logger.info("🔐 Procesando confirmación de cuenta con token: {}", token);
+            
+            // Llamar a la API para confirmar la cuenta
+            apiService.confirmarCuenta(token);
+            
+            logger.info("✅ Cuenta confirmada exitosamente");
+            return "redirect:/login-page?confirmed=true";
+            
+        } catch (Exception e) {
+            logger.error("❌ Error al confirmar cuenta: {}", e.getMessage());
+            return "redirect:/login-page?error=invalid_token";
+        }
+    }
+
     // DTO interno para recibir el JSON del frontend
     public static class LoginRequest {
         private String correoElectronico;

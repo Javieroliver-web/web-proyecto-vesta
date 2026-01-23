@@ -107,10 +107,11 @@
                 const usuarioId = sessionStorage.getItem('usuarioId');
                 if (usuarioId) {
                     try {
-                        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/vesta-api/api';
-                        await fetch(`${apiBase}/cookies/consentimiento`, {
+                        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/vesta-web/cookies/api';
+                        await fetch(`${apiBase}/consentimiento`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
                             body: JSON.stringify({
                                 usuarioId: parseInt(usuarioId),
                                 cookiesAnaliticas: analiticas,

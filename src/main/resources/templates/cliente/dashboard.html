@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Dashboard - Vesta Seguros</title>
+    <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -221,14 +222,12 @@
             ? 'http://localhost:8080/api' 
             : '/vesta-api/api';
 
-        // 1. RECOMENDADOR
+        // 1. RECOMENDADOR usando endpoint proxy
         async function cargarRecomendacion() {
             try {
-                // Usar email dinámico del usuario logueado
-                const emailQuery = userEmail ? `?email=${userEmail}` : '?email=test@vesta.es';
-                const res = await fetch(`${API_URL}/innovation/recommendation${emailQuery}`, {
+                const res = await fetch('/vesta-web/cliente/api/innovation/recommendation', {
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                    credentials: 'include'
                 });
                 if(res.ok) {
                     const data = await res.json();
@@ -245,7 +244,11 @@
                     document.getElementById('aiRecommendation').classList.remove('d-none');
                     document.getElementById('aiRecommendation').classList.add('d-flex');
                 }
-            } catch (e) { console.error("Error IA Recomendación", e); }
+            } catch (e) { 
+                console.error("Error IA Recomendación", e); 
+                // Ocultar la sección si hay error
+                document.getElementById('aiRecommendation').style.display = 'none';
+            }
         }
 
         // Función para obtener imagen por defecto según categoría
@@ -260,12 +263,15 @@
             return imageMap[categoria] || '/images/productos/viaje.png';
         }
 
-        // NUEVO: Cargar pólizas del usuario
+        // NUEVO: Cargar pólizas del usuario usando endpoint proxy
         async function cargarPolizas() {
             try {
-                const res = await fetch(`${API_URL}/polizas/usuario`, {
+                const res = await fetch('/vesta-web/cliente/api/polizas', {
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
                 
                 if (res.ok) {
@@ -277,6 +283,9 @@
                             <div class="col-12 text-center py-5">
                                 <i class="bi bi-inbox fs-1 text-muted"></i>
                                 <p class="text-muted mt-2">No tienes pólizas activas</p>
+                                <a href="/vesta-web/cliente/marketplace" class="btn btn-primary mt-3">
+                                    <i class="bi bi-plus-circle me-2"></i>Contratar Seguro
+                                </a>
                             </div>
                         `;
                         return;
@@ -289,7 +298,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                                     <div>
                                         <div class="d-flex align-items-center gap-2 mb-2">
-                                            <img src="${poliza.producto.imagenUrl}" 
+                                            <img src="${poliza.producto.imagenUrl || '/vesta-web/images/default.png'}" 
                                                  alt="${poliza.producto.nombre}"
                                                  style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover;"
                                                  onerror="this.onerror=null; this.src=getDefaultImage('${poliza.producto.categoria}');">
@@ -307,12 +316,19 @@
                         </div>
                     </div>
                     `).join('');
+                } else if (res.status === 401 || res.status === 403) {
+                    // Error de autenticación - redirigir al login
+                    console.error('Error de autenticación, redirigiendo al login');
+                    window.location.href = '/vesta-web/login';
                 } else {
-                    console.error('Error al cargar pólizas');
+                    console.error('Error al cargar pólizas:', res.status);
                     document.getElementById('polizasContainer').innerHTML = `
                         <div class="col-12 text-center py-5">
-                            <i class="bi bi-exclamation-triangle fs-1 text-danger"></i>
-                            <p class="text-danger mt-2">Error al cargar pólizas</p>
+                            <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+                            <p class="text-warning mt-2">Error al cargar pólizas (${res.status})</p>
+                            <button class="btn btn-outline-primary mt-3" onclick="cargarPolizas()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+                            </button>
                         </div>
                     `;
                 }
@@ -320,8 +336,11 @@
                 console.error("Error cargando pólizas", e);
                 document.getElementById('polizasContainer').innerHTML = `
                     <div class="col-12 text-center py-5">
-                        <i class="bi bi-exclamation-triangle fs-1 text-danger"></i>
+                        <i class="bi bi-wifi-off fs-1 text-danger"></i>
                         <p class="text-danger mt-2">Error de conexión</p>
+                        <button class="btn btn-outline-primary mt-3" onclick="cargarPolizas()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+                        </button>
                     </div>
                 `;
             }
@@ -330,9 +349,9 @@
         // 3. CARGAR CATÁLOGO RECOMENDADO (3 ALEATORIOS)
         async function cargarRecomendacionesCatalogo() {
             try {
-                const res = await fetch(`${API_URL}/productos`, {
+                const res = await fetch('/vesta-web/cliente/api/productos', {
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                    credentials: 'include'
                 });
                 if (res.ok) {
                     let productos = await res.json();
@@ -354,8 +373,8 @@
 
                     container.innerHTML = recomendados.map(p => `
                         <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm p-3 hover-lift" onclick="window.location.href='/cliente/producto/${p.id}'" style="cursor: pointer;">
-                                <img src="${p.imagenUrl || '/images/default.png'}" class="card-img-top rounded mb-3" style="height: 150px; object-fit: cover;" 
+                            <div class="card h-100 border-0 shadow-sm p-3 hover-lift" onclick="window.location.href='/vesta-web/cliente/producto/${p.id}'" style="cursor: pointer;">
+                                <img src="${p.imagenUrl || '/vesta-web/images/default.png'}" class="card-img-top rounded mb-3" style="height: 150px; object-fit: cover;" 
                                      onerror="this.onerror=null; this.src=getDefaultImage('${p.categoria}');">
                                 <h6 class="fw-bold mb-2">${p.nombre}</h6>
                                 <p class="text-muted small mb-2 text-truncate">${p.descripcion}</p>
@@ -398,12 +417,12 @@
             chatBody.scrollTop = chatBody.scrollHeight;
 
             try {
-                const res = await fetch(`${API_URL}/innovation/chat`, {
+                const res = await fetch('/vesta-web/cliente/api/innovation/chat', {
                     method: 'POST',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + authToken
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ pregunta: texto })
                 });
                 if(res.ok) {
@@ -447,9 +466,10 @@
             }
 
             try {
-                const res = await fetch(`${API_URL}/siniestros`, {
+                const res = await fetch('/vesta-web/cliente/api/siniestros', {
                     method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
                     body: formData
                 });
                 
@@ -527,6 +547,6 @@
             doomModal.addEventListener('hidden.bs.modal', stopDoom);
         }
     </script>
-    <script src="/static/js/voice-assistant.js"></script>
+    <script src="/vesta-web/js/voice-assistant.js"></script>
 </body>
 </html>

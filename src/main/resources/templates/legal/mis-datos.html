@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Mis Datos - Vesta</title>
+    <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -154,7 +155,7 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const usuarioId = [[${userId}]]; 
-        const apiBaseUrl = 'http://localhost:8080/api/derechos';
+        const apiBaseUrl = '/vesta-web/derechos/api';
         /*]]>*/
 
         function mostrarToast(mensaje) {
@@ -203,6 +204,7 @@
                 await fetch(`${apiBaseUrl}/solicitar-supresion`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ usuarioId, descripcion: razon })
                 });
                 
@@ -219,6 +221,7 @@
                 const response = await fetch(`${apiBaseUrl}/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(data)
                 });
                 
@@ -240,7 +243,9 @@
             if (!usuarioId) return;
             
             try {
-                const response = await fetch(`${apiBaseUrl}/mis-solicitudes/${usuarioId}`);
+                const response = await fetch(`${apiBaseUrl}/mis-solicitudes/${usuarioId}`, {
+                    credentials: 'include'
+                });
                 const solicitudes = await response.json();
                 
                 const listContainer = document.getElementById('solicitudesList');

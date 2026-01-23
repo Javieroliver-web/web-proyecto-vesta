@@ -3,6 +3,7 @@
 
 <head>
     <title>Mis Pólizas - Vesta Seguros</title>
+    <div th:replace="~{fragments/favicon :: favicon}"></div>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -347,7 +348,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/modal-utils.js"></script>
+    <script src="/vesta-web/js/modal-utils.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
         const authToken = /*[[${ session.token }]]*/ null;
@@ -378,16 +379,23 @@
 
         async function cargarPolizas() {
             try {
-                const res = await fetch(`${API_URL}/polizas/usuario`, {
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                const res = await fetch('/vesta-web/cliente/api/polizas', {
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
 
                 if (res.ok) {
                     todasLasPolizas = await res.json();
                     calcularEstadisticas();
                     renderizarPolizas(todasLasPolizas);
+                } else if (res.status === 401 || res.status === 403) {
+                    // Error de autenticación - redirigir al login
+                    console.error('Error de autenticación, redirigiendo al login');
+                    window.location.href = '/vesta-web/login';
                 } else {
-                    mostrarError('Error al cargar pólizas');
+                    mostrarError(`Error al cargar pólizas (${res.status})`);
                 }
             } catch (e) {
                 console.error('Error:', e);
@@ -488,8 +496,8 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando...';
                 btn.disabled = true;
 
-                const res = await fetch(`${API_URL}/reportes/polizas/pdf`, {
-                    headers: { 'Authorization': 'Bearer ' + authToken }
+                const res = await fetch('/vesta-web/cliente/api/reportes/polizas/pdf', {
+                    credentials: 'include'
                 });
 
                 if (res.ok) {
@@ -511,6 +519,10 @@
             } catch (e) {
                 console.error("Error downloading PDF", e);
                 alert('No se pudo conectar con el servidor.');
+                
+                const btn = document.querySelector('button[onclick="descargarPDF()"]');
+                btn.innerHTML = '<i class="bi bi-file-earmark-pdf me-2"></i>Descargar Resumen';
+                btn.disabled = false;
             }
         }
 
@@ -520,6 +532,9 @@
                 <div class="empty-state">
                     <i class="bi bi-exclamation-triangle text-danger"></i>
                     <h5>${mensaje}</h5>
+                    <button class="btn btn-outline-primary mt-3" onclick="cargarPolizas()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+                    </button>
                 </div>
             `;
         }

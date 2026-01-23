@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <style>
+      .bg { fill: #3c425e; }
+      .shield { fill: none; stroke: #f7cc7c; stroke-width: 1.5; }
+      .lion { fill: none; stroke: #f7cc7c; stroke-width: 1.2; }
+    </style>
+  </defs>
+  
+  <!-- Fondo -->
+  <rect class="bg" width="32" height="32" rx="4"/>
+  
+  <!-- Escudo -->
+  <path class="shield" d="M16 4 C10 4, 6 7, 6 12 C6 20, 12 26, 16 28 C20 26, 26 20, 26 12 C26 7, 22 4, 16 4 Z"/>
+  
+  <!-- León simplificado -->
+  <circle class="lion" cx="16" cy="14" r="3"/>
+  <path class="lion" d="M13 12 C13.5 11, 14.5 11, 15 12"/>
+  <path class="lion" d="M17 12 C17.5 11, 18.5 11, 19 12"/>
+  <path class="lion" d="M16 16 L16 18"/>
+  <path class="lion" d="M13 18 C14 19, 18 19, 19 18"/>
+</svg>

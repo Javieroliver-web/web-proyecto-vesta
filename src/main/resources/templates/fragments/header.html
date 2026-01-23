@@ -21,11 +21,11 @@
             if (userId && token) {
                 const apiBase = window.location.hostname === 'localhost' 
                     ? 'http://localhost:8080/api' 
-                    : '/vesta-api/api';
+                    : '/vesta-web/usuario/api';
 
                 // Fetch silencioso para actualizar preferencia
-                fetch(`${apiBase}/usuarios/${userId}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                fetch(`${apiBase}/${userId}`, {
+                    credentials: 'include'
                 })
                 .then(res => {
                     if(res.ok) return res.json();

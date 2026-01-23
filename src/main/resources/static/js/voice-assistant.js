@@ -32,8 +32,8 @@ const VoiceAssistant = {
     // Configuración
     config: {
         language: 'es-ES',
-        // En producción (Tomcat), la API estará en /vesta-api/api. En local, en /api o localhost:8080/api.
-        apiBaseUrl: window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/vesta-api/api',
+        // En producción (Tomcat), usar endpoints proxy. En local, usar API directa.
+        apiBaseUrl: window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/vesta-web/cliente/api',
         maxRetries: 3,
         retryDelay: 1000,
         speechRate: 0.9,
