@@ -254,13 +254,13 @@
         // Función para obtener imagen por defecto según categoría
         function getDefaultImage(categoria) {
             const imageMap = {
-                'Viaje': '/images/productos/viaje.png',
-                'Tecnología': '/images/productos/tecnologia.png',
-                'Entretenimiento': '/images/productos/Entretenimiento.jpg',
-                'Movilidad': '/images/productos/movilidad.png',
-                'Mascotas': '/images/productos/mascotas.png'
+                'Viaje': '/vesta-web/images/productos/viaje.png',
+                'Tecnología': '/vesta-web/images/productos/tecnologia.png',
+                'Entretenimiento': '/vesta-web/images/productos/Entretenimiento.jpg',
+                'Movilidad': '/vesta-web/images/productos/movilidad.png',
+                'Mascotas': '/vesta-web/images/productos/mascotas.png'
             };
-            return imageMap[categoria] || '/images/productos/viaje.png';
+            return imageMap[categoria] || '/vesta-web/images/productos/viaje.png';
         }
 
         // NUEVO: Cargar pólizas del usuario usando endpoint proxy
@@ -374,7 +374,7 @@
                     container.innerHTML = recomendados.map(p => `
                         <div class="col-md-4">
                             <div class="card h-100 border-0 shadow-sm p-3 hover-lift" onclick="window.location.href='/vesta-web/cliente/producto/${p.id}'" style="cursor: pointer;">
-                                <img src="${p.imagenUrl || '/vesta-web/images/default.png'}" class="card-img-top rounded mb-3" style="height: 150px; object-fit: cover;" 
+                                <img src="${p.imagenUrl || getDefaultImage(p.categoria)}" class="card-img-top rounded mb-3" style="height: 150px; object-fit: cover;" 
                                      onerror="this.onerror=null; this.src=getDefaultImage('${p.categoria}');">
                                 <h6 class="fw-bold mb-2">${p.nombre}</h6>
                                 <p class="text-muted small mb-2 text-truncate">${p.descripcion}</p>
