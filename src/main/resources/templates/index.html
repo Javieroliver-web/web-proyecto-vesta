@@ -201,6 +201,201 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .hero-section {
+                padding: 5rem 0;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section {
+                padding: 4rem 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+            }
+            
+            .insurance-card {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 0;
+            }
+            
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+            
+            .hero-section {
+                padding: 3rem 0;
+                text-align: center;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .hero-description {
+                font-size: 0.95rem;
+                margin-bottom: 2rem;
+            }
+            
+            .btn-hero {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+                margin: 0.25rem;
+            }
+            
+            .insurance-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .price-tag {
+                font-size: 1.5rem;
+            }
+            
+            footer {
+                padding: 3rem 0 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .hero-section {
+                padding: 2.5rem 0;
+            }
+            
+            .hero-title {
+                font-size: 1.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .hero-description {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .btn-hero {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .d-flex.gap-3 {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
+            
+            .insurance-card .card-body {
+                padding: 1rem;
+            }
+            
+            .insurance-card .card-title {
+                font-size: 1.1rem;
+            }
+            
+            .insurance-card .card-text {
+                font-size: 0.9rem;
+            }
+            
+            .price-tag {
+                font-size: 1.3rem;
+            }
+            
+            footer {
+                padding: 2.5rem 0 1rem;
+                text-align: center;
+            }
+            
+            footer .row {
+                text-align: center;
+            }
+            
+            footer .col-md-4 {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.95rem;
+            }
+            
+            .hero-description {
+                font-size: 0.85rem;
+            }
+            
+            .btn-hero {
+                padding: 0.65rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .insurance-card .card-body {
+                padding: 0.75rem;
+            }
+            
+            .insurance-card .card-title {
+                font-size: 1rem;
+            }
+            
+            .insurance-card .card-text {
+                font-size: 0.85rem;
+            }
+            
+            .price-tag {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <div th:replace="~{fragments/cookie-banner :: cookie-banner}"></div>

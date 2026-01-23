@@ -31,7 +31,7 @@ public class LoginController {
 
         if (token != null) {
             // Redirigir según el rol del usuario
-            if ("ADMIN".equals(rol)) {
+            if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol)) {
                 return "redirect:/admin/dashboard";
             } else {
                 return "redirect:/cliente/dashboard";
@@ -88,7 +88,7 @@ public class LoginController {
 
             // Determinar URL de redirección según el rol
             String redirectUrl;
-            if ("ADMIN".equals(response.getRol())) {
+            if ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())) {
                 redirectUrl = "/admin/dashboard";
             } else {
                 redirectUrl = "/cliente/dashboard";
@@ -137,7 +137,7 @@ public class LoginController {
             session.setAttribute("usuarioId", response.getId());
 
             // Determinar URL de redirección
-            String redirectUrl = "ADMIN".equals(response.getRol()) ? "/admin/dashboard" : "/cliente/dashboard";
+            String redirectUrl = ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())) ? "/admin/dashboard" : "/cliente/dashboard";
 
             Map<String, Object> result = new HashMap<>();
             result.put("redirectUrl", redirectUrl);

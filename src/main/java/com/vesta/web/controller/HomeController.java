@@ -28,7 +28,7 @@ public class HomeController {
         String rol = (String) session.getAttribute("rol");
 
         if (token != null) {
-            if ("ADMIN".equals(rol)) {
+            if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol)) {
                 return "redirect:/admin/dashboard";
             } else {
                 return "redirect:/cliente/dashboard";

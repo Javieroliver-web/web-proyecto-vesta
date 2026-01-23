@@ -32,7 +32,7 @@ public class ClienteController {
             return "redirect:/";
         }
 
-        if ("ADMIN".equals(rol)) {
+        if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol)) {
             return "redirect:/admin/dashboard";
         }
 
@@ -67,7 +67,7 @@ public class ClienteController {
             return "redirect:/";
         }
 
-        if ("ADMIN".equals(session.getAttribute("rol"))) {
+        if ("ADMIN".equals(session.getAttribute("rol")) || "ADMINISTRADOR".equals(session.getAttribute("rol"))) {
             return "redirect:/admin/dashboard";
         }
 
@@ -83,7 +83,7 @@ public class ClienteController {
             return "redirect:/";
         }
 
-        if ("ADMIN".equals(session.getAttribute("rol"))) {
+        if ("ADMIN".equals(session.getAttribute("rol")) || "ADMINISTRADOR".equals(session.getAttribute("rol"))) {
             return "redirect:/admin/dashboard";
         }
 
@@ -100,12 +100,102 @@ public class ClienteController {
             return "redirect:/";
         }
 
-        if ("ADMIN".equals(session.getAttribute("rol"))) {
+        if ("ADMIN".equals(session.getAttribute("rol")) || "ADMINISTRADOR".equals(session.getAttribute("rol"))) {
             return "redirect:/admin/dashboard";
         }
 
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
         return "cliente/mis-polizas";
+    }
+
+    // === TPV VIRTUAL ===
+    
+    @GetMapping("/tpv-simulator")
+    public String tpvSimulator(HttpSession session, Model model) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return "redirect:/login-page";
+        }
+
+        if ("ADMIN".equals(session.getAttribute("rol")) || "ADMINISTRADOR".equals(session.getAttribute("rol"))) {
+            return "redirect:/admin/dashboard";
+        }
+
+        // Obtener órdenes pendientes del usuario actual
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        java.util.List<java.util.Map<String, Object>> ordenesPendientes = 
+            apiService.obtenerOrdenesPendientesUsuario(token, usuarioId);
+        
+        // Preparar datos del carrito basados en órdenes pendientes
+        java.util.Map<String, Object> cartData = new java.util.HashMap<>();
+        java.util.List<java.util.Map<String, Object>> items = new java.util.ArrayList<>();
+        double totalAmount = 0.0;
+        
+        if (ordenesPendientes != null && !ordenesPendientes.isEmpty()) {
+            for (java.util.Map<String, Object> orden : ordenesPendientes) {
+                @SuppressWarnings("unchecked")
+                java.util.List<java.util.Map<String, Object>> ordenItems = 
+                    (java.util.List<java.util.Map<String, Object>>) orden.get("items");
+                
+                if (ordenItems != null) {
+                    for (java.util.Map<String, Object> ordenItem : ordenItems) {
+                        java.util.Map<String, Object> item = new java.util.HashMap<>();
+                        item.put("seguroId", ordenItem.get("seguroId"));
+                        item.put("cantidad", ordenItem.get("cantidad"));
+                        item.put("nombre", ordenItem.get("nombreSeguro"));
+                        item.put("precio", ordenItem.get("precioUnitario"));
+                        item.put("subtotal", ordenItem.get("subtotal"));
+                        items.add(item);
+                        
+                        totalAmount += ((Number) ordenItem.get("subtotal")).doubleValue();
+                    }
+                }
+            }
+        }
+        
+        cartData.put("items", items);
+        
+        model.addAttribute("cartData", cartData);
+        model.addAttribute("totalAmount", totalAmount);
+        model.addAttribute("usuarioId", usuarioId);
+        model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
+        
+        return "cliente/tpv-simulator";
+    }
+
+    @PostMapping("/api/checkout-tpv")
+    @ResponseBody
+    public ResponseEntity<?> checkoutTPV(@RequestBody Map<String, Object> request, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
+        }
+
+        try {
+            Object resultado = apiService.checkoutTPV(token, request);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Error al procesar pago: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/tpv/tarjetas-prueba")
+    @ResponseBody
+    public ResponseEntity<?> getTarjetasPrueba(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
+        }
+
+        try {
+            Object tarjetas = apiService.getTarjetasPrueba(token);
+            return ResponseEntity.ok(tarjetas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Error al obtener tarjetas: " + e.getMessage()));
+        }
     }
 
     // === API PROXY ENDPOINTS ===

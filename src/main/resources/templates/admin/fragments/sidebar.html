@@ -42,7 +42,7 @@
                 <i class="bi bi-person-circle me-2"></i>
                 <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Admin'}">Admin</span>
             </div>
-            <a href="/logout" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
+            <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
         </div>
         <script>
             // Aplicar tema oscuro si está guardado

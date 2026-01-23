@@ -23,7 +23,7 @@ public class AdminController {
         String rol = (String) session.getAttribute("rol");
 
         // Seguridad: Solo ADMIN puede entrar
-        if (token == null || !"ADMIN".equals(rol)) {
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol))) {
             return "redirect:/";
         }
 
@@ -115,7 +115,7 @@ public class AdminController {
     public String configuracion(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
-        if (token == null || !"ADMIN".equals(rol))
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol)))
             return "redirect:/";
         model.addAttribute("usuarioId", session.getAttribute("usuarioId"));
         return "admin/configuracion";
@@ -125,7 +125,7 @@ public class AdminController {
     public String catalogo(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
-        if (token == null || !"ADMIN".equals(rol))
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol)))
             return "redirect:/";
         // Pasamos token para que el frontend pueda llamar a la API
         // (Aunque realmente el frontend usa th:inline="javascript" y session.token)
@@ -136,8 +136,10 @@ public class AdminController {
     public String usuarios(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
-        if (token == null || !"ADMIN".equals(rol))
+        
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol))) {
             return "redirect:/";
+        }
 
         List<Map<String, Object>> usuarios = apiService.obtenerTodosLosUsuarios(token);
 
@@ -203,7 +205,7 @@ public class AdminController {
     public String polizas(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
-        if (token == null || !"ADMIN".equals(rol))
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol)))
             return "redirect:/";
 
         model.addAttribute("polizas", apiService.obtenerTodasLasPolizas(token));
@@ -214,7 +216,7 @@ public class AdminController {
     public String auditoria(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
-        if (token == null || !"ADMIN".equals(rol))
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol)))
             return "redirect:/";
 
         model.addAttribute("logs", apiService.obtenerLogsAuditoria(token));

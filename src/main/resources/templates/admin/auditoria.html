@@ -39,7 +39,7 @@
                         </thead>
                         <tbody id="logTableBody">
                             <tr th:each="log : ${logs}">
-                                <td class="text-muted" th:text="${#temporals.format(log.fecha, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 10:00:00</td>
+                                <td class="text-muted" th:text="${#strings.substring(log.fecha, 0, 19)}">2026-01-01 10:00:00</td>
                                 <td class="fw-bold text-primary" th:text="${log.usuarioEmail}">admin@vesta.com</td>
                                 <td>
                                     <span th:class="${'badge ' + (log.accion.contains('DELETE') || log.accion.contains('BAN') ? 'bg-danger' : (log.accion.contains('UPDATE') ? 'bg-warning text-dark' : 'bg-info text-dark'))}" 

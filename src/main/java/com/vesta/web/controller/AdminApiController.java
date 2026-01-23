@@ -145,4 +145,61 @@ public class AdminApiController {
             return ResponseEntity.status(500).body("{\"error\":\"Error al eliminar producto: " + e.getMessage() + "\"}");
         }
     }
+
+    // === GESTIÓN DE ÓRDENES/VENTAS ===
+    
+    @GetMapping("/api/ordenes")
+    @ResponseBody
+    public ResponseEntity<?> obtenerTodasLasOrdenes(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object ordenes = apiService.obtenerTodasLasOrdenes(token);
+            return ResponseEntity.ok(ordenes);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener órdenes: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // === GESTIÓN DE PÓLIZAS ===
+    
+    @GetMapping("/api/polizas")
+    @ResponseBody
+    public ResponseEntity<?> obtenerTodasLasPolizas(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object polizas = apiService.obtenerTodasLasPolizas(token);
+            return ResponseEntity.ok(polizas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener pólizas: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // === AUDITORÍA ===
+    
+    @GetMapping("/api/auditoria")
+    @ResponseBody
+    public ResponseEntity<?> obtenerLogsAuditoria(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object logs = apiService.obtenerLogsAuditoria(token);
+            return ResponseEntity.ok(logs);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener logs de auditoría: " + e.getMessage() + "\"}");
+        }
+    }
 }

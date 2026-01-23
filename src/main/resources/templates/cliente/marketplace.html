@@ -246,6 +246,177 @@
             border-width: 0.3rem;
             color: var(--vesta-gold);
         }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section .subtitle {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section {
+                padding: 60px 0 40px;
+            }
+            
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+            
+            .search-section {
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            .product-image-container {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0 30px;
+                text-align: center;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .hero-section .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .hero-section p {
+                font-size: 1rem;
+            }
+            
+            .search-section {
+                padding: 20px;
+                border-radius: 16px;
+            }
+            
+            .search-input, .filter-select {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+            
+            .product-card {
+                margin-bottom: 20px;
+            }
+            
+            .product-image-container {
+                height: 180px;
+            }
+            
+            .product-body {
+                padding: 20px;
+            }
+            
+            .benefit-card {
+                padding: 25px 15px;
+                margin-bottom: 30px;
+            }
+            
+            .benefit-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .benefit-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 30px 0 20px;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.6rem;
+            }
+            
+            .hero-section .subtitle {
+                font-size: 1rem;
+            }
+            
+            .search-section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .search-input, .filter-select {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+            
+            .product-image-container {
+                height: 160px;
+            }
+            
+            .product-body {
+                padding: 15px;
+            }
+            
+            .btn-ver-mas {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .category-badge {
+                top: 12px;
+                right: 12px;
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+            
+            .benefits-section {
+                padding: 40px 0;
+                margin-top: 40px;
+            }
+            
+            .benefit-card {
+                padding: 20px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section h1 {
+                font-size: 1.4rem;
+            }
+            
+            .search-section {
+                padding: 12px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-icon {
+                border-radius: 12px;
+                border-right: 1px solid var(--theme-border, #e9ecef);
+            }
+            
+            .search-input {
+                border-radius: 12px;
+                border-left: 1px solid var(--theme-border, #e9ecef);
+                padding-left: 16px;
+            }
+            
+            .product-image-container {
+                height: 140px;
+            }
+        }
     </style>
 </head>
 <body>

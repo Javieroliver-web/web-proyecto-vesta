@@ -816,6 +816,26 @@ public class ApiService {
         }
     }
 
+    public List<Map<String, Object>> obtenerOrdenesPendientesUsuario(String token, Long usuarioId) {
+        String url = apiUrl + "/ordenes/usuario/" + usuarioId + "/pendientes";
+        try {
+            logger.debug("Obteniendo órdenes pendientes para usuario: {}", usuarioId);
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al obtener órdenes pendientes del usuario {}: {}", usuarioId, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
     public List<Map<String, Object>> obtenerSolicitudesRGPD(String token) {
         String url = apiUrl + "/derechos/todas";
         try {
@@ -1008,6 +1028,57 @@ public class ApiService {
         }
 
         return "Error " + e.getStatusCode();
+    }
+
+    // === TPV VIRTUAL ===
+    
+    public Map<String, Object> checkoutTPV(String token, Map<String, Object> request) {
+        String url = apiUrl + "/ordenes/checkout-tpv";
+        
+        try {
+            logger.debug("Procesando checkout con TPV");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en checkout TPV: {}", e.getResponseBodyAsString());
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (Exception e) {
+            logger.error("Error inesperado en checkout TPV: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al procesar pago: " + e.getMessage());
+        }
+    }
+
+    public Map<String, String> getTarjetasPrueba(String token) {
+        String url = apiUrl + "/tpv/tarjetas-prueba";
+        
+        try {
+            logger.debug("Obteniendo tarjetas de prueba");
+
+            ResponseEntity<Map<String, String>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, String>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al obtener tarjetas de prueba: {}", e.getMessage(), e);
+            // Devolver tarjetas por defecto en caso de error
+            Map<String, String> defaultCards = new HashMap<>();
+            defaultCards.put("4111111111111111", "Visa - Pago Exitoso");
+            defaultCards.put("4000000000000002", "Visa - Tarjeta Rechazada");
+            return defaultCards;
+        }
     }
 
     private HttpHeaders getHeaders(String token) {
