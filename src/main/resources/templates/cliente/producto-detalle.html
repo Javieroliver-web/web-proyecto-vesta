@@ -450,7 +450,9 @@
         }
 
         function mostrarProducto() {
-            document.getElementById('productImage').src = productoActual.imagenUrl || 'https://via.placeholder.com/600x400';
+            // Usar imagen del producto o imagen por defecto según categoría
+            const imagenSrc = productoActual.imagenUrl || getDefaultImage(productoActual.categoria);
+            document.getElementById('productImage').src = imagenSrc;
             document.getElementById('categoryBadge').textContent = productoActual.categoria;
             document.getElementById('productTitle').textContent = productoActual.nombre;
             document.getElementById('productDescription').textContent = productoActual.descripcion;
