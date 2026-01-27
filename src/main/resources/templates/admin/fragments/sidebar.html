@@ -44,12 +44,33 @@
             </div>
             <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
         </div>
-        <script>
-            // Aplicar tema oscuro si está guardado
+        <script th:inline="javascript">
+            // Aplicar tema desde BD
             (function() {
+                // 1. Aplicar localStorage inmediatamente
                 const theme = localStorage.getItem('theme');
                 if (theme) {
                     document.documentElement.setAttribute('data-theme', theme);
+                }
+
+                // 2. Sincronizar con BD
+                /*<![CDATA[*/
+                const userId = /*[[${session.usuarioId}]]*/ null;
+                /*]]>*/
+
+                if (userId) {
+                    const apiBase = '/vesta-web/usuario/api';
+                    fetch(`${apiBase}/${userId}`, {
+                        credentials: 'include'
+                    })
+                    .then(res => res.ok ? res.json() : Promise.reject())
+                    .then(user => {
+                        if (user.tema) {
+                            localStorage.setItem('theme', user.tema);
+                            document.documentElement.setAttribute('data-theme', user.tema);
+                        }
+                    })
+                    .catch(() => {});
                 }
             })();
         </script>

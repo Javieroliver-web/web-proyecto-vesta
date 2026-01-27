@@ -7,8 +7,8 @@
         (function() {
             // 1. Aplicar Local Storage inmediatamente (para evitar flash)
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
             }
 
             // 2. Sincronizar con BD (si hay sesión activa)
@@ -23,7 +23,7 @@
                     ? 'https://localhost:8080/api' 
                     : '/vesta-web/usuario/api';
 
-                // Fetch silencioso para actualizar preferencia
+                // Fetch para aplicar preferencia de BD (siempre actualizar)
                 fetch(`${apiBase}/${userId}`, {
                     credentials: 'include'
                 })
@@ -33,13 +33,9 @@
                 })
                 .then(user => {
                     if (user.tema) {
-                        const currentLocal = localStorage.getItem('theme');
-                        // Si la BD tiene un tema diferente, actualizamos el navegador
-                        if (user.tema !== currentLocal) {
-                            console.log("Syncing theme from DB:", user.tema);
-                            localStorage.setItem('theme', user.tema);
-                            document.documentElement.setAttribute('data-theme', user.tema);
-                        }
+                        // Siempre aplicar el tema de la BD y actualizar localStorage
+                        localStorage.setItem('theme', user.tema);
+                        document.documentElement.setAttribute('data-theme', user.tema);
                     }
                 })
                 .catch(err => {
