@@ -20,12 +20,16 @@ public class OAuthController {
 
     @GetMapping("/oauth2/success-handler")
     public String handleOAuthSuccess(@AuthenticationPrincipal OAuth2User principal, HttpSession session) {
+        logger.info("🔵 Entrando a handleOAuthSuccess");
+
         if (principal == null) {
-            return "redirect:/login-page?error=oauth_failure";
+            logger.error("❌ Principal es NULL en success handler");
+            return "redirect:/login-page?error=oauth_failure_null_principal";
         }
 
         String email = principal.getAttribute("email");
         String name = principal.getAttribute("name");
+        logger.info("👤 Principal recibido: Email={}, Name={}", email, name);
 
         // Identificar proveedor (simplificado, podría mejorarse)
         // Google usa "sub", Apple "sub" también, pero atributos varían
@@ -40,7 +44,15 @@ public class OAuthController {
         try {
             // Llamar a la API de Vesta para obtener el JWT real
             // Nota: Se asume que existe un método socialLogin en ApiService
+            logger.info("📡 Llamando a ApiService.socialLogin...");
             AuthResponseDTO response = apiService.socialLogin(email, name, provider);
+            logger.info("⬇️ Respuesta de API recibida.{}",
+                    response.getToken() != null ? " Token generado." : " Token NULO (Verificación pendiente).");
+
+            if (response.getToken() == null) {
+                logger.info("ℹ️ Cuenta creada o inactiva. Redirigiendo a verificación.");
+                return "redirect:/login-page?error=verification_sent&email=" + email;
+            }
 
             // Guardar sesión Vesta
             session.setAttribute("token", response.getToken());
@@ -49,11 +61,18 @@ public class OAuthController {
             session.setAttribute("usuarioId", response.getId());
             session.setAttribute("usuarioEmail", email);
 
+            logger.info("🚀 Redirigiendo a Dashboard");
             return "redirect:/cliente/dashboard";
 
         } catch (Exception e) {
-            logger.error("Error en login social backend: {}", e.getMessage());
-            return "redirect:/login-page?error=social_backend_error";
+            String msg = e.getMessage();
+            logger.error("❌ Error CRÍTICO en login social backend: {}", msg, e);
+
+            if (msg.contains("Cuenta no verificada") || msg.contains("not verified")) {
+                return "redirect:/login-page?error=account_not_verified&email=" + email;
+            }
+
+            return "redirect:/login-page?error=social_backend_error&msg=" + msg;
         }
     }
 }

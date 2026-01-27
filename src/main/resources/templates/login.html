@@ -930,6 +930,14 @@
             if (urlParams.get('error') === 'token_invalid') {
                 showToast('El enlace de activación es inválido o ha expirado.', 'error');
             }
+            
+            if (urlParams.get('error') === 'verification_sent') {
+                showToast('Te hemos enviado un correo de confirmación. Revisa tu bandeja de entrada.', 'success');
+            }
+            
+            if (urlParams.get('error') === 'account_not_verified') {
+                showToast('Tu cuenta aún no está verificada. Revisa tu email.', 'error');
+            }
         });
 
         // 2FA Functions

@@ -30,6 +30,10 @@ public class SecurityConfig {
                                                                                                     // controlador
                                                                                                     // intermedio
                                                                                                     // nuestro
+                                                .failureUrl("/login-page?error=oauth_authentication_failed") // Capturar
+                                                                                                             // errores
+                                                                                                             // de
+                                                                                                             // autenticacion
                                 )
                                 .csrf(csrf -> csrf.disable()); // Desactivar CSRF por simplicidad en desarrollo
 

@@ -711,11 +711,20 @@
             } catch (e) { showToast('Error de conexión', 'danger'); }
         }
 
-        // === CUENTAS VINCULADAS LOGIC (MOCK) ===
-        function loadLinkedAccounts() {
-            const provider = localStorage.getItem('social_login_provider');
-            if (provider) {
-                updateLinkUI(provider, true);
+        // === CUENTAS VINCULADAS LOGIC ===
+        async function loadLinkedAccounts() {
+            try {
+                const res = await fetch(`${apiBaseUrl}/${userId}`, {
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    const user = await res.json();
+                    if (user.provider) {
+                        updateLinkUI(user.provider, true);
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading linked accounts", e);
             }
         }
         loadLinkedAccounts();
@@ -729,6 +738,7 @@
                 statusEl.className = 'text-success fw-bold';
                 btnEl.innerText = 'Desvincular';
                 btnEl.className = 'btn btn-sm btn-outline-danger';
+                btnEl.disabled = true; // Disable unlinking for OAuth users
             } else {
                 statusEl.innerText = 'No vinculado';
                 statusEl.className = provider === 'apple' ? 'text-white-50' : 'text-muted';
@@ -738,30 +748,9 @@
         }
 
         function toggleLink(provider) {
-            const isLinked = localStorage.getItem('social_login_provider') === provider;
-
-            if (isLinked) {
-                // Desvincular
-                if (confirm(`¿Estás seguro de desvincular tu cuenta de ${provider}?`)) {
-                    localStorage.removeItem('social_login_provider');
-                    localStorage.removeItem('social_login_user');
-                    updateLinkUI(provider, false);
-                    showToast(`Cuenta de ${provider} desvinculada.`, 'success');
-                }
-            } else {
-                // Vincular (Simulado)
-                const btn = document.getElementById(`btn-${provider}`);
-                const originalText = btn.innerText;
-                btn.disabled = true;
-                btn.innerText = 'Conectando...';
-
-                setTimeout(() => {
-                    localStorage.setItem('social_login_provider', provider);
-                    localStorage.setItem('social_login_user', 'Usuario Demo ' + provider);
-                    updateLinkUI(provider, true);
-                    showToast(`Cuenta de ${provider} vinculada exitosamente.`, 'success');
-                    btn.disabled = false;
-                }, 1500);
+            // For now, linking functionality redirects to OAuth flow
+            if (confirm(`Para vincular tu cuenta de ${provider}, serás redirigido al inicio de sesión`)) {
+                window.location.href = `/vesta-web/oauth2/authorization/${provider}`;
             }
         }
     </script>
