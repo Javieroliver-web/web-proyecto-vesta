@@ -877,17 +877,30 @@ body {
 /* ===== PREMIUM PAGE TITLES ===== */
 .page-title-premium {
     font-family: 'Inter', sans-serif;
-    font-weight: 800; /* Extra Bold */
+    font-weight: 800;
     font-size: 2rem;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--vesta-gold) 0%, #ffcf87 50%, var(--vesta-gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0px 4px 12px rgba(241, 166, 28, 0.15);
-    margin-bottom: 0;
+    letter-spacing: -0.02em;
+    
+    /* Solid dark gold - works well in both light and dark modes */
+    color: #c99a2e;
+    
+    /* Increased spacing below title */
+    margin-bottom: 1.5rem;
     position: relative;
     display: inline-block;
+}
+
+/* Decorative accent line */
+.page-title-premium::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: #c99a2e;
+    border-radius: 2px;
+    opacity: 0.8;
 }
 
 /* Optional: Add a subtle glow or underline if needed, but clean gradient is often enough */
