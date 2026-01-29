@@ -2,23 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Gestión de Pólizas - Vesta Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css(v=2.1)}">
     <!-- Librerías para Exportación y PDF -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <div class="d-flex">
+    <div class="d-flex flex-column flex-md-row">
         <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: sidebar(activeTab='polizas')}"></div>
 
         <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="fw-bold text-warning mb-0">📝 Gestión de Pólizas</h2>
+                    <h2 class="page-title-premium">📋 Gestión de Pólizas</h2>
                     <p class="text-muted small mb-0">Administra, filtra y exporta el historial de seguros</p>
                 </div>
                 <button class="btn btn-success" onclick="exportToExcel()">
@@ -31,9 +32,11 @@
                 <div class="card-body py-3">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text border-end-0 bg-white"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control border-start-0" id="searchPoliza" placeholder="Buscar por ID, Cliente...">
+                            <div class="search-expandable">
+                                <input type="text" id="searchPoliza" placeholder="Buscar póliza...">
+                                <div class="search-expandable-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">

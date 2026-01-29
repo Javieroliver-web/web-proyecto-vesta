@@ -1,59 +1,128 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="sidebar(activeTab)" class="sidebar p-3 d-flex flex-column flex-shrink-0" style="width: 250px; min-height: 100vh; background: #282c3f; color: white;">
-        <h4 class="mb-4 text-center fw-bold text-white">
-            <i class="bi bi-shield-check" style="color: #f1a61c;"></i> ADMIN
-        </h4>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''" th:href="@{/admin/dashboard}">
-                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''" th:href="@{/admin/usuarios}">
-                    <i class="bi bi-people me-2"></i> Usuarios
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'polizas'} ? 'active' : ''" th:href="@{/admin/polizas}">
-                    <i class="bi bi-shield-check me-2"></i> Pólizas
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'catalogo'} ? 'active' : ''" th:href="@{/admin/catalogo}">
-                    <i class="bi bi-journal-check me-2"></i> Catálogo
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'auditoria'} ? 'active' : ''" th:href="@{/admin/auditoria}">
-                    <i class="bi bi-clock-history me-2"></i> Auditoría
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'configuracion'} ? 'active' : ''" th:href="@{/admin/configuracion}">
-                    <i class="bi bi-gear me-2"></i> Configuración
-                </a>
-            </li>
-        </ul>
-        <div class="mt-auto pt-3 border-top border-secondary">
-            <div class="d-flex align-items-center mb-2 px-2 text-white small">
-                <i class="bi bi-person-circle me-2"></i>
-                <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Admin'}">Admin</span>
+    <!-- Container for Sidebar and Mobile Toggle -->
+    <div th:fragment="sidebar(activeTab)">
+        <!-- Mobile Navbar (Visible only on mobile) -->
+        <nav class="navbar navbar-dark bg-dark d-md-none w-100 p-3 d-flex align-items-center justify-content-between">
+            <button class="btn btn-outline-warning" onclick="toggleSidebar()">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1 fw-bold text-warning">
+                <i class="bi bi-shield-check me-2"></i> ADMIN
+            </span>
+            <div style="width: 44px;"></div> <!-- Spacer for centering -->
+        </nav>
+
+        <!-- Sidebar Panel -->
+        <div id="sidebarPanel" class="sidebar p-3 d-flex flex-column flex-shrink-0" 
+             style="width: 250px; min-height: 100vh; background: #282c3f; color: white; transition: all 0.3s ease;">
+            
+            <!-- Header with Close Button for Mobile -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0 fw-bold text-white mx-auto">
+                    <i class="bi bi-shield-check" style="color: #f1a61c;"></i> ADMIN
+                </h4>
+                <!-- Close Button (Visible only on mobile) -->
+                <button class="btn btn-sm btn-outline-light d-md-none rounded-circle" onclick="toggleSidebar()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-            <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
+
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''" th:href="@{/admin/dashboard}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''" th:href="@{/admin/usuarios}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-people me-2"></i> Usuarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'polizas'} ? 'active' : ''" th:href="@{/admin/polizas}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-shield-check me-2"></i> Pólizas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'catalogo'} ? 'active' : ''" th:href="@{/admin/catalogo}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-journal-check me-2"></i> Catálogo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'auditoria'} ? 'active' : ''" th:href="@{/admin/auditoria}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-clock-history me-2"></i> Auditoría
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'configuracion'} ? 'active' : ''" th:href="@{/admin/configuracion}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-gear me-2"></i> Configuración
+                    </a>
+                </li>
+            </ul>
+            <div class="mt-4 pt-3 border-top border-secondary">
+                <div class="d-flex align-items-center mb-2 px-2 text-white small">
+                    <i class="bi bi-person-circle me-2"></i>
+                    <span th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Admin'}">Admin</span>
+                </div>
+                <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm w-100">Cerrar Sesión</a>
+            </div>
         </div>
+
+        <!-- Styles and Script for Mobile Behavior -->
+        <style>
+            /* Mobile Styles using Media Query */
+            @media (max-width: 768px) {
+                #sidebarPanel {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100% !important; /* Full width */
+                    height: 100vh;
+                    z-index: 1050;
+                    transform: translateX(-100%); /* Hidden by default */
+                    opacity: 0;
+                    overflow-y: auto; /* Enable vertical scrolling */
+                    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+                    overscroll-behavior: contain; /* Prevent scroll chaining to body */
+                }
+
+                #sidebarPanel.show-sidebar {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        </style>
+
         <script th:inline="javascript">
-            // Aplicar tema desde BD
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebarPanel');
+                sidebar.classList.toggle('show-sidebar');
+                
+                // Prevent body scroll when menu is open
+                if (sidebar.classList.contains('show-sidebar')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            function closeSidebarOnMobile() {
+                if (window.innerWidth < 768) {
+                    const sidebar = document.getElementById('sidebarPanel');
+                    sidebar.classList.remove('show-sidebar');
+                    document.body.style.overflow = ''; // Restore body scroll
+                }
+            }
+
+            // Theme Logic
             (function() {
-                // 1. Aplicar localStorage inmediatamente
                 const theme = localStorage.getItem('theme');
                 if (theme) {
                     document.documentElement.setAttribute('data-theme', theme);
                 }
 
-                // 2. Sincronizar con BD
                 /*<![CDATA[*/
                 const userId = /*[[${session.usuarioId}]]*/ null;
                 /*]]>*/
