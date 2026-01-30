@@ -1080,9 +1080,31 @@
                 showToast('Tu cuenta aún no está verificada. Revisa tu email.', 'error');
             }
             
-            // Detectar error de OAuth con cuenta bloqueada
+            // Detectar cuenta bloqueada específicamente
+            if (urlParams.get('error') === 'account_blocked') {
+                const msg = decodeURIComponent(urlParams.get('msg') || 'Cuenta bloqueada por el administrador. Contacta con soporte para más información.');
+                const errorAlert = document.getElementById('errorAlert');
+                const errorMessage = document.getElementById('errorMessage');
+                const blockedBanner = document.getElementById('blockedAccountBanner');
+                
+                // Mostrar mensaje de error
+                if (errorMessage && errorAlert) {
+                    errorMessage.textContent = msg;
+                    errorAlert.classList.add('show');
+                }
+                
+                // Mostrar banner automáticamente
+                if (blockedBanner) {
+                    blockedBanner.classList.add('show');
+                    setTimeout(() => {
+                        blockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 500);
+                }
+            }
+            
+            // Detectar error de OAuth genérico
             if (urlParams.get('error') === 'social_backend_error') {
-                const msg = urlParams.get('msg') || '';
+                const msg = decodeURIComponent(urlParams.get('msg') || '');
                 const errorAlert = document.getElementById('errorAlert');
                 const errorMessage = document.getElementById('errorMessage');
                 
@@ -1097,7 +1119,6 @@
                     const blockedBanner = document.getElementById('blockedAccountBanner');
                     if (blockedBanner) {
                         blockedBanner.classList.add('show');
-                        // Hacer scroll hacia el banner
                         setTimeout(() => {
                             blockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         }, 500);

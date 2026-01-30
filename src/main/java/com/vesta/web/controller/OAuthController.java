@@ -68,11 +68,30 @@ public class OAuthController {
             String msg = e.getMessage();
             logger.error("❌ Error CRÍTICO en login social backend: {}", msg, e);
 
-            if (msg.contains("Cuenta no verificada") || msg.contains("not verified")) {
+            // Verificar si es cuenta no verificada
+            if (msg != null && (msg.contains("Cuenta no verificada") || msg.contains("not verified"))) {
                 return "redirect:/login-page?error=account_not_verified&email=" + email;
             }
 
-            return "redirect:/login-page?error=social_backend_error&msg=" + msg;
+            // Verificar si es cuenta bloqueada
+            if (msg != null && (msg.contains("bloqueada") || msg.contains("administrador"))) {
+                try {
+                    String encodedMsg = java.net.URLEncoder.encode(msg, "UTF-8");
+                    return "redirect:/login-page?error=account_blocked&msg=" + encodedMsg;
+                } catch (java.io.UnsupportedEncodingException ex) {
+                    logger.error("Error encoding message", ex);
+                    return "redirect:/login-page?error=account_blocked";
+                }
+            }
+
+            // Error genérico
+            try {
+                String encodedMsg = msg != null ? java.net.URLEncoder.encode(msg, "UTF-8") : "";
+                return "redirect:/login-page?error=social_backend_error&msg=" + encodedMsg;
+            } catch (java.io.UnsupportedEncodingException ex) {
+                logger.error("Error encoding message", ex);
+                return "redirect:/login-page?error=social_backend_error";
+            }
         }
     }
 }
