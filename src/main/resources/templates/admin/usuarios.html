@@ -181,17 +181,17 @@
 
         function applyFilters() {
             const searchText = document.getElementById('searchUser').value.toLowerCase();
-            const rolFilter = document.getElementById('filterRol').value;
-            const statusFilter = document.getElementById('filterStatus').value;
+            const rolFilter = document.getElementById('filterRol').value.toUpperCase(); // Convertir a mayúsculas
+            const statusFilter = document.getElementById('filterStatus').value.toUpperCase(); // Convertir a mayúsculas
 
             const rows = document.querySelectorAll('#userTableBody tr');
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
                 
                 // Rol en columna 6 (index 5) - OJO: Indices cambiaron al añadir columnas
-                const rolCell = row.cells[5].innerText.trim();
+                const rolCell = row.cells[5].innerText.trim().toUpperCase(); // Normalizar a mayúsculas
                 // Estado en columna 7 (index 6)
-                const statusCell = row.cells[6].innerText.trim();
+                const statusCell = row.cells[6].innerText.trim().toUpperCase(); // Normalizar a mayúsculas
 
                 let matchesSearch = text.includes(searchText);
                 let matchesRol = rolFilter === '' || rolCell === rolFilter;
