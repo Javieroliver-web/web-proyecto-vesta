@@ -263,8 +263,8 @@
     
     <script th:inline="javascript">
         // === VARIABLES GLOBALES ===
-        const userId = [[${usuarioId}]];
-        const token = [[${session.token}]];
+        const userId = /*[[${usuarioId}]]*/ null;
+        const token = /*[[${session.token}]]*/ null;
         const apiBaseUrl = '/vesta-web/usuario/api';
 
         // === LÓGICA TEMA OSCURO ===
@@ -757,6 +757,5 @@
             }
         }
     </script>
-    <script src="/vesta-web/js/voice-assistant.js"></script>
 </body>
 </html>

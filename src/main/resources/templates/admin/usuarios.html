@@ -171,7 +171,7 @@
     <script th:src="@{/js/modal-utils.js}"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const token = [[${session.token}]];
+        const token = /*[[${session.token}]]*/ null;
         /*]]>*/
         const apiBaseUrl = '/vesta-web/admin/api';
 
@@ -242,7 +242,8 @@
                     'BLOQUEAR',
                     async () => {
                         await ejecutarCambio(id, nuevoEstado, accion);
-                    }
+                    },
+                    'Confirmar Bloqueo'  // ← Texto personalizado del botón
                 );
             } else {
                 // DESBLOQUEAR PUEDE SER ESTÁNDAR O SEGURO (USARÉ ESTÁNDAR PARA AGILIDAD, O SEGURO PARA CONSISTENCIA)
@@ -253,7 +254,8 @@
                     'DESBLOQUEAR',
                     async () => {
                          await ejecutarCambio(id, nuevoEstado, accion);
-                    }
+                    },
+                    'Confirmar Desbloqueo'  // ← Texto personalizado del botón
                 );
             }
 

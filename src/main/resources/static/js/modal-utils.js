@@ -171,12 +171,13 @@ function showConfirmModal(title, message, onConfirm, onCancel = null) {
  * Muestra un modal de borrado seguro que requiere escribir una palabra clave
  * @param {string} title - Título del modal
  * @param {string} message - Mensaje explicativo
- * @param {string} requiredText - Compalabra a escribir (ej: "ELIMINAR")
+ * @param {string} requiredText - Palabra a escribir (ej: "ELIMINAR")
  * @param {Function} onConfirm - Callback al confirmar
+ * @param {string} buttonText - Texto del botón de confirmación (opcional, por defecto "Eliminar Definitivamente")
  */
-function showSafeDeleteModal(title, message, requiredText, onConfirm) {
+function showSafeDeleteModal(title, message, requiredText, onConfirm, buttonText = 'Eliminar Definitivamente') {
     const modalId = `safeDelete${modalCounter++}`;
-    
+
     const modalHTML = `
         <div class="modal fade" id="${modalId}" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
@@ -200,7 +201,7 @@ function showSafeDeleteModal(title, message, requiredText, onConfirm) {
                     <div class="modal-footer bg-light border-0">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger disabled" id="${modalId}Confirm" disabled>
-                            <i class="bi bi-trash-fill me-2"></i>Eliminar Definitivamente
+                            <i class="bi bi-trash-fill me-2"></i>${buttonText}
                         </button>
                     </div>
                 </div>

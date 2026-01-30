@@ -301,6 +301,100 @@
             display: flex;
         }
 
+        /* Banner de cuenta bloqueada */
+        .blocked-account-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #fff8dc 100%);
+            border: 2px solid #ffc107;
+            border-left: 5px solid #ff6b6b;
+            color: #856404;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            display: none;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
+        }
+
+        .blocked-account-banner.show {
+            display: block;
+            animation: fadeInDown 0.4s ease-out;
+        }
+
+        .blocked-account-banner .banner-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .blocked-account-banner .banner-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #721c24;
+        }
+
+        .blocked-account-banner .btn-close-banner {
+            background: transparent;
+            border: none;
+            color: #856404;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .blocked-account-banner .btn-close-banner:hover {
+            background: rgba(0,0,0,0.1);
+            color: #721c24;
+        }
+
+        .blocked-account-banner .banner-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #856404;
+        }
+
+        .blocked-account-banner .contact-info {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 193, 7, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .blocked-account-banner .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #721c24;
+        }
+
+        .blocked-account-banner .contact-item i {
+            color: #ffc107;
+            font-size: 1.1rem;
+        }
+
+        .blocked-account-banner .contact-item a {
+            color: #721c24;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .blocked-account-banner .contact-item a:hover {
+            color: #d32f2f;
+            text-decoration: underline;
+        }
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -639,6 +733,31 @@
             <div class="divider">
                 <a th:href="@{/}" style="color: #adb5bd; text-decoration: none;">← Volver al inicio</a>
             </div>
+
+            <!-- Banner de Cuenta Bloqueada -->
+            <div id="blockedAccountBanner" class="blocked-account-banner">
+                <div class="banner-header">
+                    <div class="banner-title">
+                        <i class="bi bi-shield-exclamation"></i>
+                        <span>Cuenta Suspendida</span>
+                    </div>
+                    <button class="btn-close-banner" onclick="closeBanner()" aria-label="Cerrar">×</button>
+                </div>
+                <div class="banner-content">
+                    <p class="mb-2"><strong>Tu cuenta ha sido suspendida por el administrador.</strong></p>
+                    <p class="mb-0">Si deseas más información sobre el motivo de la suspensión, puedes ponerte en contacto con nosotros:</p>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="bi bi-telephone-fill"></i>
+                            <span>Teléfono: <a href="tel:+34622645922">622 64 59 22</a></span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-envelope-fill"></i>
+                            <span>Email: <a href="mailto:javip200555@gmail.com">javip200555@gmail.com</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -858,8 +977,20 @@
                     console.error('❌ Error de login:', data);
                     errorMessage.textContent = data.message || 'Credenciales incorrectas';
                     
+                    // Si es error de cuenta bloqueada por administrador
+                    if (data.message && (data.message.toLowerCase().includes('bloqueada') || data.message.toLowerCase().includes('administrador'))) {
+                        // Mostrar banner de cuenta bloqueada
+                        const blockedBanner = document.getElementById('blockedAccountBanner');
+                        if (blockedBanner) {
+                            blockedBanner.classList.add('show');
+                            // Hacer scroll hacia el banner
+                            setTimeout(() => {
+                                blockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }, 100);
+                        }
+                    }
                     // Si es error de cuenta no verificada
-                    if (data.message && (data.message.toLowerCase().includes('no verificada') || data.message.toLowerCase().includes('confirmar'))) {
+                    else if (data.message && (data.message.toLowerCase().includes('no verificada') || data.message.toLowerCase().includes('confirmar'))) {
                         const actionDiv = document.createElement('div');
                         actionDiv.className = 'resend-action mt-2 pt-2 border-top border-danger-subtle d-flex align-items-center justify-content-between gap-3';
                         const helpText = document.createElement('span');
@@ -919,6 +1050,14 @@
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
             });
+        }
+
+        // Función para cerrar el banner de cuenta bloqueada
+        function closeBanner() {
+            const banner = document.getElementById('blockedAccountBanner');
+            if (banner) {
+                banner.classList.remove('show');
+            }
         }
 
         // Comprobación de mensajes URL al cargar la página

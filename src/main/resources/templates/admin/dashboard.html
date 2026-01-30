@@ -293,7 +293,7 @@
         // Variables globales
         let currentSiniestroId = null;
         /*<![CDATA[*/
-        const token = [[${session.token}]];
+        const token = /*[[${session.token}]]*/ null;
         /*]]>*/
         const apiBaseUrl = '/vesta-web/admin/api'; 
 
@@ -448,6 +448,5 @@
             }
         });
     </script>
-    <script src="/vesta-web/js/voice-assistant.js"></script>
 </body>
 </html>
