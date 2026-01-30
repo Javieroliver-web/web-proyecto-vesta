@@ -135,9 +135,19 @@ public class ApiService {
             } else {
                 throw new RuntimeException("Respuesta de API vacía en social login");
             }
+        } catch (HttpClientErrorException e) {
+            logger.error("Error de cliente en social login para {}: {}", email, e.getResponseBodyAsString());
+            // Extraer el mensaje real del error (puede ser "Cuenta bloqueada..." u otro)
+            throw new RuntimeException(extractErrorMessage(e));
+        } catch (HttpServerErrorException e) {
+            logger.error("Error de servidor en social login: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
+        } catch (ResourceAccessException e) {
+            logger.error("Error de conexión con la API en social login: {}", e.getMessage());
+            throw new RuntimeException("No se pudo conectar con el servidor. Verifique su conexión.");
         } catch (Exception e) {
-            logger.error("Error en social login: {}", e.getMessage());
-            throw new RuntimeException("Error al procesar login social");
+            logger.error("Error inesperado en social login: {}", e.getMessage(), e);
+            throw new RuntimeException("Error en login social: " + e.getMessage());
         }
     }
 
@@ -394,7 +404,7 @@ public class ApiService {
     }
 
     // === PÓLIZAS DEL USUARIO ===
-    
+
     public List<Map<String, Object>> obtenerPolizasUsuario(String token) {
         String url = apiUrl + "/polizas/usuario";
         try {
@@ -413,7 +423,8 @@ public class ApiService {
             logger.error("Error de cliente al obtener pólizas del usuario: {}", e.getResponseBodyAsString());
             throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
-            logger.error("Error de servidor al obtener pólizas: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            logger.error("Error de servidor al obtener pólizas: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
         } catch (ResourceAccessException e) {
             logger.error("Error de conexión con la API: {}", e.getMessage());
@@ -425,13 +436,13 @@ public class ApiService {
     }
 
     // === RECOMENDACIONES IA ===
-    
+
     public Map<String, Object> obtenerRecomendacionIA(String token, String email) {
         String url = apiUrl + "/innovation/recommendation";
         if (email != null) {
             url += "?email=" + email;
         }
-        
+
         try {
             logger.debug("Obteniendo recomendación IA para: {}", email);
 
@@ -456,7 +467,7 @@ public class ApiService {
 
     public Map<String, Object> chatIA(String token, String pregunta) {
         String url = apiUrl + "/innovation/chat";
-        
+
         try {
             logger.debug("Enviando pregunta al chat IA");
 
@@ -475,16 +486,17 @@ public class ApiService {
         } catch (Exception e) {
             logger.error("Error en chat IA: {}", e.getMessage(), e);
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("respuesta", "Lo siento, no puedo procesar tu consulta en este momento. Por favor, intenta más tarde.");
+            errorResponse.put("respuesta",
+                    "Lo siento, no puedo procesar tu consulta en este momento. Por favor, intenta más tarde.");
             return errorResponse;
         }
     }
 
     // === CONTRATACIÓN DE PÓLIZAS ===
-    
+
     public Map<String, Object> contratarPoliza(String token, Map<String, Object> request) {
         String url = apiUrl + "/polizas/contratar";
-        
+
         try {
             logger.debug("Contratando póliza");
 
@@ -501,7 +513,8 @@ public class ApiService {
             logger.error("Error de cliente al contratar póliza: {}", e.getResponseBodyAsString());
             throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
-            logger.error("Error de servidor al contratar póliza: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            logger.error("Error de servidor al contratar póliza: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
         } catch (ResourceAccessException e) {
             logger.error("Error de conexión con la API: {}", e.getMessage());
@@ -513,10 +526,10 @@ public class ApiService {
     }
 
     // === REPORTES PDF ===
-    
+
     public byte[] generarReportePDF(String token) {
         String url = apiUrl + "/reportes/polizas/pdf";
-        
+
         try {
             logger.debug("Generando reporte PDF de pólizas");
 
@@ -524,8 +537,7 @@ public class ApiService {
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(getHeaders(token)),
-                    byte[].class
-            );
+                    byte[].class);
 
             return response.getBody();
 
@@ -545,10 +557,10 @@ public class ApiService {
     }
 
     // === SINIESTROS ===
-    
+
     public Map<String, Object> reportarSiniestro(String token, Map<String, Object> request) {
         String url = apiUrl + "/siniestros";
-        
+
         try {
             logger.debug("Reportando siniestro");
 
@@ -565,7 +577,8 @@ public class ApiService {
             logger.error("Error de cliente al reportar siniestro: {}", e.getResponseBodyAsString());
             throw new RuntimeException(extractErrorMessage(e));
         } catch (HttpServerErrorException e) {
-            logger.error("Error de servidor al reportar siniestro: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            logger.error("Error de servidor al reportar siniestro: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
             throw new RuntimeException("Error del servidor. Por favor, intente más tarde.");
         } catch (ResourceAccessException e) {
             logger.error("Error de conexión con la API: {}", e.getMessage());
@@ -577,10 +590,10 @@ public class ApiService {
     }
 
     // === GESTIÓN DE USUARIOS INDIVIDUALES ===
-    
+
     public Map<String, Object> obtenerUsuario(String token, Long userId) {
         String url = apiUrl + "/usuarios/" + userId;
-        
+
         try {
             logger.debug("Obteniendo usuario: {}", userId);
 
@@ -601,7 +614,7 @@ public class ApiService {
 
     public Map<String, Object> actualizarUsuario(String token, Long userId, Map<String, Object> updates) {
         String url = apiUrl + "/usuarios/" + userId;
-        
+
         try {
             logger.debug("Actualizando usuario: {}", userId);
 
@@ -622,7 +635,7 @@ public class ApiService {
 
     public void eliminarUsuario(String token, Long userId) {
         String url = apiUrl + "/usuarios/" + userId;
-        
+
         try {
             logger.debug("Eliminando usuario: {}", userId);
 
@@ -630,8 +643,7 @@ public class ApiService {
                     url,
                     HttpMethod.DELETE,
                     new HttpEntity<>(getHeaders(token)),
-                    String.class
-            );
+                    String.class);
 
         } catch (Exception e) {
             logger.error("Error al eliminar usuario {}: {}", userId, e.getMessage());
@@ -640,10 +652,10 @@ public class ApiService {
     }
 
     // === DERECHOS RGPD ===
-    
+
     public Map<String, Object> solicitarSupresionDatos(String token, Map<String, Object> request) {
         String url = apiUrl + "/derechos/solicitar-supresion";
-        
+
         try {
             logger.debug("Solicitando supresión de datos");
 
@@ -664,7 +676,7 @@ public class ApiService {
 
     public Map<String, Object> solicitarDerecho(String token, String endpoint, Map<String, Object> request) {
         String url = apiUrl + "/derechos/" + endpoint;
-        
+
         try {
             logger.debug("Solicitando derecho: {}", endpoint);
 
@@ -685,7 +697,7 @@ public class ApiService {
 
     public List<Map<String, Object>> obtenerSolicitudesUsuario(String token, Long userId) {
         String url = apiUrl + "/derechos/mis-solicitudes/" + userId;
-        
+
         try {
             logger.debug("Obteniendo solicitudes del usuario: {}", userId);
 
@@ -705,10 +717,10 @@ public class ApiService {
     }
 
     // === GESTIÓN DE SINIESTROS (ADMIN) ===
-    
+
     public Map<String, Object> actualizarEstadoSiniestro(String token, Long siniestroId, Map<String, Object> updates) {
         String url = apiUrl + "/siniestros/" + siniestroId + "/estado";
-        
+
         try {
             logger.debug("Actualizando estado de siniestro: {}", siniestroId);
 
@@ -728,10 +740,10 @@ public class ApiService {
     }
 
     // === GESTIÓN DE PRODUCTOS (ADMIN) ===
-    
+
     public void eliminarProducto(String token, Long productoId) {
         String url = apiUrl + "/productos/" + productoId;
-        
+
         try {
             logger.debug("Eliminando producto: {}", productoId);
 
@@ -739,8 +751,7 @@ public class ApiService {
                     url,
                     HttpMethod.DELETE,
                     new HttpEntity<>(getHeaders(token)),
-                    String.class
-            );
+                    String.class);
 
         } catch (Exception e) {
             logger.error("Error al eliminar producto {}: {}", productoId, e.getMessage());
@@ -749,10 +760,10 @@ public class ApiService {
     }
 
     // === GESTIÓN DE COOKIES ===
-    
+
     public Map<String, Object> guardarConsentimientoCookies(String token, Map<String, Object> request) {
         String url = apiUrl + "/cookies/consentimiento";
-        
+
         try {
             logger.debug("Guardando consentimiento de cookies");
 
@@ -772,10 +783,10 @@ public class ApiService {
     }
 
     // === CONFIRMACIÓN DE CUENTA ===
-    
+
     public void confirmarCuenta(String token) {
         String url = apiUrl + "/auth/confirm-account?token=" + token;
-        
+
         try {
             logger.debug("Confirmando cuenta con token: {}", token);
 
@@ -783,8 +794,7 @@ public class ApiService {
                     url,
                     HttpMethod.GET,
                     null,
-                    String.class
-            );
+                    String.class);
 
             logger.info("Cuenta confirmada exitosamente");
 
@@ -1031,10 +1041,10 @@ public class ApiService {
     }
 
     // === TPV VIRTUAL ===
-    
+
     public Map<String, Object> checkoutTPV(String token, Map<String, Object> request) {
         String url = apiUrl + "/ordenes/checkout-tpv";
-        
+
         try {
             logger.debug("Procesando checkout con TPV");
 
@@ -1058,7 +1068,7 @@ public class ApiService {
 
     public Map<String, String> getTarjetasPrueba(String token) {
         String url = apiUrl + "/tpv/tarjetas-prueba";
-        
+
         try {
             logger.debug("Obteniendo tarjetas de prueba");
 
