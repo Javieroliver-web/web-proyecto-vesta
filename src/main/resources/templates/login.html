@@ -1079,6 +1079,31 @@
             if (urlParams.get('error') === 'account_not_verified') {
                 showToast('Tu cuenta aún no está verificada. Revisa tu email.', 'error');
             }
+            
+            // Detectar error de OAuth con cuenta bloqueada
+            if (urlParams.get('error') === 'social_backend_error') {
+                const msg = urlParams.get('msg') || '';
+                const errorAlert = document.getElementById('errorAlert');
+                const errorMessage = document.getElementById('errorMessage');
+                
+                // Mostrar mensaje de error
+                if (errorMessage && errorAlert) {
+                    errorMessage.textContent = msg || 'Error al iniciar sesión con Google';
+                    errorAlert.classList.add('show');
+                }
+                
+                // Si el mensaje contiene "bloqueada" o "administrador", mostrar banner
+                if (msg && (msg.toLowerCase().includes('bloqueada') || msg.toLowerCase().includes('administrador'))) {
+                    const blockedBanner = document.getElementById('blockedAccountBanner');
+                    if (blockedBanner) {
+                        blockedBanner.classList.add('show');
+                        // Hacer scroll hacia el banner
+                        setTimeout(() => {
+                            blockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 500);
+                    }
+                }
+            }
         });
 
         // 2FA Functions
