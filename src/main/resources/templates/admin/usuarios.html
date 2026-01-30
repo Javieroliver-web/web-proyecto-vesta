@@ -147,14 +147,25 @@
                                         <button th:if="${u.activo == true}" class="btn btn-sm btn-outline-danger" 
                                                 th:data-id="${u.id}"
                                                 th:data-nombre="${u.nombreCompleto}"
-                                                onclick="toggleEstado(this, false)">
+                                                onclick="toggleEstado(this, false)"
+                                                title="Bloquear Usuario">
                                             <i class="bi bi-ban"></i>
                                         </button>
                                         <button th:if="${u.activo == false}" class="btn btn-sm btn-outline-success" 
                                                 th:data-id="${u.id}"
                                                 th:data-nombre="${u.nombreCompleto}"
-                                                onclick="toggleEstado(this, true)">
+                                                onclick="toggleEstado(this, true)"
+                                                title="Desbloquear Usuario">
                                             <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        
+                                        <!-- Botón Eliminar -->
+                                        <button class="btn btn-sm btn-danger ms-1"
+                                                th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}"
+                                                onclick="eliminarUsuario(this)"
+                                                title="Eliminar Usuario Permanentemente">
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -387,6 +398,37 @@
                         showErrorModal('Error', 'Error de conexión.');
                 }
             }
+        }
+
+        // --- ELIMINAR USUARIO ---
+        async function eliminarUsuario(btn) {
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+
+            showSafeDeleteModal(
+                'Confirmar Eliminación',
+                `Estás a punto de eliminar permanentemente a <b>${nombre}</b>. Esta acción no se puede deshacer.<br>Escribe "ELIMINAR" para confirmar:`,
+                'ELIMINAR',
+                async () => {
+                    try {
+                        const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        if (res.ok) {
+                            showSuccessModal('Usuario Eliminado', 'El usuario ha sido eliminado correctamente.');
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            const data = await res.json();
+                            showErrorModal('Error', data.message || 'No se pudo eliminar el usuario.');
+                        }
+                    } catch (e) {
+                        showErrorModal('Error', 'Error de conexión.');
+                    }
+                },
+                'Eliminar Usuario'
+            );
         }
     </script>
 </body>

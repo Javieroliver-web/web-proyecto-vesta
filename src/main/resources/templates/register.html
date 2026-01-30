@@ -175,19 +175,24 @@
         }
 
         .brand-logo {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.25);
+            width: 120px;
+            height: auto;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 2rem auto; /* Center and add bottom gap */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            padding: 15px;
+        }
+        
+        .brand-logo:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
         }
 
         .brand-logo i {
@@ -593,13 +598,13 @@
     <div class="register-wrapper">
         <!-- Left Side - Branding (Desktop only) -->
         <div class="brand-side">
-            <!-- Logo in top-left corner -->
-            <div class="brand-logo" style="background: transparent; border: none; box-shadow: none;">
-                <img src="/vesta-web/images/logo_vesta.png" alt="VESTA" style="width: 100%; height: auto;">
-            </div>
-            
             <!-- Centered content -->
             <div class="brand-content">
+                <!-- Logo integrated in flow -->
+                <div class="brand-logo">
+                    <img src="/vesta-web/images/logo_vesta.png" alt="VESTA" style="width: 100%; height: auto;">
+                </div>
+                
                 <h1 class="brand-title">Vesta</h1>
                 <p class="brand-subtitle">Tu protección, nuestra prioridad. Únete a miles de usuarios que confían en nosotros.</p>
                 
