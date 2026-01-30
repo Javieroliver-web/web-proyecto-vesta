@@ -31,7 +31,7 @@ public class LoginController {
 
         if (token != null) {
             // Redirigir según el rol del usuario
-            if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol)) {
+            if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol) || "OWNER".equals(rol)) {
                 return "redirect:/admin/dashboard";
             } else {
                 return "redirect:/cliente/dashboard";
@@ -88,7 +88,8 @@ public class LoginController {
 
             // Determinar URL de redirección según el rol
             String redirectUrl;
-            if ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())) {
+            if ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())
+                    || "OWNER".equals(response.getRol())) {
                 redirectUrl = "/admin/dashboard";
             } else {
                 redirectUrl = "/cliente/dashboard";
@@ -137,7 +138,8 @@ public class LoginController {
             session.setAttribute("usuarioId", response.getId());
 
             // Determinar URL de redirección
-            String redirectUrl = ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())) ? "/admin/dashboard" : "/cliente/dashboard";
+            String redirectUrl = ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())
+                    || "OWNER".equals(response.getRol())) ? "/admin/dashboard" : "/cliente/dashboard";
 
             Map<String, Object> result = new HashMap<>();
             result.put("redirectUrl", redirectUrl);
@@ -203,18 +205,18 @@ public class LoginController {
     }
 
     // === CONFIRMACIÓN DE CUENTA ===
-    
+
     @GetMapping("/api/auth/confirm-account")
     public String confirmAccount(@RequestParam String token) {
         try {
             logger.info("🔐 Procesando confirmación de cuenta con token: {}", token);
-            
+
             // Llamar a la API para confirmar la cuenta
             apiService.confirmarCuenta(token);
-            
+
             logger.info("✅ Cuenta confirmada exitosamente");
             return "redirect:/login-page?confirmed=true";
-            
+
         } catch (Exception e) {
             logger.error("❌ Error al confirmar cuenta: {}", e.getMessage());
             return "redirect:/login-page?error=invalid_token";

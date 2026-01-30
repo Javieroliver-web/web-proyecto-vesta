@@ -104,7 +104,11 @@
                                     <span th:unless="${u.fechaNacimiento}" class="text-muted">-</span>
                                 </td>
                                 <td>
-                                    <span th:class="${'badge ' + (u.rol == 'ADMIN' ? 'bg-warning text-dark' : 'bg-info bg-opacity-10 text-info border border-info')}" 
+                                    <span th:class="${'badge ' + 
+                                          (u.rol == 'OWNER' ? 'bg-owner' : 
+                                          (u.rol == 'ADMIN' ? 'bg-warning text-dark' : 
+                                          'bg-info bg-opacity-10 text-info border border-info'))}" 
+                                          th:styleappend="${u.rol == 'OWNER' ? 'background-color: #282c3f !important; color: #f1a61c !important; border: 1px solid #f1a61c !important;' : ''}"
                                           th:text="${u.rol}">USER</span>
                                 </td>
                                 <td>
@@ -112,19 +116,44 @@
                                     <span th:if="${u.activo == false}" class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
                                 </td>
                                 <td>
+                                    <!-- Botón Ver Detalle -->
                                     <button class="btn btn-sm btn-outline-primary me-1" 
-                                            th:onclick="verDetalle([[${u.id}]], [[${u.nombreCompleto}]], [[${u.email}]], [[${u.ciudad}]], [[${u.rol}]], [[${u.movil}]], [[${u.fechaNacimiento}]], [[${u.direccion}]])">
+                                            th:data-id="${u.id}"
+                                            th:data-nombre="${u.nombreCompleto}"
+                                            th:data-email="${u.email}"
+                                            th:data-ciudad="${u.ciudad}"
+                                            th:data-rol="${u.rol}"
+                                            th:data-movil="${u.movil}"
+                                            th:data-nacimiento="${u.fechaNacimiento}"
+                                            th:data-direccion="${u.direccion}"
+                                            onclick="verDetalle(this)"
+                                            title="Ver Detalle">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                     
+                                    <!-- Botón Cambiar Rol (Solo OWNER) -->
+                                    <button th:if="${session.rol == 'OWNER' && u.rol != 'OWNER'}"
+                                            class="btn btn-sm btn-outline-warning text-dark me-1"
+                                            th:data-id="${u.id}"
+                                            th:data-nombre="${u.nombreCompleto}"
+                                            th:data-rolactual="${u.rol}"
+                                            onclick="console.log('Click en Cambiar Rol'); mostrarCambioRol(this)"
+                                            title="Cambiar Rol">
+                                        <i class="bi bi-person-badge"></i>
+                                    </button>
+                                    
                                     <!-- Botón Bloquear/Desbloquear -->
-                                    <div th:if="${u.rol != 'ADMIN'}" class="d-inline">
+                                    <div th:if="${u.rol != 'ADMIN' && u.rol != 'OWNER'}" class="d-inline">
                                         <button th:if="${u.activo == true}" class="btn btn-sm btn-outline-danger" 
-                                                th:onclick="toggleEstado([[${u.id}]], false, [[${u.nombreCompleto}]])">
+                                                th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}"
+                                                onclick="toggleEstado(this, false)">
                                             <i class="bi bi-ban"></i>
                                         </button>
                                         <button th:if="${u.activo == false}" class="btn btn-sm btn-outline-success" 
-                                                th:onclick="toggleEstado([[${u.id}]], true, [[${u.nombreCompleto}]])">
+                                                th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}"
+                                                onclick="toggleEstado(this, true)">
                                             <i class="bi bi-check-lg"></i>
                                         </button>
                                     </div>
@@ -166,6 +195,36 @@
             </div>
         </div>
     </div>
+    <!-- Modal Cambio de Rol -->
+    <div class="modal fade" id="modalCambioRol" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cambiar Rol de Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Estás editando el rol de: <strong id="roleChangeUserName">Nombre</strong></p>
+                    <input type="hidden" id="roleChangeUserId">
+                    
+                    <div class="mb-3">
+                        <label for="selectNewRole" class="form-label">Nuevo Rol</label>
+                        <select class="form-select" id="selectNewRole">
+                            <option value="USUARIO">USUARIO (Cliente)</option>
+                            <option value="ADMIN">ADMIN (Administrador)</option>
+                        </select>
+                        <div class="form-text text-danger mt-2" id="roleChangeWarning" style="display:none;">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Estás a punto de dar permisos de Administrador.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmarCambioRol()">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/modal-utils.js}"></script>
@@ -181,17 +240,17 @@
 
         function applyFilters() {
             const searchText = document.getElementById('searchUser').value.toLowerCase();
-            const rolFilter = document.getElementById('filterRol').value.toUpperCase(); // Convertir a mayúsculas
-            const statusFilter = document.getElementById('filterStatus').value.toUpperCase(); // Convertir a mayúsculas
+            const rolFilter = document.getElementById('filterRol').value.toUpperCase(); 
+            const statusFilter = document.getElementById('filterStatus').value.toUpperCase();
 
             const rows = document.querySelectorAll('#userTableBody tr');
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
                 
-                // Rol en columna 6 (index 5) - OJO: Indices cambiaron al añadir columnas
-                const rolCell = row.cells[5].innerText.trim().toUpperCase(); // Normalizar a mayúsculas
+                // Rol en columna 6 (index 5)
+                const rolCell = row.cells[5].innerText.trim().toUpperCase(); 
                 // Estado en columna 7 (index 6)
-                const statusCell = row.cells[6].innerText.trim().toUpperCase(); // Normalizar a mayúsculas
+                const statusCell = row.cells[6].innerText.trim().toUpperCase(); 
 
                 let matchesSearch = text.includes(searchText);
                 let matchesRol = rolFilter === '' || rolCell === rolFilter;
@@ -215,22 +274,72 @@
             XLSX.writeFile(wb, "Reporte_Usuarios_Vesta.xlsx");
         }
 
-        function verDetalle(id, nombre, email, ciudad, rol, movil, nacimiento, direccion) {
-            document.getElementById('detailId').innerText = '#' + id;
-            document.getElementById('detailNombre').innerText = nombre;
-            document.getElementById('detailEmail').innerText = email;
+        function verDetalle(btn) {
+            const d = btn.dataset;
+            document.getElementById('detailId').innerText = '#' + d.id;
+            document.getElementById('detailNombre').innerText = d.nombre;
+            document.getElementById('detailEmail').innerText = d.email;
             
-            document.getElementById('detailCiudad').innerText = ciudad || 'No registrada';
-            document.getElementById('detailRol').innerText = rol;
+            document.getElementById('detailCiudad').innerText = d.ciudad || 'No registrada';
+            document.getElementById('detailRol').innerText = d.rol;
             
-            document.getElementById('detailMovil').innerText = movil || '-';
-            document.getElementById('detailNacimiento').innerText = nacimiento || '-';
-            document.getElementById('detailDireccion').innerText = direccion || '-';
+            document.getElementById('detailMovil').innerText = d.movil || '-';
+            document.getElementById('detailNacimiento').innerText = d.nacimiento || '-';
+            document.getElementById('detailDireccion').innerText = d.direccion || '-';
 
             new bootstrap.Modal(document.getElementById('modalUsuario')).show();
         }
 
-        async function toggleEstado(id, nuevoEstado, nombre) {
+        // --- CAMBIO DE ROL (OWNER ONLY) ---
+        function mostrarCambioRol(btn) {
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            const rolActual = btn.dataset.rolactual;
+
+            document.getElementById('roleChangeUserId').value = id;
+            document.getElementById('roleChangeUserName').innerText = nombre;
+            document.getElementById('selectNewRole').value = rolActual;
+            
+            // Warning logic
+            const select = document.getElementById('selectNewRole');
+            select.onchange = function() {
+                const warn = document.getElementById('roleChangeWarning');
+                warn.style.display = (this.value === 'ADMIN') ? 'block' : 'none';
+            }
+            // Trigger change to set warning initial state
+            select.dispatchEvent(new Event('change'));
+            
+            new bootstrap.Modal(document.getElementById('modalCambioRol')).show();
+        }
+
+        async function confirmarCambioRol() {
+            const id = document.getElementById('roleChangeUserId').value;
+            const nuevoRol = document.getElementById('selectNewRole').value;
+            
+            try {
+                const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rol: nuevoRol })
+                });
+                
+                if (res.ok) {
+                    showSuccessModal('Rol Actualizado', 'El rol del usuario ha sido modificado correctamente.');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    const data = await res.json();
+                    showErrorModal('Error', data.message || 'No se pudo cambiar el rol.');
+                }
+            } catch (e) {
+                showErrorModal('Error', 'Error de conexión.');
+            }
+        }
+
+        // --- CAMBIO DE ESTADO (User/Admin) ---
+        async function toggleEstado(btn, nuevoEstado) {
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            
             const accion = nuevoEstado ? 'DESBLOQUEAR' : 'BLOQUEAR';
             const color = nuevoEstado ? 'success' : 'danger';
             
@@ -243,11 +352,9 @@
                     async () => {
                         await ejecutarCambio(id, nuevoEstado, accion);
                     },
-                    'Confirmar Bloqueo'  // ← Texto personalizado del botón
+                    'Confirmar Bloqueo'
                 );
             } else {
-                // DESBLOQUEAR PUEDE SER ESTÁNDAR O SEGURO (USARÉ ESTÁNDAR PARA AGILIDAD, O SEGURO PARA CONSISTENCIA)
-                // Usaré seguro para consistencia con el requisito de "edición/borrado seguro"
                 showSafeDeleteModal(
                     'Confirmar Desbloqueo',
                     `Para reactivar a <b>${nombre}</b>, escribe "DESBLOQUEAR" a continuación:`,
@@ -255,7 +362,7 @@
                     async () => {
                          await ejecutarCambio(id, nuevoEstado, accion);
                     },
-                    'Confirmar Desbloqueo'  // ← Texto personalizado del botón
+                    'Confirmar Desbloqueo'
                 );
             }
 

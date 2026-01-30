@@ -906,4 +906,4 @@ body {
 /* Optional: Add a subtle glow or underline if needed, but clean gradient is often enough */
 [data-theme="dark"] .page-title-premium {
     text-shadow: 0px 4px 15px rgba(241, 166, 28, 0.3);
-}
+}.bg-owner { background-color: var(--vesta-navy) !important; color: var(--vesta-gold) !important; border: 1px solid var(--vesta-gold) !important; }

@@ -17,12 +17,12 @@ public class AdminApiController {
     private ApiService apiService;
 
     // === GESTIÓN DE USUARIOS ===
-    
+
     @GetMapping("/api/usuarios")
     @ResponseBody
     public ResponseEntity<?> obtenerTodosLosUsuarios(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -37,31 +37,31 @@ public class AdminApiController {
 
     @PutMapping("/api/usuarios/{id}")
     @ResponseBody
-    public ResponseEntity<?> actualizarEstadoUsuario(@PathVariable Long id, @RequestBody Map<String, Object> updates, HttpSession session) {
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> updates,
+            HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
 
         try {
-            Boolean activo = (Boolean) updates.get("activo");
-            if (activo != null) {
-                apiService.actualizarEstadoUsuario(id, activo, token);
-            }
+            // Usar método genérico para soportar cambio de rol y estado
+            apiService.actualizarUsuario(token, id, updates);
             return ResponseEntity.ok("{\"message\":\"Usuario actualizado correctamente\"}");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
         }
     }
 
     // === GESTIÓN DE SINIESTROS ===
-    
+
     @GetMapping("/api/siniestros")
     @ResponseBody
     public ResponseEntity<?> obtenerSiniestros(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -70,15 +70,17 @@ public class AdminApiController {
             Object siniestros = apiService.obtenerSiniestros(token);
             return ResponseEntity.ok(siniestros);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener siniestros: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener siniestros: " + e.getMessage() + "\"}");
         }
     }
 
     @PutMapping("/api/siniestros/{id}/estado")
     @ResponseBody
-    public ResponseEntity<?> actualizarEstadoSiniestro(@PathVariable Long id, @RequestBody Map<String, Object> updates, HttpSession session) {
+    public ResponseEntity<?> actualizarEstadoSiniestro(@PathVariable Long id, @RequestBody Map<String, Object> updates,
+            HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -87,17 +89,18 @@ public class AdminApiController {
             Object resultado = apiService.actualizarEstadoSiniestro(token, id, updates);
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al actualizar siniestro: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al actualizar siniestro: " + e.getMessage() + "\"}");
         }
     }
 
     // === ESTADÍSTICAS ===
-    
+
     @GetMapping("/api/estadisticas")
     @ResponseBody
     public ResponseEntity<?> obtenerEstadisticas(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -106,17 +109,18 @@ public class AdminApiController {
             Object estadisticas = apiService.obtenerEstadisticas(token);
             return ResponseEntity.ok(estadisticas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener estadísticas: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener estadísticas: " + e.getMessage() + "\"}");
         }
     }
 
     // === GESTIÓN DE PRODUCTOS ===
-    
+
     @GetMapping("/api/productos")
     @ResponseBody
     public ResponseEntity<?> obtenerProductosAdmin(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -125,7 +129,8 @@ public class AdminApiController {
             Object productos = apiService.getProductos(); // Los productos son públicos
             return ResponseEntity.ok(productos);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener productos: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener productos: " + e.getMessage() + "\"}");
         }
     }
 
@@ -133,7 +138,7 @@ public class AdminApiController {
     @ResponseBody
     public ResponseEntity<?> eliminarProducto(@PathVariable Long id, HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -142,17 +147,18 @@ public class AdminApiController {
             apiService.eliminarProducto(token, id);
             return ResponseEntity.ok("{\"message\":\"Producto eliminado correctamente\"}");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al eliminar producto: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al eliminar producto: " + e.getMessage() + "\"}");
         }
     }
 
     // === GESTIÓN DE ÓRDENES/VENTAS ===
-    
+
     @GetMapping("/api/ordenes")
     @ResponseBody
     public ResponseEntity<?> obtenerTodasLasOrdenes(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -166,12 +172,12 @@ public class AdminApiController {
     }
 
     // === GESTIÓN DE PÓLIZAS ===
-    
+
     @GetMapping("/api/polizas")
     @ResponseBody
     public ResponseEntity<?> obtenerTodasLasPolizas(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -185,12 +191,12 @@ public class AdminApiController {
     }
 
     // === AUDITORÍA ===
-    
+
     @GetMapping("/api/auditoria")
     @ResponseBody
     public ResponseEntity<?> obtenerLogsAuditoria(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -199,7 +205,8 @@ public class AdminApiController {
             Object logs = apiService.obtenerLogsAuditoria(token);
             return ResponseEntity.ok(logs);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener logs de auditoría: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener logs de auditoría: " + e.getMessage() + "\"}");
         }
     }
 }
