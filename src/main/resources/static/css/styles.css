@@ -10,7 +10,7 @@
     --vesta-navy: #282c3f;
     --vesta-navy-light: #3c425e;
     --vesta-dark: #141620;
-    
+
     /* Gradientes premium */
     --gradient-primary: linear-gradient(135deg, #f1a61c 0%, #f4b94c 100%);
     --gradient-gold-vibrant: linear-gradient(135deg, #f4b94c 0%, #ffcc7c 50%, #f1a61c 100%);
@@ -18,7 +18,7 @@
     --gradient-navy: linear-gradient(135deg, #3c425e 0%, #282c3f 100%);
     --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
     --gradient-overlay: linear-gradient(135deg, rgba(241, 166, 28, 0.1) 0%, rgba(244, 185, 76, 0.05) 100%);
-    
+
     /* Sombras con profundidad */
     --shadow-xs: 0 1px 3px rgba(20, 22, 32, 0.06);
     --shadow-sm: 0 2px 8px rgba(20, 22, 32, 0.08);
@@ -27,24 +27,24 @@
     --shadow-xl: 0 12px 48px rgba(20, 22, 32, 0.24);
     --shadow-gold: 0 4px 20px rgba(241, 166, 28, 0.35);
     --shadow-gold-lg: 0 8px 32px rgba(241, 166, 28, 0.4);
-    
+
     /* Efectos glassmorphism */
     --glass-bg: rgba(255, 255, 255, 0.95);
     --glass-border: rgba(255, 255, 255, 0.18);
     --glass-dark-bg: rgba(40, 44, 63, 0.85);
     --backdrop-blur: blur(12px);
-    
+
     /* Border radius */
     --radius-sm: 8px;
     --radius: 12px;
     --radius-lg: 16px;
     --radius-xl: 20px;
-    
+
     /* Transiciones suaves */
     --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* Light Mode Border (Darker for visibility) */
     --theme-border: #ced4da;
 }
@@ -62,13 +62,25 @@
 }
 
 /* Overrides de Utilidades Bootstrap para Dark Mode */
-[data-theme="dark"] .text-dark { color: #e2e8f0 !important; }
-[data-theme="dark"] .text-secondary { color: #94a3b8 !important; }
-[data-theme="dark"] .text-muted { color: #64748b !important; }
+[data-theme="dark"] .text-dark {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-secondary {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #64748b !important;
+}
+
 /* Excepción para badges brillantes (Warning/Info) que necesitan texto oscuro */
-[data-theme="dark"] .badge.text-dark:not(.bg-light) { color: #212529 !important; }
-[data-theme="dark"] .badge.bg-light { 
-    background-color: rgba(255, 255, 255, 0.1) !important; 
+[data-theme="dark"] .badge.text-dark:not(.bg-light) {
+    color: #212529 !important;
+}
+
+[data-theme="dark"] .badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.1) !important;
     color: var(--theme-text-main) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
@@ -87,7 +99,7 @@
     border-color: var(--theme-border) !important;
 }
 
-[data-theme="dark"] .shadow-sm, 
+[data-theme="dark"] .shadow-sm,
 [data-theme="dark"] .shadow {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.45) !important;
 }
@@ -103,18 +115,18 @@
     color: var(--theme-text-main);
 }
 
-[data-theme="dark"] .table > :not(caption) > * > * {
+[data-theme="dark"] .table> :not(caption)>*>* {
     background-color: transparent;
     border-color: var(--theme-border);
     color: var(--theme-text-main);
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
-    background-color: rgba(255,255,255, 0.03);
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
+    background-color: rgba(255, 255, 255, 0.03);
     color: var(--theme-text-main);
 }
 
-[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+[data-theme="dark"] .table-hover>tbody>tr:hover>* {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--theme-text-main);
 }
@@ -142,7 +154,7 @@
 [data-theme="dark"] .modal-header,
 [data-theme="dark"] .modal-footer {
     border-color: var(--theme-border);
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] .btn-close {
@@ -172,6 +184,7 @@ body {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -183,6 +196,7 @@ body {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -194,6 +208,7 @@ body {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -205,6 +220,7 @@ body {
         opacity: 0;
         transform: scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -215,24 +231,31 @@ body {
     0% {
         background-position: -1000px 0;
     }
+
     100% {
         background-position: 1000px 0;
     }
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.7;
     }
 }
 
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px);
     }
+
     50% {
         transform: translateY(-10px);
     }
@@ -362,7 +385,7 @@ body {
 .card:hover {
     box-shadow: var(--shadow-lg);
     /* Transform removed to avoid movement if desired, but user specifically asked for "linea amarilla" */
-    /* transform: translateY(-4px); */ 
+    /* transform: translateY(-4px); */
     /* border-color: rgba(241, 166, 28, 0.2); */
 }
 
@@ -454,7 +477,7 @@ body {
 
 .navbar-brand:hover {
     color: var(--vesta-gold-light) !important;
-    transform: scale(1.05);
+    transform: none !important;
 }
 
 /* ===== FORMS ===== */
@@ -673,17 +696,18 @@ body {
     .card-body {
         padding: 1rem;
     }
-    
+
     .btn {
         font-size: 0.9rem;
         padding: 0.65rem 1.25rem;
     }
-    
+
     .navbar-brand {
         font-size: 1.25rem;
     }
-    
-    h1, .hero-title {
+
+    h1,
+    .hero-title {
         font-size: 2rem !important;
     }
 }
@@ -694,7 +718,7 @@ body {
         --radius-lg: 14px;
         --radius-xl: 16px;
     }
-    
+
     .btn-lg {
         padding: 0.875rem 1.5rem;
         font-size: 1rem;
@@ -751,7 +775,8 @@ body {
 }
 
 .sidebar .nav-link.active {
-    background-color: #0d6efd !important; /* Bootstrap Primary Blue to match user preference in screenshot */
+    background-color: #0d6efd !important;
+    /* Bootstrap Primary Blue to match user preference in screenshot */
     color: white !important;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
@@ -772,7 +797,7 @@ body {
 /* 2. Voice Assistant Dark Mode Fixes */
 [data-theme="dark"] #voice-assistant-btn {
     /* Slightly darker gradient for better contrast or keep same but ensure visibility */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
 }
 
 [data-theme="dark"] #voice-toast {
@@ -818,7 +843,8 @@ body {
     width: 42px;
     height: 42px;
     background: var(--theme-card-bg, white);
-    border-radius: 10px; /* Square rounded */
+    border-radius: 10px;
+    /* Square rounded */
     transition: width 0.4s var(--transition-base);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -829,7 +855,7 @@ body {
 }
 
 .search-expandable:focus-within,
-.search-expandable:hover { 
+.search-expandable:hover {
     width: 250px;
     border-color: var(--vesta-gold);
     box-shadow: var(--shadow-gold);
@@ -841,7 +867,8 @@ body {
     border: none;
     background: transparent;
     padding-left: 15px;
-    padding-right: 40px; /* Space for icon */
+    padding-right: 40px;
+    /* Space for icon */
     outline: none;
     box-shadow: none;
     color: var(--theme-text-main);
@@ -880,10 +907,10 @@ body {
     font-weight: 800;
     font-size: 2rem;
     letter-spacing: -0.02em;
-    
+
     /* Solid dark gold - works well in both light and dark modes */
     color: #c99a2e;
-    
+
     /* Increased spacing below title */
     margin-bottom: 1.5rem;
     position: relative;
@@ -906,4 +933,10 @@ body {
 /* Optional: Add a subtle glow or underline if needed, but clean gradient is often enough */
 [data-theme="dark"] .page-title-premium {
     text-shadow: 0px 4px 15px rgba(241, 166, 28, 0.3);
-}.bg-owner { background-color: var(--vesta-navy) !important; color: var(--vesta-gold) !important; border: 1px solid var(--vesta-gold) !important; }
+}
+
+.bg-owner {
+    background-color: var(--vesta-navy) !important;
+    color: var(--vesta-gold) !important;
+    border: 1px solid var(--vesta-gold) !important;
+}

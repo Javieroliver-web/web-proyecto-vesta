@@ -109,7 +109,7 @@ public class ClienteController {
     }
 
     // === TPV VIRTUAL ===
-    
+
     @GetMapping("/tpv-simulator")
     public String tpvSimulator(HttpSession session, Model model) {
         String token = (String) session.getAttribute("token");
@@ -124,20 +124,20 @@ public class ClienteController {
 
         // Obtener órdenes pendientes del usuario actual
         Long usuarioId = (Long) session.getAttribute("usuarioId");
-        java.util.List<java.util.Map<String, Object>> ordenesPendientes = 
-            apiService.obtenerOrdenesPendientesUsuario(token, usuarioId);
-        
+        java.util.List<java.util.Map<String, Object>> ordenesPendientes = apiService
+                .obtenerOrdenesPendientesUsuario(token, usuarioId);
+
         // Preparar datos del carrito basados en órdenes pendientes
         java.util.Map<String, Object> cartData = new java.util.HashMap<>();
         java.util.List<java.util.Map<String, Object>> items = new java.util.ArrayList<>();
         double totalAmount = 0.0;
-        
+
         if (ordenesPendientes != null && !ordenesPendientes.isEmpty()) {
             for (java.util.Map<String, Object> orden : ordenesPendientes) {
                 @SuppressWarnings("unchecked")
-                java.util.List<java.util.Map<String, Object>> ordenItems = 
-                    (java.util.List<java.util.Map<String, Object>>) orden.get("items");
-                
+                java.util.List<java.util.Map<String, Object>> ordenItems = (java.util.List<java.util.Map<String, Object>>) orden
+                        .get("items");
+
                 if (ordenItems != null) {
                     for (java.util.Map<String, Object> ordenItem : ordenItems) {
                         java.util.Map<String, Object> item = new java.util.HashMap<>();
@@ -147,20 +147,20 @@ public class ClienteController {
                         item.put("precio", ordenItem.get("precioUnitario"));
                         item.put("subtotal", ordenItem.get("subtotal"));
                         items.add(item);
-                        
+
                         totalAmount += ((Number) ordenItem.get("subtotal")).doubleValue();
                     }
                 }
             }
         }
-        
+
         cartData.put("items", items);
-        
+
         model.addAttribute("cartData", cartData);
         model.addAttribute("totalAmount", totalAmount);
         model.addAttribute("usuarioId", usuarioId);
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        
+
         return "cliente/tpv-simulator";
     }
 
@@ -168,7 +168,7 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> checkoutTPV(@RequestBody Map<String, Object> request, HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
         }
@@ -185,7 +185,7 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> getTarjetasPrueba(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
         }
@@ -199,12 +199,12 @@ public class ClienteController {
     }
 
     // === API PROXY ENDPOINTS ===
-    
+
     @GetMapping("/api/polizas")
     @ResponseBody
     public ResponseEntity<?> obtenerPolizasUsuario(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -226,7 +226,8 @@ public class ClienteController {
             Object productos = apiService.getProductos();
             return ResponseEntity.ok(productos);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener productos: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener productos: " + e.getMessage() + "\"}");
         }
     }
 
@@ -245,7 +246,7 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> obtenerRecomendacion(HttpSession session, @RequestParam(required = false) String email) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -255,11 +256,12 @@ public class ClienteController {
             if (email == null) {
                 email = (String) session.getAttribute("usuarioEmail");
             }
-            
+
             Object recomendacion = apiService.obtenerRecomendacionIA(token, email);
             return ResponseEntity.ok(recomendacion);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener recomendación: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al obtener recomendación: " + e.getMessage() + "\"}");
         }
     }
 
@@ -267,7 +269,7 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> chatIA(HttpSession session, @RequestBody Map<String, String> request) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -284,7 +286,7 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> contratarPoliza(HttpSession session, @RequestBody Map<String, Object> request) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -301,14 +303,14 @@ public class ClienteController {
     @ResponseBody
     public ResponseEntity<?> descargarReportePDF(HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
 
         try {
             byte[] pdfBytes = apiService.generarReportePDF(token);
-            
+
             return ResponseEntity.ok()
                     .header("Content-Type", "application/pdf")
                     .header("Content-Disposition", "attachment; filename=Vesta_Resumen_Polizas.pdf")
@@ -320,18 +322,23 @@ public class ClienteController {
 
     @PostMapping("/api/siniestros")
     @ResponseBody
-    public ResponseEntity<?> reportarSiniestro(HttpSession session, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> reportarSiniestro(
+            HttpSession session,
+            @RequestParam("polizaId") Long polizaId,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
-            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+            return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
         }
 
         try {
-            Object resultado = apiService.reportarSiniestro(token, request);
+            Object resultado = apiService.reportarSiniestro(token, polizaId, descripcion, file);
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al reportar siniestro: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500).body(Map.of("error", "Error al reportar siniestro: " + e.getMessage()));
         }
     }
 }

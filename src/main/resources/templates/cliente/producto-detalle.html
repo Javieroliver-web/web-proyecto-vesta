@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Detalles del Producto - Vesta Seguros</title>
     <div th:replace="~{fragments/favicon :: favicon}"></div>
@@ -11,12 +12,12 @@
     <style>
         /* Eliminados estilos hardcoded para usar variables globales de styles.css */
         /* Esto soporta automáticamente Dark/Light mode */
-        
+
         body {
             background-color: var(--theme-bg-secondary, #f8f9fa);
             color: var(--theme-text-main, #212529);
         }
-        
+
         .breadcrumb-link {
             color: var(--vesta-gold);
             text-decoration: none;
@@ -26,24 +27,24 @@
             gap: 8px;
             margin-bottom: 30px;
         }
-        
+
         .breadcrumb-link:hover {
             color: #f4b94c;
         }
-        
+
         .product-image-container {
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             position: relative;
         }
-        
+
         .product-image-large {
             width: 100%;
             height: 400px;
             object-fit: cover;
         }
-        
+
         .category-badge-large {
             position: absolute;
             top: 20px;
@@ -55,94 +56,94 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
+
         .product-info-card {
             background: var(--theme-card-bg, white);
             border-radius: 20px;
             padding: 35px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             color: var(--theme-text-main, #212529);
         }
-        
+
         .product-title-large {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 20px;
         }
-        
+
         .product-description-large {
             font-size: 1.1rem;
             color: var(--theme-text-muted, #6c757d);
             line-height: 1.8;
             margin-bottom: 30px;
         }
-        
+
         .coberturas-section h5 {
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 20px;
         }
-        
+
         .cobertura-item {
             display: flex;
             align-items: flex-start;
             gap: 12px;
             margin-bottom: 16px;
         }
-        
+
         .cobertura-item i {
             color: #28a745;
             font-size: 1.2rem;
             margin-top: 2px;
         }
-        
+
         .cobertura-item span {
             font-size: 1rem;
             line-height: 1.6;
             color: var(--theme-text-main, #495057);
         }
-        
+
         .pricing-card {
             background: var(--theme-card-bg, white);
             border-radius: 20px;
             padding: 35px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             position: sticky;
             top: 100px;
             color: var(--theme-text-main, #212529);
         }
-        
+
         .price-label {
             font-size: 0.9rem;
             color: var(--theme-text-muted, #6c757d);
             margin-bottom: 8px;
         }
-        
+
         .price-amount {
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 5px;
         }
-        
+
         .price-period {
             font-size: 1.1rem;
             color: var(--theme-text-muted, #6c757d);
         }
-        
+
         .duration-selector {
             margin: 30px 0;
         }
-        
+
         .duration-selector label {
             font-weight: 600;
             margin-bottom: 10px;
             display: block;
         }
-        
+
         .duration-mode-select {
             margin-bottom: 15px;
         }
-        
+
         .duration-input {
             border: 2px solid var(--theme-border, #e9ecef);
             background-color: var(--theme-input-bg, #fff);
@@ -151,12 +152,12 @@
             padding: 12px 16px;
             font-size: 1.1rem;
         }
-        
+
         .duration-input:focus {
             border-color: var(--vesta-gold);
             box-shadow: 0 0 0 0.2rem rgba(241, 166, 28, 0.25);
         }
-        
+
         .summary-box {
             background: var(--theme-bg-secondary, #f8f9fa);
             border-radius: 12px;
@@ -164,14 +165,14 @@
             margin: 25px 0;
             color: var(--theme-text-main, #212529);
         }
-        
+
         .summary-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 12px;
             font-size: 1rem;
         }
-        
+
         .summary-row.total {
             font-size: 1.3rem;
             font-weight: 700;
@@ -180,7 +181,7 @@
             border-top: 2px solid var(--theme-border, #dee2e6);
             margin-top: 12px;
         }
-        
+
         .btn-comprar {
             background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 100%);
             color: white;
@@ -193,7 +194,7 @@
             transition: all 0.3s;
             box-shadow: 0 4px 16px rgba(40, 44, 63, 0.3);
         }
-        
+
         .btn-comprar:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 24px rgba(40, 44, 63, 0.4);
@@ -205,13 +206,13 @@
             background: linear-gradient(135deg, var(--vesta-gold) 0%, #f4b94c 100%);
             color: #282c3f;
         }
-        
+
         .benefits-list {
             list-style: none;
             padding: 0;
             margin: 25px 0 0 0;
         }
-        
+
         .benefits-list li {
             display: flex;
             align-items: center;
@@ -220,12 +221,13 @@
             margin-bottom: 10px;
             font-size: 0.95rem;
         }
-        
+
         .benefits-list li i {
             font-size: 1.1rem;
         }
     </style>
 </head>
+
 <body>
     <div th:replace="~{fragments/header :: header-nav}"></div>
 
@@ -238,7 +240,8 @@
             <!-- Left Column: Product Info -->
             <div class="col-lg-7">
                 <div class="product-image-container mb-4">
-                    <img id="productImage" src="" alt="Producto" class="product-image-large" onerror="handleImageError(this)">
+                    <img id="productImage" src="" alt="Producto" class="product-image-large"
+                        onerror="handleImageError(this)">
                     <span id="categoryBadge" class="category-badge-large"></span>
                 </div>
 
@@ -266,19 +269,21 @@
 
                     <div class="duration-selector">
                         <label>Contratar por:</label>
-                        
+
                         <!-- Toggle Meses/Años -->
                         <div class="btn-group w-100 mb-3" role="group">
-                            <input type="radio" class="btn-check" name="durationType" id="typeMonth" value="month" checked onclick="cambiarModo('month')">
+                            <input type="radio" class="btn-check" name="durationType" id="typeMonth" value="month"
+                                checked onclick="cambiarModo('month')">
                             <label class="btn btn-outline-warning" for="typeMonth">Meses</label>
 
-                            <input type="radio" class="btn-check" name="durationType" id="typeYear" value="year" onclick="cambiarModo('year')">
+                            <input type="radio" class="btn-check" name="durationType" id="typeYear" value="year"
+                                onclick="cambiarModo('year')">
                             <label class="btn btn-outline-warning" for="typeYear">Años</label>
                         </div>
 
                         <div class="input-group">
-                            <input type="number" id="duracionInput" class="form-control duration-input" 
-                                   value="1" min="1" max="120" onchange="calcularPrecio()">
+                            <input type="number" id="duracionInput" class="form-control duration-input" value="1"
+                                min="1" max="120" onchange="calcularPrecio()">
                             <span class="input-group-text" id="unitLabel">meses</span>
                         </div>
                         <small class="text-muted" id="daysPreview">Equivale a 30 días de cobertura</small>
@@ -315,16 +320,16 @@
 
     <!-- Mobile Navigation -->
     <div th:replace="~{fragments/mobile-nav :: mobile-nav}"></div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/vesta-web/js/modal-utils.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
         const authToken = /*[[${session.token}]]*/ null;
         /*]]>*/
-        
-        const API_URL = window.location.hostname === 'localhost' 
-            ? 'https://localhost:8080/api' 
+
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'https://localhost:8080/api'
             : '/vesta-api/api';
 
         let productoActual = null;
@@ -355,7 +360,7 @@
                 'Cambio de fecha'
             ],
             'Movilidad': [
-                'Robo de bicicleta',
+                'Robo de vehículo personal',
                 'Daños por accidente',
                 'Responsabilidad civil',
                 'Asistencia en carretera',
@@ -370,7 +375,7 @@
             ]
         };
 
-        window.onload = function() {
+        window.onload = function () {
             cargarProducto();
         };
 
@@ -379,7 +384,7 @@
             currentMode = mode;
             const input = document.getElementById('duracionInput');
             const label = document.getElementById('unitLabel');
-            
+
             if (mode === 'month') {
                 label.textContent = 'meses';
                 input.value = 1;
@@ -410,7 +415,7 @@
             // Calcular diferencia en milisegundos y convertir a días
             const diffTime = Math.abs(future - now);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
             return diffDays;
         }
 
@@ -438,7 +443,7 @@
                 const res = await fetch(`/vesta-web/cliente/api/productos/${productoId}`, {
                     credentials: 'include'
                 });
-                
+
                 if (res.ok) {
                     productoActual = await res.json();
                     mostrarProducto();
@@ -485,7 +490,7 @@
 
             const totalDias = getDays();
             const precioBaseDia = parseFloat(productoActual.precioBase);
-            
+
             // Actualizar preview de días
             document.getElementById('daysPreview').textContent = `Equivale a ${totalDias} días de cobertura`;
 
@@ -501,7 +506,7 @@
 
         async function comprarAhora() {
             const totalDias = getDays();
-            
+
             if (totalDias < 1) {
                 showErrorModal('Error', 'La duración debe ser al menos 1 día');
                 return;
@@ -538,4 +543,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Dashboard - Vesta Seguros</title>
     <div th:replace="~{fragments/favicon :: favicon}"></div>
@@ -8,51 +9,55 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <style>
         /* Estilos para el Chatbot */
-        .chat-btn { 
-            position: fixed; 
-            bottom: 24px; 
-            right: 24px; 
-            z-index: 1000; 
-            width: 64px; 
-            height: 64px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .chat-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, #f1a61c 0%, #f4b94c 100%);
-            box-shadow: 0 6px 24px rgba(241, 166, 28, 0.4); 
+            box-shadow: 0 6px 24px rgba(241, 166, 28, 0.4);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
         }
-        .chat-btn:hover { 
-            transform: scale(1.1) translateY(-2px); 
+
+        .chat-btn:hover {
+            transform: scale(1.1) translateY(-2px);
             box-shadow: 0 8px 32px rgba(241, 166, 28, 0.5);
         }
-        .chat-message { 
-            margin-bottom: 12px; 
-            padding: 12px 16px; 
-            border-radius: 16px; 
-            max-width: 80%; 
+
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 80%;
             font-size: 0.9rem;
             animation: slideInUp 0.3s ease-out;
         }
-        .chat-user { 
+
+        .chat-user {
             background: linear-gradient(135deg, #f1a61c 0%, #f4b94c 100%);
-            color: white; 
-            align-self: flex-end; 
-            margin-left: auto; 
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
             border-bottom-right-radius: 4px;
             box-shadow: 0 2px 8px rgba(241, 166, 28, 0.2);
         }
-        .chat-bot { 
-            background-color: #ffffff; 
-            color: var(--theme-text-main, #282c3f); 
-            align-self: flex-start; 
+
+        .chat-bot {
+            background-color: #ffffff;
+            color: var(--theme-text-main, #282c3f);
+            align-self: flex-start;
             border-bottom-left-radius: 4px;
             border: 1px solid #e9ecef;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        
+
         .ai-recommendation-card {
             background: linear-gradient(135deg, var(--theme-card-bg, #e3f2fd) 0%, var(--theme-bg-secondary, #ffffff) 100%);
             border-left: 4px solid #f1a61c;
@@ -60,13 +65,13 @@
             animation: slideInDown 0.5s ease-out;
             color: var(--theme-text-main, #212529);
         }
-        
+
         .policy-card {
             transition: all 0.3s ease;
             border-left: 4px solid #f1a61c;
             background-color: var(--theme-card-bg, white);
         }
-        
+
         .policy-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
@@ -76,7 +81,7 @@
         .tpv-card-primary {
             background: linear-gradient(135deg, var(--theme-card-bg, #ffffff) 0%, var(--theme-bg-secondary, #f8f9fa) 100%);
             color: var(--theme-text-main, #282c3f);
-            border: 1px solid var(--theme-border, rgba(0,0,0,0.1));
+            border: 1px solid var(--theme-border, rgba(0, 0, 0, 0.1));
         }
 
         .tpv-card-secondary {
@@ -155,11 +160,11 @@
             .ai-recommendation-card {
                 margin-bottom: 20px;
             }
-            
+
             .policy-card {
                 margin-bottom: 15px;
             }
-            
+
             .tpv-card-primary,
             .tpv-card-secondary {
                 margin-bottom: 20px;
@@ -173,26 +178,26 @@
                 bottom: 16px;
                 right: 16px;
             }
-            
+
             .chat-message {
                 max-width: 90%;
                 font-size: 0.85rem;
                 padding: 10px 14px;
             }
-            
+
             .ai-recommendation-card .card-body {
                 padding: 1rem;
             }
-            
+
             .policy-card .card-body {
                 padding: 1rem;
             }
-            
+
             .tpv-card-primary .card-body,
             .tpv-card-secondary .card-body {
                 padding: 1rem;
             }
-            
+
             .row.g-4 {
                 --bs-gutter-x: 1rem;
                 --bs-gutter-y: 1rem;
@@ -206,30 +211,30 @@
                 bottom: 12px;
                 right: 12px;
             }
-            
+
             .chat-message {
                 max-width: 95%;
                 font-size: 0.8rem;
                 padding: 8px 12px;
                 margin-bottom: 8px;
             }
-            
+
             .ai-recommendation-card .card-body,
             .policy-card .card-body,
             .tpv-card-primary .card-body,
             .tpv-card-secondary .card-body {
                 padding: 0.75rem;
             }
-            
+
             .card-title {
                 font-size: 1.1rem;
             }
-            
+
             .btn {
                 font-size: 0.85rem;
                 padding: 0.5rem 1rem;
             }
-            
+
             .row.g-4 {
                 --bs-gutter-x: 0.75rem;
                 --bs-gutter-y: 0.75rem;
@@ -241,25 +246,25 @@
                 padding-left: 10px;
                 padding-right: 10px;
             }
-            
+
             .chat-btn {
                 width: 40px;
                 height: 40px;
                 bottom: 10px;
                 right: 10px;
             }
-            
+
             .ai-recommendation-card .card-body,
             .policy-card .card-body,
             .tpv-card-primary .card-body,
             .tpv-card-secondary .card-body {
                 padding: 0.5rem;
             }
-            
+
             .card-title {
                 font-size: 1rem;
             }
-            
+
             .btn {
                 font-size: 0.8rem;
                 padding: 0.4rem 0.8rem;
@@ -267,13 +272,15 @@
         }
     </style>
 </head>
+
 <body>
 
     <div th:replace="~{fragments/header :: header-nav}"></div>
 
     <div class="container mt-4" style="padding-bottom: 80px;">
 
-        <div id="aiRecommendation" class="alert ai-recommendation-card border-0 shadow-sm d-none align-items-center mb-4" role="alert">
+        <div id="aiRecommendation"
+            class="alert ai-recommendation-card border-0 shadow-sm d-none align-items-center mb-4" role="alert">
             <div id="weatherIcon" class="fs-1 me-3">🌦️</div>
             <div class="flex-grow-1">
                 <h6 class="fw-bold mb-1">💡 Sugerencia Inteligente Vesta</h6>
@@ -287,7 +294,7 @@
             </h4>
 
         </div>
-        
+
         <!-- Contenedor dinámico para pólizas del usuario -->
         <div id="polizasContainer" class="row mb-5">
             <div class="col-12 text-center py-5">
@@ -327,19 +334,21 @@
                                     <i class="bi bi-credit-card-2-front fs-3 text-warning"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold mb-1" style="color: var(--theme-text-main, #282c3f);">Simulador de Pagos</h5>
+                                    <h5 class="fw-bold mb-1" style="color: var(--theme-text-main, #282c3f);">Simulador
+                                        de Pagos</h5>
                                     <p class="text-muted mb-0 small">Prueba pagos sin cargos reales</p>
                                 </div>
                             </div>
                             <p class="text-muted mb-3">
-                                Utiliza nuestro simulador TPV para probar el proceso de pago con tarjetas virtuales. 
+                                Utiliza nuestro simulador TPV para probar el proceso de pago con tarjetas virtuales.
                                 Perfecto para testing y demostraciones.
                             </p>
                             <div class="d-flex gap-2">
                                 <a href="/vesta-web/cliente/tpv-simulator" class="btn btn-warning text-white px-4">
                                     <i class="bi bi-play-circle me-2"></i>Abrir Simulador
                                 </a>
-                                <button class="btn btn-outline-secondary tpv-info-btn" data-bs-toggle="collapse" data-bs-target="#tpvInfo">
+                                <button class="btn btn-outline-secondary tpv-info-btn" data-bs-toggle="collapse"
+                                    data-bs-target="#tpvInfo">
                                     <i class="bi bi-info-circle me-1"></i>Info
                                 </button>
                             </div>
@@ -393,22 +402,28 @@
             <div class="modal-content bg-dark border-danger border-3">
                 <div class="modal-header border-0">
                     <h5 class="modal-title font-monospace text-danger fw-bold">☠️ DOOM 1993 ☠️</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopDoom()"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        onclick="stopDoom()"></button>
                 </div>
-                <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black" style="height: 80vh;">
-                    <iframe id="doomFrame" src="" style="width: 800px; height: 600px; max-width: 100%; max-height: 100%; border: none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black"
+                    style="height: 80vh;">
+                    <iframe id="doomFrame" src=""
+                        style="width: 800px; height: 600px; max-width: 100%; max-height: 100%; border: none;"
+                        allow="autoplay; fullscreen" allowfullscreen></iframe>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="toast-container position-fixed top-50 start-50 translate-middle p-3" style="z-index: 2000">
-        <div id="doomToast" class="toast align-items-center text-bg-danger border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="doomToast" class="toast align-items-center text-bg-danger border-0 shadow-lg" role="alert"
+            aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body fs-4 fw-bold font-monospace">
                     <i class="bi bi-trophy-fill me-2"></i> LOGRO DESBLOQUEADO: DOOM SLAYER
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
             </div>
         </div>
     </div>
@@ -431,8 +446,10 @@
                 </div>
                 <div class="modal-footer bg-white border-top-0">
                     <div class="input-group">
-                        <input type="text" id="chatInput" class="form-control bg-light border-0" placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter') enviarMensaje()">
-                        <button class="btn btn-warning text-white" onclick="enviarMensaje()"><i class="bi bi-send-fill"></i></button>
+                        <input type="text" id="chatInput" class="form-control bg-light border-0"
+                            placeholder="Escribe tu duda..." onkeypress="if(event.key==='Enter') enviarMensaje()">
+                        <button class="btn btn-warning text-white" onclick="enviarMensaje()"><i
+                                class="bi bi-send-fill"></i></button>
                     </div>
                 </div>
             </div>
@@ -448,20 +465,27 @@
                 </div>
                 <div class="modal-body bg-light">
                     <div class="alert alert-warning border-0 shadow-sm mb-3">
-                        <small><i class="bi bi-info-circle me-1"></i> El <strong>Perito IA</strong> analizará tu imagen en tiempo real.</small>
+                        <small><i class="bi bi-info-circle me-1"></i> El <strong>Perito IA</strong> analizará tu imagen
+                            en tiempo real.</small>
                     </div>
                     <form id="formSiniestro">
                         <input type="hidden" id="polizaId" value="1">
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-uppercase text-muted">¿Qué ha ocurrido?</label>
-                            <textarea class="form-control border-0 shadow-sm" id="descSiniestro" rows="3" placeholder="Describe los detalles del incidente..." style="resize: none;" required></textarea>
+                            <textarea class="form-control border-0 shadow-sm" id="descSiniestro" rows="3"
+                                placeholder="Describe los detalles del incidente..." style="resize: none;"
+                                required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Evidencia Fotográfica</label>
-                            <div class="p-4 border-2 border-dashed rounded text-center bg-white position-relative hover-lift transition-all" style="border-color: #dee2e6; border-style: dashed;">
+                            <label class="form-label fw-bold small text-uppercase text-muted">Evidencia
+                                Fotográfica</label>
+                            <div class="p-4 border-2 border-dashed rounded text-center bg-white position-relative hover-lift transition-all"
+                                style="border-color: #dee2e6; border-style: dashed;">
                                 <i class="bi bi-camera-fill fs-1 text-secondary mb-2"></i>
                                 <p class="small text-muted mb-2">Arrastra tu foto aquí o haz clic</p>
-                                <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" id="fotoSiniestro" accept="image/*" style="cursor: pointer;" required>
+                                <input type="file"
+                                    class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                    id="fotoSiniestro" accept="image/*" style="cursor: pointer; z-index: 10;" required>
                             </div>
                         </div>
                     </form>
@@ -470,8 +494,10 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-white border-top-0">
-                    <button type="button" class="btn btn-outline-secondary border-0" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btnEnviarSiniestro" class="btn btn-danger px-4 rounded-pill shadow-sm" onclick="enviarSiniestro()">
+                    <button type="button" id="btnCancelarSiniestro" class="btn btn-outline-secondary border-0"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnEnviarSiniestro" class="btn btn-danger px-4 rounded-pill shadow-sm"
+                        onclick="enviarSiniestro()">
                         <i class="bi bi-send-fill me-2"></i>Enviar Reporte
                     </button>
                 </div>
@@ -483,15 +509,15 @@
     <div th:replace="~{fragments/mobile-nav :: mobile-nav}"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script th:inline="javascript">
         /*<![CDATA[*/
         const authToken = /*[[${session.token}]]*/ null;
         const userEmail = /*[[${usuarioEmail}]]*/ 'test@vesta.es';
         /*]]>*/
         // Detectar si estamos en Docker o local
-        const API_URL = window.location.hostname === 'localhost' 
-            ? 'https://localhost:8080/api' 
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'https://localhost:8080/api'
             : '/vesta-api/api';
 
         // 1. RECOMENDADOR usando endpoint proxy
@@ -501,10 +527,10 @@
                     method: 'GET',
                     credentials: 'include'
                 });
-                if(res.ok) {
+                if (res.ok) {
                     const data = await res.json();
                     document.getElementById('recText').innerText = data.mensaje;
-                    
+
                     // Icono Dinámico
                     const iconMap = {
                         'SUN': '☀️',
@@ -516,8 +542,8 @@
                     document.getElementById('aiRecommendation').classList.remove('d-none');
                     document.getElementById('aiRecommendation').classList.add('d-flex');
                 }
-            } catch (e) { 
-                console.error("Error IA Recomendación", e); 
+            } catch (e) {
+                console.error("Error IA Recomendación", e);
                 // Ocultar la sección si hay error
                 document.getElementById('aiRecommendation').style.display = 'none';
             }
@@ -540,16 +566,16 @@
             try {
                 const res = await fetch('/vesta-web/cliente/api/polizas', {
                     method: 'GET',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json'
                     },
                     credentials: 'include'
                 });
-                
+
                 if (res.ok) {
                     const polizas = await res.json();
                     const container = document.getElementById('polizasContainer');
-                    
+
                     if (polizas.length === 0) {
                         container.innerHTML = `
                             <div class="col-12 text-center py-5">
@@ -562,7 +588,7 @@
                         `;
                         return;
                     }
-                    
+
                     // Renderizar pólizas
                     container.innerHTML = polizas.map(poliza => `
                         <div class="col-md-6 mb-3">
@@ -627,20 +653,20 @@
                 });
                 if (res.ok) {
                     let productos = await res.json();
-                    
+
                     // Barajar array (Fisher-Yates shuffle)
                     for (let i = productos.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [productos[i], productos[j]] = [productos[j], productos[i]];
                     }
-                    
+
                     // Tomar los primeros 3
                     const recomendados = productos.slice(0, 3);
-                    
+
                     const container = document.getElementById('recommendedContainer');
-                    if(recomendados.length === 0) {
-                         container.innerHTML = '<p class="text-muted">No hay recomendaciones disponibles por el momento.</p>';
-                         return;
+                    if (recomendados.length === 0) {
+                        container.innerHTML = '<p class="text-muted">No hay recomendaciones disponibles por el momento.</p>';
+                        return;
                     }
 
                     container.innerHTML = recomendados.map(p => `
@@ -668,11 +694,11 @@
         }
 
         // Cargar todo al iniciar
-        window.onload = function() {
+        window.onload = function () {
             cargarRecomendacion();
             cargarPolizas();
             cargarRecomendacionesCatalogo();
-            
+
             // Actualizar IA cada 5 minutos (300,000 ms)
             setInterval(cargarRecomendacion, 300000);
         };
@@ -691,13 +717,13 @@
             try {
                 const res = await fetch('/vesta-web/cliente/api/innovation/chat', {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json'
                     },
                     credentials: 'include',
                     body: JSON.stringify({ pregunta: texto })
                 });
-                if(res.ok) {
+                if (res.ok) {
                     const data = await res.json();
                     chatBody.innerHTML += `<div class="chat-message chat-bot">${data.respuesta}</div>`;
                 } else {
@@ -710,13 +736,71 @@
         }
 
         // 3. PERITO DIGITAL
-        function setPoliza(id) { 
-            document.getElementById('polizaId').value = id; 
+        function setPoliza(id) {
+            document.getElementById('polizaId').value = id;
             // RESTAURAR BOTÓN AL ABRIR EL MODAL (Por si se ocultó anteriormente)
             document.getElementById('btnEnviarSiniestro').style.display = 'block';
             document.getElementById('analisisResult').classList.add('d-none'); // Ocultar mensajes anteriores
             document.getElementById('formSiniestro').reset(); // Limpiar formulario
+
+            // Resetear preview de imagen (sin destruir el input)
+            const dropzone = document.getElementById('fotoSiniestro').parentNode;
+
+            // Resetear botón Cerrar a Cancelar
+            const btnCancelar = document.getElementById('btnCancelarSiniestro');
+            if (btnCancelar) {
+                btnCancelar.innerText = 'Cancelar';
+                btnCancelar.classList.remove('btn-success');
+                btnCancelar.classList.add('btn-outline-secondary');
+            }
+
+            // Reconstruimos la estructura visual separando el contenido default del preview
+            // El input se queda como hermano
+            dropzone.innerHTML = `
+                <div id="dropzone-default" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="bi bi-camera-fill fs-1 text-secondary mb-2"></i>
+                    <p class="small text-muted mb-2">Arrastra tu foto aquí o haz clic</p>
+                </div>
+                <div id="dropzone-preview" class="d-none w-100 d-flex flex-column align-items-center justify-content-center">
+                    <!-- Preview content injected here -->
+                </div>
+                <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                       id="fotoSiniestro" accept="image/*" style="cursor: pointer; z-index: 10;" required onchange="handleFileSelect(this)">
+            `;
         }
+
+        // Nueva función para manejar selección de archivo (Visual Feedback)
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const defaultContent = document.getElementById('dropzone-default');
+                    const previewContent = document.getElementById('dropzone-preview');
+
+                    // Ocultar default
+                    if (defaultContent) {
+                        defaultContent.classList.remove('d-flex');
+                        defaultContent.classList.add('d-none');
+                    }
+
+                    // Mostrar preview
+                    if (previewContent) {
+                        previewContent.innerHTML = `
+                            <img src="${e.target.result}" class="img-fluid rounded mb-2 shadow-sm" style="max-height: 150px; object-fit: contain;">
+                            <p class="small text-success fw-bold mb-0"><i class="bi bi-check-circle-fill me-1"></i> ${file.name}</p>
+                            <p class="small text-muted mb-0" style="font-size: 0.7rem;">Clic para cambiar</p>
+                        `;
+                        previewContent.classList.remove('d-none');
+                        previewContent.classList.add('d-flex');
+                    }
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+
 
         async function enviarSiniestro() {
             // OCULTAR BOTÓN INMEDIATAMENTE
@@ -731,7 +815,7 @@
             const formData = new FormData();
             formData.append('polizaId', document.getElementById('polizaId').value);
             formData.append('descripcion', document.getElementById('descSiniestro').value);
-            
+
             const fileInput = document.getElementById('fotoSiniestro');
             if (fileInput.files.length > 0) {
                 formData.append('file', fileInput.files[0]);
@@ -741,10 +825,10 @@
                 const res = await fetch('/vesta-web/cliente/api/siniestros', {
                     method: 'POST',
                     credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
+                    // headers: { 'Content-Type': 'multipart/form-data' }, // NO poner esto manualmente con FormData
                     body: formData
                 });
-                
+
                 if (!res.ok) throw new Error("Error en la petición: " + res.status);
 
                 const data = await res.json();
@@ -754,13 +838,22 @@
                     resultBox.innerHTML = `<strong>¡Siniestro Aprobado!</strong><br>${data.analisisIA}`;
                 } else {
                     resultBox.className = 'alert alert-secondary mt-3';
+                    resultBox.className = 'alert alert-secondary mt-3';
                     resultBox.innerHTML = `<strong>Pendiente de Revisión</strong><br>${data.analisisIA || 'En proceso de revisión.'}`;
+                }
+
+                // CAMBIAR BOTÓN CANCELAR A CERRAR
+                const btnCancelar = document.getElementById('btnCancelarSiniestro');
+                if (btnCancelar) {
+                    btnCancelar.innerText = 'Cerrar';
+                    btnCancelar.classList.remove('btn-outline-secondary');
+                    btnCancelar.classList.add('btn-success');
                 }
             } catch (e) {
                 console.error(e);
                 resultBox.className = 'alert alert-danger mt-3';
                 resultBox.innerText = 'Error al subir la evidencia. Verifica que estás logueado y que la imagen no sea demasiado grande.';
-                
+
                 // SI FALLA, MOSTRAR EL BOTÓN DE NUEVO PARA QUE PUEDA REINTENTAR
                 btnEnviar.style.display = 'block';
             }
@@ -812,7 +905,7 @@
         function stopDoom() {
             document.getElementById('doomFrame').src = "";
         }
-        
+
         // Asegurar que el sonido pare si se cierra el modal
         const doomModal = document.getElementById('doomModal');
         if (doomModal) {
@@ -820,4 +913,5 @@
         }
     </script>
 </body>
+
 </html>

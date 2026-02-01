@@ -558,16 +558,41 @@ public class ApiService {
 
     // === SINIESTROS ===
 
-    public Map<String, Object> reportarSiniestro(String token, Map<String, Object> request) {
+    public Map<String, Object> reportarSiniestro(String token, Long polizaId, String descripcion,
+            org.springframework.web.multipart.MultipartFile file) {
         String url = apiUrl + "/siniestros";
 
         try {
-            logger.debug("Reportando siniestro");
+            logger.debug("Reportando siniestro con archivo");
+
+            // Crear headers para multipart
+            HttpHeaders headers = getHeaders(token);
+            headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+
+            // Crear body con MultiValueMap
+            org.springframework.util.MultiValueMap<String, Object> body = new org.springframework.util.LinkedMultiValueMap<>();
+            body.add("polizaId", polizaId);
+            body.add("descripcion", descripcion);
+
+            // Usar ByteArrayResource para asegurar que se envíe el nombre del archivo y el
+            // contenido correctamente
+            try {
+                org.springframework.core.io.ByteArrayResource fileResource = new org.springframework.core.io.ByteArrayResource(
+                        file.getBytes()) {
+                    @Override
+                    public String getFilename() {
+                        return file.getOriginalFilename();
+                    }
+                };
+                body.add("file", fileResource);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
+            }
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
-                    new HttpEntity<>(request, getHeaders(token)),
+                    new HttpEntity<>(body, headers),
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
@@ -740,6 +765,48 @@ public class ApiService {
     }
 
     // === GESTIÓN DE PRODUCTOS (ADMIN) ===
+
+    public Map<String, Object> crearProducto(String token, Map<String, Object> productData) {
+        String url = apiUrl + "/productos";
+
+        try {
+            logger.debug("Creando nuevo producto");
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(productData, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al crear producto: {}", e.getMessage());
+            throw new RuntimeException("Error al crear producto: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> actualizarProducto(String token, Long productoId, Map<String, Object> productData) {
+        String url = apiUrl + "/productos/" + productoId;
+
+        try {
+            logger.debug("Actualizando producto: {}", productoId);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    new HttpEntity<>(productData, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al actualizar producto {}: {}", productoId, e.getMessage());
+            throw new RuntimeException("Error al actualizar producto: " + e.getMessage());
+        }
+    }
 
     public void eliminarProducto(String token, Long productoId) {
         String url = apiUrl + "/productos/" + productoId;

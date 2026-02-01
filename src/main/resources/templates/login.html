@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,10 +25,11 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);            min-height: 100vh;
+            background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);
+            min-height: 100vh;
             display: flex;
             align-items: flex-start;
             justify-content: center;
@@ -36,7 +38,8 @@
             padding: 2rem 0;
             overflow-x: hidden;
             overflow-y: auto;
-            font-size: 16px; /* Base font size for rem calculations */
+            font-size: 16px;
+            /* Base font size for rem calculations */
         }
 
         /* Contenedor separado para evitar scrollbars por los orbes */
@@ -54,7 +57,8 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(2px); /* Suaviza bordes */
+            filter: blur(2px);
+            /* Suaviza bordes */
         }
 
         .orb-1 {
@@ -76,8 +80,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.3; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
         }
 
         .login-container {
@@ -169,7 +182,8 @@
             color: #adb5bd;
             font-size: 1.1rem;
             z-index: 5;
-            pointer-events: none; /* Icono no clickeable para no bloquear input */
+            pointer-events: none;
+            /* Icono no clickeable para no bloquear input */
         }
 
         .form-control-custom {
@@ -352,7 +366,7 @@
         }
 
         .blocked-account-banner .btn-close-banner:hover {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             color: #721c24;
         }
 
@@ -400,6 +414,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -411,6 +426,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -448,14 +464,16 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ===== RESPONSIVE DESIGN ===== */
@@ -472,11 +490,11 @@
                 padding: 2rem;
                 margin: 1rem;
             }
-            
+
             .logo-container img {
                 max-width: 180px;
             }
-            
+
             .login-title {
                 font-size: 2rem;
             }
@@ -486,49 +504,49 @@
             body {
                 padding: 1rem 0;
             }
-            
+
             .login-container {
                 max-width: 100%;
                 margin: 0.5rem;
                 padding: 1.5rem;
                 border-radius: 16px;
             }
-            
+
             .logo-container img {
                 max-width: 160px;
             }
-            
+
             .login-title {
                 font-size: 1.8rem;
                 margin-bottom: 0.5rem;
             }
-            
+
             .login-subtitle {
                 font-size: 0.95rem;
                 margin-bottom: 1.5rem;
             }
-            
+
             .form-group {
                 margin-bottom: 1rem;
             }
-            
+
             .form-control {
                 padding: 0.75rem 1rem;
                 font-size: 0.95rem;
             }
-            
+
             .btn-login {
                 padding: 0.875rem;
                 font-size: 0.95rem;
             }
-            
+
             .help-button {
                 width: 50px;
                 height: 50px;
                 bottom: 20px;
                 right: 20px;
             }
-            
+
             .help-button i {
                 font-size: 1.3rem;
             }
@@ -540,49 +558,49 @@
                 padding: 1.25rem;
                 border-radius: 12px;
             }
-            
+
             .logo-container {
                 margin-bottom: 1.5rem;
             }
-            
+
             .logo-container img {
                 max-width: 140px;
             }
-            
+
             .login-title {
                 font-size: 1.6rem;
             }
-            
+
             .login-subtitle {
                 font-size: 0.9rem;
                 margin-bottom: 1.25rem;
             }
-            
+
             .form-group {
                 margin-bottom: 0.875rem;
             }
-            
+
             .form-control {
                 padding: 0.65rem 0.875rem;
                 font-size: 0.9rem;
             }
-            
+
             .btn-login {
                 padding: 0.75rem;
                 font-size: 0.9rem;
             }
-            
+
             .help-button {
                 width: 45px;
                 height: 45px;
                 bottom: 15px;
                 right: 15px;
             }
-            
+
             .help-button i {
                 font-size: 1.2rem;
             }
-            
+
             .text-center a {
                 font-size: 0.9rem;
             }
@@ -593,36 +611,36 @@
                 margin: 0.125rem;
                 padding: 1rem;
             }
-            
+
             .logo-container img {
                 max-width: 120px;
             }
-            
+
             .login-title {
                 font-size: 1.4rem;
             }
-            
+
             .login-subtitle {
                 font-size: 0.85rem;
             }
-            
+
             .form-control {
                 padding: 0.6rem 0.75rem;
                 font-size: 0.85rem;
             }
-            
+
             .btn-login {
                 padding: 0.65rem;
                 font-size: 0.85rem;
             }
-            
+
             .help-button {
                 width: 40px;
                 height: 40px;
                 bottom: 10px;
                 right: 10px;
             }
-            
+
             .help-button i {
                 font-size: 1rem;
             }
@@ -630,6 +648,7 @@
     </style>
 </head>
 <div th:replace="~{fragments/cookie-banner :: cookie-banner}"></div>
+
 <body>
 
     <!-- Decoraciones de fondo (Aisladas para no causar scroll) -->
@@ -641,7 +660,7 @@
     <div class="login-container">
         <!-- Logo -->
         <div class="logo-container">
-            <img th:src="@{/images/logo_vesta.png}" alt="Vesta Logo" style="max-width: 200px; height: auto;">
+            <img th:src="@{/images/logo_vesta_sin_fondo.png}" alt="Vesta Logo" style="max-width: 200px; height: auto;">
         </div>
 
         <!-- Card de Login -->
@@ -664,15 +683,8 @@
                     <label class="form-label">Correo Electrónico o Teléfono</label>
                     <div class="input-wrapper">
                         <i class="bi bi-person input-icon"></i>
-                        <input 
-                            type="text" 
-                            class="form-control-custom" 
-                            id="email" 
-                            name="correoElectronico" 
-                            placeholder="Direccion email o Telefono" 
-                            required 
-                            autocomplete="username"
-                        >
+                        <input type="text" class="form-control-custom" id="email" name="correoElectronico"
+                            placeholder="Direccion email o Telefono" required autocomplete="username">
                     </div>
                 </div>
 
@@ -681,15 +693,8 @@
                     <label class="form-label">Contraseña</label>
                     <div class="input-wrapper">
                         <i class="bi bi-lock input-icon"></i>
-                        <input 
-                            type="password" 
-                            class="form-control-custom" 
-                            id="password" 
-                            name="contrasena" 
-                            placeholder="••••••••" 
-                            required 
-                            autocomplete="current-password"
-                        >
+                        <input type="password" class="form-control-custom" id="password" name="contrasena"
+                            placeholder="••••••••" required autocomplete="current-password">
                     </div>
                 </div>
 
@@ -707,13 +712,15 @@
                 <!-- Social Login -->
                 <div class="position-relative my-4 text-center">
                     <hr style="border-color: #dee2e6;">
-                    <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small" style="z-index: 1;">O continúa con</span>
+                    <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small"
+                        style="z-index: 1;">O continúa con</span>
                 </div>
 
                 <div class="d-grid mb-4">
                     <!-- Google Button -->
                     <a th:href="@{/oauth2/authorization/google}" class="btn-google">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20"
+                            height="20">
                         <span>Continuar con Google</span>
                     </a>
                 </div>
@@ -722,7 +729,7 @@
 
             <!-- Links adicionales -->
             <div class="link-section">
-                <span style="color: #6c757d;">¿No tienes cuenta?</span> 
+                <span style="color: #6c757d;">¿No tienes cuenta?</span>
                 <a th:href="@{/register}">Regístrate aquí</a>
             </div>
 
@@ -745,7 +752,8 @@
                 </div>
                 <div class="banner-content">
                     <p class="mb-2"><strong>Tu cuenta ha sido suspendida por el administrador.</strong></p>
-                    <p class="mb-0">Si deseas más información sobre el motivo de la suspensión, puedes ponerte en contacto con nosotros:</p>
+                    <p class="mb-0">Si deseas más información sobre el motivo de la suspensión, puedes ponerte en
+                        contacto con nosotros:</p>
                     <div class="contact-info">
                         <div class="contact-item">
                             <i class="bi bi-telephone-fill"></i>
@@ -778,17 +786,21 @@
                 </div>
                 <div class="modal-body p-4">
                     <div class="accordion accordion-flush" id="faqAccordion">
-                        
+
                         <!-- Item 1 -->
                         <div class="accordion-item rounded-3 mb-2 border">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <button class="accordion-button collapsed fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq1">
                                     <i class="bi bi-envelope-x me-2 text-muted"></i> No recibí el correo de confirmación
                                 </button>
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-secondary small">
-                                    <p>Primero, revisa tu carpeta de <strong>Spam o Correo no deseado</strong>. Si no está allí, intenta iniciar sesión con tus credenciales; si tu cuenta no está activada, verás un mensaje de error con un botón para <strong>"Reenviar"</strong> el correo.</p>
+                                    <p>Primero, revisa tu carpeta de <strong>Spam o Correo no deseado</strong>. Si no
+                                        está allí, intenta iniciar sesión con tus credenciales; si tu cuenta no está
+                                        activada, verás un mensaje de error con un botón para
+                                        <strong>"Reenviar"</strong> el correo.</p>
                                 </div>
                             </div>
                         </div>
@@ -796,13 +808,16 @@
                         <!-- Item 2 -->
                         <div class="accordion-item rounded-3 mb-2 border">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <button class="accordion-button collapsed fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq2">
                                     <i class="bi bi-key me-2 text-muted"></i> Olvidé mi contraseña
                                 </button>
                             </h2>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-secondary small">
-                                    <p>Haz clic en el enlace <strong>"¿Olvidaste tu contraseña?"</strong> debajo del botón de inicio de sesión. Te enviaremos un código o enlace a tu correo para que puedas crear una nueva.</p>
+                                    <p>Haz clic en el enlace <strong>"¿Olvidaste tu contraseña?"</strong> debajo del
+                                        botón de inicio de sesión. Te enviaremos un código o enlace a tu correo para que
+                                        puedas crear una nueva.</p>
                                 </div>
                             </div>
                         </div>
@@ -810,13 +825,16 @@
                         <!-- Item 3 -->
                         <div class="accordion-item rounded-3 mb-2 border">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <button class="accordion-button collapsed fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq3">
                                     <i class="bi bi-person-plus me-2 text-muted"></i> ¿Cómo me registro?
                                 </button>
                             </h2>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-secondary small">
-                                    <p>Si aún no tienes cuenta, pulsa en el enlace <strong>"Regístrate aquí"</strong> al final del formulario. Necesitarás proporcionar un correo electrónico válido y crear una contraseña segura.</p>
+                                    <p>Si aún no tienes cuenta, pulsa en el enlace <strong>"Regístrate aquí"</strong> al
+                                        final del formulario. Necesitarás proporcionar un correo electrónico válido y
+                                        crear una contraseña segura.</p>
                                 </div>
                             </div>
                         </div>
@@ -824,19 +842,22 @@
                         <!-- Item 4 -->
                         <div class="accordion-item rounded-3 border">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                <button class="accordion-button collapsed fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq4">
                                     <i class="bi bi-shield-lock me-2 text-muted"></i> Mi cuenta está bloqueada
                                 </button>
                             </h2>
                             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-secondary small">
-                                    <p>Por seguridad, tras varios intentos fallidos la cuenta puede bloquearse temporalmente. Espera unos minutos e inténtalo de nuevo, o restablece tu contraseña si la has olvidado.</p>
+                                    <p>Por seguridad, tras varios intentos fallidos la cuenta puede bloquearse
+                                        temporalmente. Espera unos minutos e inténtalo de nuevo, o restablece tu
+                                        contraseña si la has olvidado.</p>
                                 </div>
                             </div>
                         </div>
 
                     </div>
-                    
+
                     <div class="mt-4 pt-3 border-top text-center">
                         <p class="small text-muted mb-1">¿Sigues teniendo problemas?</p>
                         <a href="mailto:soporte@vesta.com" class="btn btn-sm btn-outline-secondary rounded-pill px-4">
@@ -857,15 +878,17 @@
                         <i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i>
                     </div>
                     <h4 class="fw-bold mb-3">Autenticación de Dos Pasos</h4>
-                    <p class="text-muted mb-4">Ingresa el código de 6 dígitos de tu aplicación de autenticación para continuar.</p>
-                    
+                    <p class="text-muted mb-4">Ingresa el código de 6 dígitos de tu aplicación de autenticación para
+                        continuar.</p>
+
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control text-center fs-4 letter-spacing-2" id="code2fa" placeholder="000000" maxlength="6" autocomplete="one-time-code">
+                        <input type="text" class="form-control text-center fs-4 letter-spacing-2" id="code2fa"
+                            placeholder="000000" maxlength="6" autocomplete="one-time-code">
                         <label for="code2fa">Código de Verificación</label>
                     </div>
-                    
+
                     <div id="error2fa" class="text-danger small mb-3" style="min-height: 20px;"></div>
-                    
+
                     <button class="btn btn-primary w-100 py-2 fw-bold" id="btnVerify2FA">Verificar</button>
                     <!-- Opción de cancelar eliminada para forzar 2FA si se requiere, o se puede permitir cerrar y volver al login -->
                     <button class="btn btn-link text-muted mt-2" data-bs-dismiss="modal">Cancelar</button>
@@ -876,13 +899,15 @@
 
     <!-- Toast Container para notificaciones -->
     <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive"
+            aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2">
                     <i id="toastIcon" class="bi"></i>
                     <span id="toastMessage"></span>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
             </div>
         </div>
     </div>
@@ -895,7 +920,7 @@
             const toastBody = toastEl.querySelector('.toast-body');
             const toastIcon = document.getElementById('toastIcon');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             // Configurar colores e íconos
             if (type === 'success') {
                 toastEl.classList.remove('bg-danger');
@@ -906,9 +931,9 @@
                 toastEl.classList.add('bg-danger');
                 toastIcon.className = 'bi bi-x-circle-fill fs-5';
             }
-            
+
             toastMessage.textContent = message;
-            
+
             const toast = new bootstrap.Toast(toastEl, { delay: 3000 }); // 3 segundos
             toast.show();
         }
@@ -922,30 +947,30 @@
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const loginBtn = document.getElementById('loginBtn');
             const btnText = document.getElementById('btnText');
             const btnSpinner = document.getElementById('btnSpinner');
             const errorAlert = document.getElementById('errorAlert');
             const errorMessage = document.getElementById('errorMessage');
-            
+
             // Ocultar errores previos
             errorAlert.classList.remove('show');
             // Limpiar botón de reenvío previo si existe
             const existingLink = errorAlert.querySelector('.resend-action');
             if (existingLink) existingLink.remove();
-            
+
             // Mostrar spinner
             loginBtn.disabled = true;
             btnText.style.display = 'none';
             btnSpinner.style.display = 'inline';
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
+
             try {
                 console.log('🔐 Intentando login con:', email);
-                
+
                 // Llamamos al backend WEB (no a la API directamente)
                 const response = await fetch(loginUrl, {
                     method: 'POST',
@@ -957,10 +982,10 @@
                         contrasena: password
                     })
                 });
-                
+
                 const data = await response.json();
                 console.log('📡 Respuesta del servidor:', data);
-                
+
                 if (response.ok) {
                     if (data.requires2fa) {
                         // 2FA Requerido - Mostrar Modal
@@ -976,7 +1001,7 @@
                     // Error en las credenciales
                     console.error('❌ Error de login:', data);
                     errorMessage.textContent = data.message || 'Credenciales incorrectas';
-                    
+
                     // Si es error de cuenta bloqueada por administrador
                     if (data.message && (data.message.toLowerCase().includes('bloqueada') || data.message.toLowerCase().includes('administrador'))) {
                         // Mostrar banner de cuenta bloqueada
@@ -1034,22 +1059,22 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.message && (data.message.includes('reenviado') || data.message.includes('EMAIL_SENT') || data.message.includes('éxito'))) {
-                    showToast('Correo reenviado correctamente. Revisa tu bandeja.', 'success');
-                } else {
-                    showToast('Error: ' + (data.message || 'No se pudo reenviar'), 'error');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                showToast('Error de conexión al reenviar', 'error');
-            })
-            .finally(() => {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message && (data.message.includes('reenviado') || data.message.includes('EMAIL_SENT') || data.message.includes('éxito'))) {
+                        showToast('Correo reenviado correctamente. Revisa tu bandeja.', 'success');
+                    } else {
+                        showToast('Error: ' + (data.message || 'No se pudo reenviar'), 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Error de conexión al reenviar', 'error');
+                })
+                .finally(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                });
         }
 
         // Función para cerrar el banner de cuenta bloqueada
@@ -1063,36 +1088,36 @@
         // Comprobación de mensajes URL al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            
+
             if (urlParams.get('confirmed') === 'true') {
                 showToast('¡Cuenta activada con éxito! Ya puedes iniciar sesión.', 'success');
             }
-            
+
             if (urlParams.get('error') === 'token_invalid') {
                 showToast('El enlace de activación es inválido o ha expirado.', 'error');
             }
-            
+
             if (urlParams.get('error') === 'verification_sent') {
                 showToast('Te hemos enviado un correo de confirmación. Revisa tu bandeja de entrada.', 'success');
             }
-            
+
             if (urlParams.get('error') === 'account_not_verified') {
                 showToast('Tu cuenta aún no está verificada. Revisa tu email.', 'error');
             }
-            
+
             // Detectar cuenta bloqueada específicamente
             if (urlParams.get('error') === 'account_blocked') {
                 const msg = decodeURIComponent(urlParams.get('msg') || 'Cuenta bloqueada por el administrador. Contacta con soporte para más información.');
                 const errorAlert = document.getElementById('errorAlert');
                 const errorMessage = document.getElementById('errorMessage');
                 const blockedBanner = document.getElementById('blockedAccountBanner');
-                
+
                 // Mostrar mensaje de error
                 if (errorMessage && errorAlert) {
                     errorMessage.textContent = msg;
                     errorAlert.classList.add('show');
                 }
-                
+
                 // Mostrar banner automáticamente
                 if (blockedBanner) {
                     blockedBanner.classList.add('show');
@@ -1101,19 +1126,19 @@
                     }, 500);
                 }
             }
-            
+
             // Detectar error de OAuth genérico
             if (urlParams.get('error') === 'social_backend_error') {
                 const msg = decodeURIComponent(urlParams.get('msg') || '');
                 const errorAlert = document.getElementById('errorAlert');
                 const errorMessage = document.getElementById('errorMessage');
-                
+
                 // Mostrar mensaje de error
                 if (errorMessage && errorAlert) {
                     errorMessage.textContent = msg || 'Error al iniciar sesión con Google';
                     errorAlert.classList.add('show');
                 }
-                
+
                 // Si el mensaje contiene "bloqueada" o "administrador", mostrar banner
                 if (msg && (msg.toLowerCase().includes('bloqueada') || msg.toLowerCase().includes('administrador'))) {
                     const blockedBanner = document.getElementById('blockedAccountBanner');
@@ -1133,12 +1158,12 @@
 
         // Inicialización segura del Modal
         document.addEventListener('DOMContentLoaded', () => {
-             const modalEl = document.getElementById('modal2FA');
-             if (modalEl) {
-                 modal2FA = new bootstrap.Modal(modalEl);
-             } else {
-                 console.error("CRITICAL: modal2FA element not found in DOM");
-             }
+            const modalEl = document.getElementById('modal2FA');
+            if (modalEl) {
+                modal2FA = new bootstrap.Modal(modalEl);
+            } else {
+                console.error("CRITICAL: modal2FA element not found in DOM");
+            }
         });
 
         function show2FAModal(token) {
@@ -1147,7 +1172,7 @@
                 modal2FA.show();
                 setTimeout(() => {
                     const input = document.getElementById('code2fa');
-                    if(input) input.focus();
+                    if (input) input.focus();
                 }, 500);
             } else {
                 alert("Error: No se pudo cargar la ventana de 2FA. Recarga la página.");
@@ -1162,13 +1187,13 @@
                 const errorDiv = document.getElementById('error2fa');
 
                 if (code.length < 6) {
-                    if(errorDiv) errorDiv.textContent = 'Código incompleto';
+                    if (errorDiv) errorDiv.textContent = 'Código incompleto';
                     return;
                 }
 
                 btnVerify.disabled = true;
                 btnVerify.innerHTML = 'Verificando...';
-                if(errorDiv) errorDiv.textContent = '';
+                if (errorDiv) errorDiv.textContent = '';
 
                 try {
                     const res = await fetch(verify2faUrl, {
@@ -1181,12 +1206,12 @@
                     if (res.ok) {
                         window.location.href = data.redirectUrl || dashboardUrl;
                     } else {
-                        if(errorDiv) errorDiv.textContent = data.message || 'Código incorrecto';
+                        if (errorDiv) errorDiv.textContent = data.message || 'Código incorrecto';
                         btnVerify.disabled = false;
                         btnVerify.innerText = 'Verificar';
                     }
                 } catch (e) {
-                    if(errorDiv) errorDiv.textContent = 'Error de conexión';
+                    if (errorDiv) errorDiv.textContent = 'Error de conexión';
                     btnVerify.disabled = false;
                     btnVerify.innerText = 'Verificar';
                 }
@@ -1197,4 +1222,5 @@
     </script>
 
 </body>
+
 </html>

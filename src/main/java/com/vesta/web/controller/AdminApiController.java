@@ -134,6 +134,43 @@ public class AdminApiController {
         }
     }
 
+    @PostMapping("/api/productos")
+    @ResponseBody
+    public ResponseEntity<?> crearProducto(@RequestBody Map<String, Object> productData, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object nuevoProducto = apiService.crearProducto(token, productData);
+            return ResponseEntity.ok(nuevoProducto);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al crear producto: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @PutMapping("/api/productos/{id}")
+    @ResponseBody
+    public ResponseEntity<?> actualizarProducto(@PathVariable Long id, @RequestBody Map<String, Object> productData,
+            HttpSession session) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Object productoActualizado = apiService.actualizarProducto(token, id, productData);
+            return ResponseEntity.ok(productoActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al actualizar producto: " + e.getMessage() + "\"}");
+        }
+    }
+
     @DeleteMapping("/api/productos/{id}")
     @ResponseBody
     public ResponseEntity<?> eliminarProducto(@PathVariable Long id, HttpSession session) {
