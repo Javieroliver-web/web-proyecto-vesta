@@ -795,9 +795,7 @@
 
         function toggleLink(provider) {
             // For now, linking functionality redirects to OAuth flow
-            if (confirm(`Para vincular tu cuenta de ${provider}, serás redirigido al inicio de sesión`)) {
-                window.location.href = `/vesta-web/oauth2/authorization/${provider}`;
-            }
+            window.location.href = `/vesta-web/oauth2/authorization/${provider}`;
         }
     </script>
 </body>
