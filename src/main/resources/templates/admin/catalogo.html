@@ -145,7 +145,8 @@
         async function loadProducts() {
             try {
                 const res = await fetch(apiBaseUrl, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    cache: 'no-store'
                 });
                 if (!res.ok) throw new Error("Error loading");
                 const products = await res.json();
