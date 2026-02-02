@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Gestión Catálogo - Vesta Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,43 +9,44 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css(v=3.4)}">
 </head>
+
 <body>
     <div class="d-flex flex-column flex-md-row">
         <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: sidebar(activeTab='catalogo')}"></div>
 
         <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="page-title-premium">Gestión de Seguros</h2>
-            <button class="btn btn-primary" onclick="openProductModal()">
-                <i class="bi bi-plus-lg me-2"></i>Nuevo Producto
-            </button>
-        </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="page-title-premium">Gestión de Seguros</h2>
+                <button class="btn btn-primary" onclick="openProductModal()">
+                    <i class="bi bi-plus-lg me-2"></i>Nuevo Producto
+                </button>
+            </div>
 
-        <!-- TABLA PRODUCTOS -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4">ID</th>
-                                <th>Imagen</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th class="text-end pe-4">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productsTableBody">
-                            <!-- JS content -->
-                        </tbody>
-                    </table>
+            <!-- TABLA PRODUCTOS -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- JS content -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- MODAL PRODUCTO -->
@@ -58,7 +60,7 @@
                 <div class="modal-body">
                     <form id="productForm">
                         <input type="hidden" id="prodId">
-                        
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Nombre</label>
@@ -73,6 +75,7 @@
                                     <option value="Tecnología">Tecnología</option>
                                     <option value="Hogar">Hogar</option>
                                     <option value="Viaje">Viaje</option>
+                                    <option value="Entretenimiento">Entretenimiento</option>
                                 </select>
                             </div>
                             <div class="col-12">
@@ -85,24 +88,29 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">URL Imagen</label>
-                                <input type="url" class="form-control" id="prodImagen" placeholder="https://..." required oninput="updateImagePreview()">
+                                <input type="url" class="form-control" id="prodImagen" placeholder="https://..."
+                                    required oninput="updateImagePreview()">
                             </div>
                             <!-- Vista Previa Imagen -->
                             <div class="col-12 text-center" id="previewContainer" style="display: none;">
                                 <label class="form-label small text-muted d-block">Vista Previa</label>
-                                <img id="prodPreview" src="" class="img-fluid rounded shadow-sm border" style="max-height: 150px; object-fit: contain;">
+                                <img id="prodPreview" src="" class="img-fluid rounded shadow-sm border"
+                                    style="max-height: 150px; object-fit: contain;">
                             </div>
                             <div class="col-12">
-                                <div class="form-check form-switch p-3 bg-light rounded bg-opacity-10 d-flex align-items-center gap-2">
+                                <div
+                                    class="form-check form-switch p-3 bg-light rounded bg-opacity-10 d-flex align-items-center gap-2">
                                     <input class="form-check-input ms-0" type="checkbox" id="prodActivo" checked>
-                                    <label class="form-check-label fw-bold ms-2" for="prodActivo">Producto Activo (Visible en tienda)</label>
+                                    <label class="form-check-label fw-bold ms-2" for="prodActivo">Producto Activo
+                                        (Visible en tienda)</label>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer bg-light border-0">
-                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-link text-muted text-decoration-none"
+                        data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary px-4" onclick="saveProduct()">Guardar Producto</button>
                 </div>
             </div>
@@ -111,7 +119,8 @@
 
     <!-- TOAST -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
-        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert"
+            aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2">
                     <i id="toastIcon" class="bi"></i>
@@ -135,13 +144,13 @@
 
         async function loadProducts() {
             try {
-                const res = await fetch(apiBaseUrl, { 
-                    credentials: 'include' 
+                const res = await fetch(apiBaseUrl, {
+                    credentials: 'include'
                 });
-                if(!res.ok) throw new Error("Error loading");
+                if (!res.ok) throw new Error("Error loading");
                 const products = await res.json();
                 renderTable(products);
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 showToast('Error cargando productos', 'error');
             }
@@ -193,12 +202,12 @@
             document.getElementById('prodPrecio').value = p.precioBase;
             document.getElementById('prodImagen').value = p.imagenUrl;
             document.getElementById('prodActivo').checked = p.activo;
-            
+
             document.getElementById('modalTitle').innerText = 'Editar Producto';
-            
+
             // Actualizar vista previa
             updateImagePreview();
-            
+
             productModal.show();
         }
 
@@ -206,11 +215,11 @@
             const url = document.getElementById('prodImagen').value;
             const container = document.getElementById('previewContainer');
             const img = document.getElementById('prodPreview');
-            
+
             if (url && url.length > 10) {
                 img.src = url;
-                img.onerror = function() { container.style.display = 'none'; };
-                img.onload = function() { container.style.display = 'block'; };
+                img.onerror = function () { container.style.display = 'none'; };
+                img.onload = function () { container.style.display = 'block'; };
             } else {
                 container.style.display = 'none';
             }
@@ -237,44 +246,45 @@
                     body: JSON.stringify(data)
                 });
 
-                if(res.ok) {
+                if (res.ok) {
                     showToast('Producto guardado correctamente', 'success');
                     productModal.hide();
                     loadProducts();
                 } else {
                     showToast('Error al guardar', 'error');
                 }
-            } catch(e) { showToast('Error de conexión', 'error'); }
+            } catch (e) { showToast('Error de conexión', 'error'); }
         }
 
         async function deleteProduct(id) {
-            if(!confirm('¿Seguro que quieres eliminar este producto?')) return;
+            if (!confirm('¿Seguro que quieres eliminar este producto?')) return;
             try {
                 const res = await fetch(`${apiBaseUrl}/${id}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
-                if(res.ok) {
+                if (res.ok) {
                     showToast('Producto eliminado', 'success');
                     loadProducts();
                 } else {
                     showToast('Error al eliminar', 'error');
                 }
-            } catch(e) { showToast('Error de conexión', 'error'); }
+            } catch (e) { showToast('Error de conexión', 'error'); }
         }
 
         function showToast(msg, type) {
             const el = document.getElementById('liveToast');
             const icon = document.getElementById('toastIcon');
             const text = document.getElementById('toastMessage');
-            
+
             el.className = 'toast align-items-center text-white border-0 shadow-lg';
-            if(type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
+            if (type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
             else { el.classList.add('bg-danger'); icon.className = 'bi bi-x-circle-fill'; }
-            
+
             text.innerText = msg;
             new bootstrap.Toast(el).show();
         }
     </script>
 </body>
+
 </html>

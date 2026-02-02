@@ -800,7 +800,8 @@
                                     <p>Primero, revisa tu carpeta de <strong>Spam o Correo no deseado</strong>. Si no
                                         está allí, intenta iniciar sesión con tus credenciales; si tu cuenta no está
                                         activada, verás un mensaje de error con un botón para
-                                        <strong>"Reenviar"</strong> el correo.</p>
+                                        <strong>"Reenviar"</strong> el correo.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -943,6 +944,9 @@
         const dashboardUrl = /*[[@{/cliente/dashboard}]]*/ '/cliente/dashboard';
         const verify2faUrl = /*[[@{/login/verify-2fa}]]*/ '/login/verify-2fa';
         const resendUrl = /*[[@{/resend-confirmation}]]*/ '/resend-confirmation';
+
+        // RECIBIR TOKEN DE 2FA SI VIENE DESDE SOCIAL LOGIN
+        const initial2FAToken = /*[[${tempToken}]]*/ null;
         /*]]>*/
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -1139,7 +1143,6 @@
                     errorAlert.classList.add('show');
                 }
 
-                // Si el mensaje contiene "bloqueada" o "administrador", mostrar banner
                 if (msg && (msg.toLowerCase().includes('bloqueada') || msg.toLowerCase().includes('administrador'))) {
                     const blockedBanner = document.getElementById('blockedAccountBanner');
                     if (blockedBanner) {
@@ -1149,6 +1152,15 @@
                         }, 500);
                     }
                 }
+            }
+
+            // AUTO-SHOW 2FA for Social Login
+            if (initial2FAToken) {
+                console.log("🔐 2FA Requerido desde Social Login. Mostrando modal...");
+                // Esperar un poco a que el modal esté listo
+                setTimeout(() => {
+                    show2FAModal(initial2FAToken);
+                }, 500);
             }
         });
 

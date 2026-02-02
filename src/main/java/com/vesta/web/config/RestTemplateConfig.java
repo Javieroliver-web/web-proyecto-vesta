@@ -3,7 +3,7 @@ package com.vesta.web.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
@@ -11,7 +11,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
+import org.springframework.lang.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,10 +74,12 @@ public class RestTemplateConfig {
         private static final Logger log = LoggerFactory.getLogger(LoggingInterceptor.class);
 
         @Override
+        @NonNull
         public org.springframework.http.client.ClientHttpResponse intercept(
-                org.springframework.http.HttpRequest request,
-                byte[] body,
-                org.springframework.http.client.ClientHttpRequestExecution execution) throws java.io.IOException {
+                @NonNull org.springframework.http.HttpRequest request,
+                @NonNull byte[] body,
+                @NonNull org.springframework.http.client.ClientHttpRequestExecution execution)
+                throws java.io.IOException {
 
             log.debug(">>> Request: {} {}", request.getMethod(), request.getURI());
 

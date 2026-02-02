@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <nav th:fragment="mobile-nav" class="bottom-nav d-md-none">
         <style>
@@ -8,26 +9,38 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: white;
-                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                background: var(--theme-card-bg, white);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
                 padding: 0.5rem 0;
-                z-index: 1000;
+                z-index: 1050;
                 display: flex;
+                border-top: 1px solid var(--theme-border, #dee2e6);
             }
-            
+
+            [data-theme="dark"] .bottom-nav {
+                background: var(--vesta-navy);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+                border-top-color: var(--vesta-gold);
+            }
+
             .nav-item {
                 flex: 1;
                 text-align: center;
                 position: relative;
                 padding: 0.5rem;
-                color: #6c757d;
+                color: var(--theme-text-muted, #6c757d);
                 text-decoration: none;
+                transition: all 0.3s;
             }
-            
+
+            .nav-item:hover {
+                color: var(--vesta-gold);
+            }
+
             .nav-item.active {
-                color: #f4b94c;
+                color: var(--vesta-gold);
             }
-            
+
             .nav-item.active::before {
                 content: '';
                 position: absolute;
@@ -36,31 +49,28 @@
                 transform: translateX(-50%);
                 width: 40px;
                 height: 4px;
-                background: #f4b94c;
+                background: var(--vesta-gold);
                 border-radius: 0 0 4px 4px;
             }
         </style>
-        
-        <a href="/cliente/dashboard" class="nav-item active">
+
+        <a href="/vesta-web/cliente/dashboard" class="nav-item active">
             <i class="bi bi-house-door fs-5 d-block"></i>
             <small>Inicio</small>
         </a>
-        <a href="/cliente/analytics" class="nav-item">
-            <i class="bi bi-graph-up fs-5 d-block"></i>
-            <small>Analytics</small>
+        <a href="/vesta-web/cliente/marketplace" class="nav-item">
+            <i class="bi bi-shop fs-5 d-block"></i>
+            <small>Tienda</small>
         </a>
-        <a href="/cliente/comparador" class="nav-item">
-            <i class="bi bi-list-check fs-5 d-block"></i>
-            <small>Comparar</small>
+        <a href="/vesta-web/cliente/mis-polizas" class="nav-item">
+            <i class="bi bi-shield-check fs-5 d-block"></i>
+            <small>Pólizas</small>
         </a>
-        <a href="/cliente/carrito" class="nav-item">
-            <i class="bi bi-cart fs-5 d-block"></i>
-            <small>Carrito</small>
-        </a>
-        <a href="/cliente/configuracion" class="nav-item">
+        <a href="/vesta-web/cliente/configuracion" class="nav-item">
             <i class="bi bi-person fs-5 d-block"></i>
             <small>Perfil</small>
         </a>
     </nav>
 </body>
+
 </html>

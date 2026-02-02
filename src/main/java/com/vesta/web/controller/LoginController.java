@@ -24,7 +24,7 @@ public class LoginController {
     // CAMBIO: Ahora la página de login se sirve en /login-page
     // La raíz "/" queda libre para el HomeController (Landing Page)
     @GetMapping("/login-page")
-    public String showLoginForm(HttpSession session) {
+    public String showLoginForm(HttpSession session, org.springframework.ui.Model model) {
         // Si ya hay sesión activa, redirigir al dashboard correspondiente
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
@@ -36,6 +36,14 @@ public class LoginController {
             } else {
                 return "redirect:/cliente/dashboard";
             }
+        }
+
+        // 2FA Handling for Social Login
+        String temp2faToken = (String) session.getAttribute("temp2faToken");
+        if (temp2faToken != null) {
+            logger.info("🔑 Token 2FA temporal encontrado - activando modal en vista.");
+            model.addAttribute("tempToken", temp2faToken);
+            session.removeAttribute("temp2faToken");
         }
 
         return "login";

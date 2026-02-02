@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
     <!-- Container for Sidebar and Mobile Toggle -->
     <div th:fragment="sidebar(activeTab)">
@@ -15,9 +16,9 @@
         </nav>
 
         <!-- Sidebar Panel -->
-        <div id="sidebarPanel" class="sidebar p-3 d-flex flex-column flex-shrink-0" 
-             style="width: 250px; min-height: 100vh; background: #282c3f; color: white; transition: all 0.3s ease;">
-            
+        <div id="sidebarPanel" class="sidebar p-3 d-flex flex-column flex-shrink-0"
+            style="width: 250px; min-height: 100vh; background: #282c3f; color: white; transition: all 0.3s ease;">
+
             <!-- Header with Close Button for Mobile -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="mb-0 fw-bold text-white mx-auto">
@@ -31,32 +32,44 @@
 
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''" th:href="@{/admin/dashboard}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''"
+                        th:href="@{/admin/dashboard}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''" th:href="@{/admin/usuarios}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''"
+                        th:href="@{/admin/usuarios}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-people me-2"></i> Usuarios
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'polizas'} ? 'active' : ''" th:href="@{/admin/polizas}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'polizas'} ? 'active' : ''"
+                        th:href="@{/admin/polizas}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-shield-check me-2"></i> Pólizas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'catalogo'} ? 'active' : ''" th:href="@{/admin/catalogo}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'siniestros'} ? 'active' : ''"
+                        th:href="@{/admin/siniestros}" onclick="closeSidebarOnMobile()">
+                        <i class="bi bi-file-medical me-2"></i> Siniestros
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'catalogo'} ? 'active' : ''"
+                        th:href="@{/admin/catalogo}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-journal-check me-2"></i> Catálogo
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'auditoria'} ? 'active' : ''" th:href="@{/admin/auditoria}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'auditoria'} ? 'active' : ''"
+                        th:href="@{/admin/auditoria}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-clock-history me-2"></i> Auditoría
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeTab == 'configuracion'} ? 'active' : ''" th:href="@{/admin/configuracion}" onclick="closeSidebarOnMobile()">
+                    <a class="nav-link" th:classappend="${activeTab == 'configuracion'} ? 'active' : ''"
+                        th:href="@{/admin/configuracion}" onclick="closeSidebarOnMobile()">
                         <i class="bi bi-gear me-2"></i> Configuración
                     </a>
                 </li>
@@ -78,14 +91,19 @@
                     position: fixed;
                     top: 0;
                     left: 0;
-                    width: 100% !important; /* Full width */
+                    width: 100% !important;
+                    /* Full width */
                     height: 100vh;
                     z-index: 1050;
-                    transform: translateX(-100%); /* Hidden by default */
+                    transform: translateX(-100%);
+                    /* Hidden by default */
                     opacity: 0;
-                    overflow-y: auto; /* Enable vertical scrolling */
-                    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-                    overscroll-behavior: contain; /* Prevent scroll chaining to body */
+                    overflow-y: auto;
+                    /* Enable vertical scrolling */
+                    -webkit-overflow-scrolling: touch;
+                    /* Smooth scroll on iOS */
+                    overscroll-behavior: contain;
+                    /* Prevent scroll chaining to body */
                 }
 
                 #sidebarPanel.show-sidebar {
@@ -99,7 +117,7 @@
             function toggleSidebar() {
                 const sidebar = document.getElementById('sidebarPanel');
                 sidebar.classList.toggle('show-sidebar');
-                
+
                 // Prevent body scroll when menu is open
                 if (sidebar.classList.contains('show-sidebar')) {
                     document.body.style.overflow = 'hidden';
@@ -117,7 +135,7 @@
             }
 
             // Theme Logic
-            (function() {
+            (function () {
                 const theme = localStorage.getItem('theme');
                 if (theme) {
                     document.documentElement.setAttribute('data-theme', theme);
@@ -132,17 +150,18 @@
                     fetch(`${apiBase}/${userId}`, {
                         credentials: 'include'
                     })
-                    .then(res => res.ok ? res.json() : Promise.reject())
-                    .then(user => {
-                        if (user.tema) {
-                            localStorage.setItem('theme', user.tema);
-                            document.documentElement.setAttribute('data-theme', user.tema);
-                        }
-                    })
-                    .catch(() => {});
+                        .then(res => res.ok ? res.json() : Promise.reject())
+                        .then(user => {
+                            if (user.tema) {
+                                localStorage.setItem('theme', user.tema);
+                                document.documentElement.setAttribute('data-theme', user.tema);
+                            }
+                        })
+                        .catch(() => { });
                 }
             })();
         </script>
     </div>
 </body>
+
 </html>

@@ -439,12 +439,18 @@ public class ApiService {
 
     public Map<String, Object> obtenerRecomendacionIA(String token, String email) {
         String url = apiUrl + "/innovation/recommendation";
-        if (email != null) {
-            url += "?email=" + email;
+
+        // Asegurarse de que siempre se envíe el email
+        if (email != null && !email.isEmpty()) {
+            try {
+                url += "?email=" + java.net.URLEncoder.encode(email, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException e) {
+                url += "?email=" + email; // Fallback sin encoding
+            }
         }
 
         try {
-            logger.debug("Obteniendo recomendación IA para: {}", email);
+            logger.debug("Obteniendo recomendación IA para: {} - URL: {}", email, url);
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,

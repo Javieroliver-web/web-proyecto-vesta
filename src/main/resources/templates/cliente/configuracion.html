@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Configuración - Vesta</title>
     <div th:replace="~{fragments/favicon :: favicon}"></div>
@@ -9,11 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
+
 <body>
 
     <div th:replace="~{fragments/header :: header-nav}"></div>
 
-    <div class="container py-5" style="padding-bottom: 80px;">
+    <div class="container py-5">
         <h2 class="fw-bold mb-4">⚙️ Configuración</h2>
 
         <div class="row">
@@ -32,7 +34,7 @@
 
             <div class="col-md-9">
                 <div class="tab-content">
-                    
+
                     <div class="tab-pane fade show active" id="general">
                         <div class="card border-0 shadow-sm mb-4 static-card">
                             <div class="card-header bg-transparent border-0 pt-4 px-4">
@@ -42,10 +44,12 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="fw-bold mb-1">Modo Oscuro</h6>
-                                        <p class="text-muted small mb-0">Cambia la apariencia de la aplicación para reducir la fatiga visual.</p>
+                                        <p class="text-muted small mb-0">Cambia la apariencia de la aplicación para
+                                            reducir la fatiga visual.</p>
                                     </div>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="themeToggle" style="width: 3em; height: 1.5em; cursor: pointer;">
+                                        <input class="form-check-input" type="checkbox" id="themeToggle"
+                                            style="width: 3em; height: 1.5em; cursor: pointer;">
                                     </div>
                                 </div>
                             </div>
@@ -63,13 +67,17 @@
                                         <div class="position-relative">
                                             <div class="input-group">
                                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                                <input type="text" class="form-control" id="ciudadInput" placeholder="Ej: Sevilla, ES" autocomplete="off">
+                                                <input type="text" class="form-control" id="ciudadInput"
+                                                    placeholder="Ej: Sevilla, ES" autocomplete="off">
                                                 <button class="btn btn-primary" type="submit">Guardar</button>
                                             </div>
                                             <!-- Lista de Autocompletado -->
-                                            <div id="cityList" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 200px; overflow-y: auto;"></div>
+                                            <div id="cityList" class="list-group position-absolute w-100 shadow"
+                                                style="top: 100%; left: 0; z-index: 1050; display: none; max-height: 200px; overflow-y: auto;">
+                                            </div>
                                         </div>
-                                        <div class="form-text" style="color: var(--theme-text-muted);">Usado para la previsión meteorológica del Dashboard.</div>
+                                        <div class="form-text" style="color: var(--theme-text-muted);">Usado para la
+                                            previsión meteorológica del Dashboard.</div>
                                     </div>
                                 </form>
                                 <div id="locMsgBox" class="mt-2" style="display:none"></div>
@@ -85,25 +93,29 @@
                             <div class="card-body px-4 pb-4">
                                 <form id="passwordForm">
                                     <div class="mb-3">
-                                        <label class="form-label">Contraseña Actual <span class="text-danger">*</span></label>
-                                        <input type="password" class="form-control" id="currentPassword" required placeholder="Escribe tu contraseña actual">
+                                        <label class="form-label">Contraseña Actual <span
+                                                class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="currentPassword" required
+                                            placeholder="Escribe tu contraseña actual">
                                     </div>
-                                    
+
                                     <hr class="my-4">
-                                    
+
                                     <div class="mb-3">
                                         <label class="form-label">Nueva Contraseña</label>
-                                        <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                        <input type="password" class="form-control" id="newPassword" required
+                                            minlength="6">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Confirmar Nueva Contraseña</label>
-                                        <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                                        <input type="password" class="form-control" id="confirmPassword" required
+                                            minlength="6">
                                     </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                         <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
                                     </div>
                                 </form>
-                                
+
                                 <div id="msgBox" class="mt-3" style="display:none"></div>
                             </div>
                         </div>
@@ -117,30 +129,36 @@
                                 <div id="2faStatusSection">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <p class="mb-0 text-muted">Protege tu cuenta con Google Authenticator o similar.</p>
+                                            <p class="mb-0 text-muted">Protege tu cuenta con Google Authenticator o
+                                                similar.</p>
                                             <span id="2faBadge" class="badge bg-secondary mt-2">Desactivado</span>
                                         </div>
-                                        <button id="btnToggle2FA" class="btn btn-outline-primary" onclick="setup2FA()">Activar 2FA</button>
+                                        <button id="btnToggle2FA" class="btn btn-outline-primary"
+                                            onclick="setup2FA()">Activar 2FA</button>
                                     </div>
                                 </div>
 
                                 <!-- 2FA Setup Area -->
                                 <div id="2faSetupArea" class="mt-4 p-4 bg-light rounded-3" style="display:none;">
                                     <h6 class="fw-bold">Configuración 2FA</h6>
-                                    <p class="small text-muted">Escanea el código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.).</p>
-                                    
+                                    <p class="small text-muted">Escanea el código QR con tu aplicación de autenticación
+                                        (Google Authenticator, Authy, etc.).</p>
+
                                     <div class="text-center my-3">
                                         <canvas id="qrCanvas"></canvas>
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label small fw-bold">Código de verificación</label>
-                                        <input type="text" class="form-control" id="verify2faInput" placeholder="123456" maxlength="6">
+                                        <input type="text" class="form-control" id="verify2faInput" placeholder="123456"
+                                            maxlength="6">
                                     </div>
-                                    
+
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-primary w-100" onclick="verifyAndEnable2FA()">Activar 2FA</button>
-                                        <button class="btn btn-outline-secondary w-100" onclick="cancel2FASetup()">Cancelar</button>
+                                        <button class="btn btn-primary w-100" onclick="verifyAndEnable2FA()">Activar
+                                            2FA</button>
+                                        <button class="btn btn-outline-secondary w-100"
+                                            onclick="cancel2FASetup()">Cancelar</button>
                                     </div>
                                     <div id="2faMsg" class="mt-2 text-danger small"></div>
                                 </div>
@@ -154,19 +172,23 @@
                             </div>
                             <div class="card-body px-4 pb-4">
                                 <p class="text-muted small">Inicia sesión rápidamente con tus cuentas sociales.</p>
-                                
+
                                 <!-- Google -->
-                                <div class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded-3">
+                                <div
+                                    class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded-3">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-white p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="24" height="24">
+                                        <div class="bg-white p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                            style="width: 40px; height: 40px;">
+                                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+                                                width="24" height="24">
                                         </div>
                                         <div>
                                             <h6 class="fw-bold mb-0">Google</h6>
                                             <small class="text-muted" id="status-google">No vinculado</small>
                                         </div>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary" id="btn-google" onclick="toggleLink('google')">Vincular</button>
+                                    <button class="btn btn-sm btn-outline-primary" id="btn-google"
+                                        onclick="toggleLink('google')">Vincular</button>
                                 </div>
 
                                 <!-- Apple Eliminado -->
@@ -176,11 +198,14 @@
                         <!-- ZONA DE PELIGRO -->
                         <div class="card border-danger shadow-sm mt-4 static-card">
                             <div class="card-header bg-danger-subtle text-danger border-0 pt-4 px-4">
-                                <h5 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Zona de Peligro</h5>
+                                <h5 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Zona de
+                                    Peligro</h5>
                             </div>
                             <div class="card-body px-4 pb-4">
-                                <p class="text-muted">Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate.</p>
-                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <p class="text-muted">Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor,
+                                    asegúrate.</p>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
                                     Eliminar Cuenta
                                 </button>
                             </div>
@@ -190,7 +215,7 @@
 
 
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -205,15 +230,18 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Esta acción <strong>no se puede deshacer</strong>. Esto eliminará permanentemente tu cuenta, tus pólizas contratadas y tus siniestros registrados.</p>
+                    <p>Esta acción <strong>no se puede deshacer</strong>. Esto eliminará permanentemente tu cuenta, tus
+                        pólizas contratadas y tus siniestros registrados.</p>
                     <div class="mb-3">
                         <label class="form-label">Escribe <strong>BORRAR</strong> para confirmar:</label>
-                        <input type="text" class="form-control" id="deleteConfirmInput" onkeyup="verificarBorrado()" placeholder="Escribe BORRAR aquí">
+                        <input type="text" class="form-control" id="deleteConfirmInput" onkeyup="verificarBorrado()"
+                            placeholder="Escribe BORRAR aquí">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="btnDeleteFinal" disabled onclick="eliminarCuenta()">Eliminar esta cuenta</button>
+                    <button type="button" class="btn btn-danger" id="btnDeleteFinal" disabled
+                        onclick="eliminarCuenta()">Eliminar esta cuenta</button>
                 </div>
             </div>
         </div>
@@ -232,12 +260,15 @@
                         <div class="bg-danger-subtle rounded-circle d-inline-flex p-3 mb-3">
                             <i class="bi bi-shield-slash text-danger fs-1"></i>
                         </div>
-                        <p class="mb-0 text-muted">Tu cuenta será <strong>menos segura</strong>. Se requerirá solo tu contraseña para iniciar sesión.</p>
+                        <p class="mb-0 text-muted">Tu cuenta será <strong>menos segura</strong>. Se requerirá solo tu
+                            contraseña para iniciar sesión.</p>
                     </div>
                 </div>
                 <div class="modal-footer border-0 bg-light">
-                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger px-4" onclick="confirmDisable2FA()">Sí, Desactivar</button>
+                    <button type="button" class="btn btn-link text-muted text-decoration-none"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="confirmDisable2FA()">Sí,
+                        Desactivar</button>
                 </div>
             </div>
         </div>
@@ -245,7 +276,8 @@
 
     <!-- Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
-        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert"
+            aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2">
                     <i id="toastIcon" class="bi"></i>
@@ -257,10 +289,10 @@
     </div>
 
     <!-- Mobile Navigation -->
-    <div th:replace="~{fragments/mobile-nav :: mobile-nav}"></div>
-    
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script th:inline="javascript">
         // === VARIABLES GLOBALES ===
         const userId = /*[[${usuarioId}]]*/ null;
@@ -270,16 +302,16 @@
         // === LÓGICA TEMA OSCURO ===
         const toggle = document.getElementById('themeToggle');
         const root = document.documentElement;
-        
+
         const currentTheme = localStorage.getItem('theme');
         if (currentTheme === 'dark') {
             root.setAttribute('data-theme', 'dark');
             toggle.checked = true;
         }
 
-        toggle.addEventListener('change', async function() {
+        toggle.addEventListener('change', async function () {
             const newTheme = this.checked ? 'dark' : 'light';
-            
+
             // 1. Aplicar localmente
             if (this.checked) {
                 root.setAttribute('data-theme', 'dark');
@@ -293,7 +325,7 @@
             try {
                 await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'PUT',
-                     headers: { 
+                    headers: {
                         'Content-Type': 'application/json'
                     },
                     credentials: 'include',
@@ -314,7 +346,7 @@
                 });
                 if (res.ok) {
                     const user = await res.json();
-                    
+
                     // Cargar Ciudad
                     if (user.ciudad) {
                         document.getElementById('ciudadInput').value = user.ciudad;
@@ -343,11 +375,11 @@
             e.preventDefault();
             const ciudad = document.getElementById('ciudadInput').value;
             const msgBox = document.getElementById('locMsgBox');
-            
+
             try {
                 const res = await fetch(`${apiBaseUrl}/${userId}`, {
                     method: 'PUT',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json'
                     },
                     credentials: 'include',
@@ -360,7 +392,7 @@
                     msgBox.innerText = 'Ubicación verificada y guardada correctamente.';
                     setTimeout(() => msgBox.style.display = 'none', 3000);
                     // Actualizar localStorage para el dashboard
-                    loadUserData(); 
+                    loadUserData();
                 } else {
                     const err = await res.json();
                     msgBox.style.display = 'block';
@@ -383,9 +415,9 @@
         let debounceTimer;
 
         // Base URL para Clima
-        const weatherApiUrl = apiBaseUrl.replace('/usuarios', '/clima');
+        const weatherApiUrl = '/vesta-api/api/clima';
 
-        ciudadInput.addEventListener('input', function() {
+        ciudadInput.addEventListener('input', function () {
             clearTimeout(debounceTimer);
             const query = this.value;
             if (query.length < 1) {
@@ -398,14 +430,14 @@
                     // Usar token si fuera necesario, pero el endpoint es público/autenticado segun config
                     // Asumimos que requiere token si está segura
                     const res = await fetch(`${weatherApiUrl}/buscar?q=${query}`, {
-                         headers: { 'Authorization': 'Bearer ' + token }
+                        headers: { 'Authorization': 'Bearer ' + token }
                     });
-                    
+
                     if (res.ok) {
                         const cities = await res.json();
                         renderCities(cities);
                     }
-                } catch(e) { console.error("Error fetching cities", e); }
+                } catch (e) { console.error("Error fetching cities", e); }
             }, 400);
         });
 
@@ -423,7 +455,7 @@
                 const country = city.country ? `, ${city.country}` : '';
                 const state = city.state ? ` (${city.state})` : '';
                 const fullName = `${city.name}${state}${country}`;
-                
+
                 item.innerHTML = `<i class="bi bi-geo-alt me-2 text-primary"></i>${fullName}`;
                 item.onclick = () => {
                     ciudadInput.value = `${city.name}${country}`; // Guardamos "Nombre, Pais"
@@ -435,7 +467,7 @@
         }
 
         // Ocultar lista al hacer click fuera
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target !== ciudadInput && e.target !== cityList) {
                 cityList.style.display = 'none';
             }
@@ -443,7 +475,7 @@
 
         document.getElementById('passwordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const currentPass = document.getElementById('currentPassword').value; // Recuperar valor
             const p1 = document.getElementById('newPassword').value;
             const p2 = document.getElementById('confirmPassword').value;
@@ -469,9 +501,9 @@
                     credentials: 'include',
                     body: JSON.stringify(payload)
                 });
-                
+
                 // Parsear respuesta, tanto si es OK como si es ERROR
-                const data = await response.json().catch(() => ({})); 
+                const data = await response.json().catch(() => ({}));
 
                 if (response.ok) {
                     showMsg('Contraseña actualizada correctamente', 'success');
@@ -519,14 +551,14 @@
                     // Feedback visual en el botón antes de redirigir
                     btn.className = 'btn btn-success';
                     btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Cuenta eliminada';
-                    
+
                     // Pequeña espera para que el usuario lea
                     setTimeout(() => {
-                        window.location.href = '/vesta-web/logout'; 
+                        window.location.href = '/vesta-web/logout';
                     }, 1500);
                 } else {
                     const errorMsg = await res.json();
-                    
+
                     // Mostrar error dentro del modal sin usar alert
                     const modalBody = document.querySelector('#deleteModal .modal-body');
                     // Crear o recuperar alerta dentro del modal
@@ -538,23 +570,23 @@
                         modalBody.appendChild(alertDiv);
                     }
                     alertDiv.textContent = errorMsg.message || 'Error al eliminar la cuenta. Inténtalo de nuevo.';
-                    
+
                     btn.innerText = 'Eliminar esta cuenta';
                     btn.disabled = false;
                 }
             } catch (e) {
                 console.error(e);
-                 // Mostrar error de conexión
-                 const modalBody = document.querySelector('#deleteModal .modal-body');
-                 let alertDiv = document.getElementById('deleteErrorAlert');
-                 if (!alertDiv) {
-                     alertDiv = document.createElement('div');
-                     alertDiv.id = 'deleteErrorAlert';
-                     alertDiv.className = 'alert alert-danger mt-3 mb-0';
-                     modalBody.appendChild(alertDiv);
-                 }
-                 alertDiv.textContent = 'Error de conexión.';
-                 
+                // Mostrar error de conexión
+                const modalBody = document.querySelector('#deleteModal .modal-body');
+                let alertDiv = document.getElementById('deleteErrorAlert');
+                if (!alertDiv) {
+                    alertDiv = document.createElement('div');
+                    alertDiv.id = 'deleteErrorAlert';
+                    alertDiv.className = 'alert alert-danger mt-3 mb-0';
+                    modalBody.appendChild(alertDiv);
+                }
+                alertDiv.textContent = 'Error de conexión.';
+
                 btn.innerText = 'Eliminar esta cuenta';
                 btn.disabled = false;
             }
@@ -562,7 +594,8 @@
 
 
         // === 2FA LOGIC ===
-        const apiTwoFactorUrl = window.location.protocol + '//' + window.location.hostname + ':8080/api/auth/2fa';
+        // Usar ruta relativa para aprovechar el proxy Nginx (evita problemas de puertos y SSL)
+        const apiTwoFactorUrl = '/vesta-api/api/auth/2fa';
 
         // Check Status on Load
         async function check2FAStatus() {
@@ -574,15 +607,20 @@
                     const data = await res.json();
                     const isEnabled = data.data; // ApiResponse<Boolean>
                     update2FAUI(isEnabled);
+                } else {
+                    console.warn("No se pudo obtener estado 2FA");
                 }
-            } catch (e) { console.error("Error checking 2FA", e); }
+            } catch (e) {
+                console.error("Error checking 2FA", e);
+                // No mostrar toast aquí para no molestar al cargar la página si falla
+            }
         }
         check2FAStatus();
 
         function update2FAUI(isEnabled) {
             const badge = document.getElementById('2faBadge');
             const btn = document.getElementById('btnToggle2FA');
-            
+
             if (isEnabled) {
                 badge.className = 'badge bg-success mt-2';
                 badge.innerText = 'Activado';
@@ -603,10 +641,10 @@
             const toastEl = document.getElementById('liveToast');
             const toastIcon = document.getElementById('toastIcon');
             const toastMsg = document.getElementById('toastMessage');
-            
+
             // Reset classes
             toastEl.className = 'toast align-items-center text-white border-0 shadow-lg';
-            
+
             if (type === 'success') {
                 toastEl.classList.add('bg-success');
                 toastIcon.className = 'bi bi-check-circle-fill fs-5';
@@ -617,9 +655,9 @@
                 toastEl.classList.add('bg-primary');
                 toastIcon.className = 'bi bi-info-circle-fill fs-5';
             }
-            
+
             toastMsg.textContent = message;
-            
+
             // Bootstrap Toast
             const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
             toast.show();
@@ -634,9 +672,9 @@
                 const res = await fetch(`${apiTwoFactorUrl}/setup`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                const data = await res.json();
-                
+
                 if (res.ok) {
+                    const data = await res.json();
                     setupArea.style.display = 'block';
                     // Generate QR
                     new QRious({
@@ -645,19 +683,23 @@
                         size: 200
                     });
                 } else {
+                    const data = await res.json().catch(() => ({}));
                     showToast(data.message || 'Error al iniciar configuración', 'danger');
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                showToast('Error de conexión con el servidor de 2FA', 'danger');
+            }
         }
 
         function cancel2FASetup() {
-             document.getElementById('2faSetupArea').style.display = 'none';
+            document.getElementById('2faSetupArea').style.display = 'none';
         }
 
         async function verifyAndEnable2FA() {
             const code = document.getElementById('verify2faInput').value;
             const msg = document.getElementById('2faMsg');
-            
+
             if (code.length < 6) {
                 msg.innerText = 'Ingresa el código de 6 dígitos.';
                 return;
@@ -666,19 +708,20 @@
             try {
                 const res = await fetch(`${apiTwoFactorUrl}/verify-setup`, {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token 
+                        'Authorization': 'Bearer ' + token
                     },
                     body: JSON.stringify({ code: code })
                 });
-                const data = await res.json();
 
                 if (res.ok) {
+                    const data = await res.json();
                     cancel2FASetup();
                     update2FAUI(true);
                     showToast('¡2FA Activado correctamente!', 'success');
                 } else {
+                    const data = await res.json().catch(() => ({}));
                     msg.innerText = data.message || 'Error al verificar código';
                 }
             } catch (e) {
@@ -735,7 +778,7 @@
         function updateLinkUI(provider, isLinked) {
             const statusEl = document.getElementById(`status-${provider}`);
             const btnEl = document.getElementById(`btn-${provider}`);
-            
+
             if (isLinked) {
                 statusEl.innerText = 'Vinculado';
                 statusEl.className = 'text-success fw-bold';
@@ -758,4 +801,5 @@
         }
     </script>
 </body>
+
 </html>

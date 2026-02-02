@@ -54,6 +54,13 @@ public class OAuthController {
                 return "redirect:/login-page?error=verification_sent&email=" + email;
             }
 
+            // 2FA CHECK
+            if (response.isRequires2fa()) {
+                logger.info("🔐 2FA Requerido para: {}", email);
+                session.setAttribute("temp2faToken", response.getToken());
+                return "redirect:/login-page?error=2fa_required";
+            }
+
             // Guardar sesión Vesta
             session.setAttribute("token", response.getToken());
             session.setAttribute("rol", response.getRol());

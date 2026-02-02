@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/admin")
@@ -31,9 +35,6 @@ public class AdminController {
         model.addAttribute("ordenes", apiService.obtenerTodasLasOrdenes(token));
         model.addAttribute("solicitudes", apiService.obtenerSolicitudesRGPD(token));
 
-        // === NUEVO: Cargar lista de siniestros ===
-        model.addAttribute("siniestros", apiService.obtenerSiniestros(token));
-
         // === NUEVO: Cargar lista de usuarios (para pestaña usuarios) ===
         model.addAttribute("usuarios", apiService.obtenerTodosLosUsuarios(token));
 
@@ -41,6 +42,7 @@ public class AdminController {
         java.util.Map<String, Object> stats = apiService.obtenerEstadisticas(token);
 
         // Procesar Ventas
+        @SuppressWarnings("unchecked")
         java.util.List<java.util.Map<String, Object>> ventas = (java.util.List<java.util.Map<String, Object>>) stats
                 .getOrDefault("ventas", java.util.Collections.emptyList());
         java.util.List<String> ventasLabels = new java.util.ArrayList<>();
@@ -88,6 +90,7 @@ public class AdminController {
         model.addAttribute("chartVentasData", ventasData);
 
         // Procesar Siniestros
+        @SuppressWarnings("unchecked")
         java.util.List<java.util.Map<String, Object>> siniestros = (java.util.List<java.util.Map<String, Object>>) stats
                 .getOrDefault("siniestros", java.util.Collections.emptyList());
         java.util.List<String> siniestrosLabels = new java.util.ArrayList<>();
@@ -221,5 +224,36 @@ public class AdminController {
 
         model.addAttribute("logs", apiService.obtenerLogsAuditoria(token));
         return "admin/auditoria";
+    }
+
+    @GetMapping("/siniestros")
+    public String siniestros(HttpSession session, Model model) {
+        String token = (String) session.getAttribute("token");
+        String rol = (String) session.getAttribute("rol");
+        if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol) && !"OWNER".equals(rol)))
+            return "redirect:/";
+
+        model.addAttribute("siniestros", apiService.obtenerSiniestros(token));
+        return "admin/siniestros";
+    }
+
+    // === API ENDPOINTS ===
+
+    @DeleteMapping("/api/usuarios/{id}")
+    @ResponseBody
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "No autenticado"));
+        }
+
+        try {
+            apiService.eliminarUsuario(token, id);
+            return ResponseEntity.ok(Map.of("message", "Usuario eliminado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "Error al eliminar usuario: " + e.getMessage()));
+        }
     }
 }
