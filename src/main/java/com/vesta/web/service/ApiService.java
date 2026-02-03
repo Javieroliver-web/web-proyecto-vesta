@@ -1026,6 +1026,21 @@ public class ApiService {
         }
     }
 
+    public String exportarLogsUsuario(String token, String email) {
+        String url = apiUrl + "/auditoria/exportar/" + email;
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    String.class);
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al exportar logs para {}: {}", email, e.getMessage());
+            throw new RuntimeException("Error al exportar logs: " + e.getMessage());
+        }
+    }
+
     // === ESTADÍSTICAS ===
     public Map<String, Object> obtenerEstadisticas(String token) {
         String url = apiUrl + "/admin/estadisticas";

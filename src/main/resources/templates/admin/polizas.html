@@ -194,17 +194,14 @@
                 if (row.classList.contains('no-data')) return;
 
                 const text = row.innerText.toLowerCase();
-                const statusBadge = row.querySelector('.badge');
-                const status = statusBadge ? (statusBadge.classList.contains('bg-success') ? 'ACTIVA' : 'INACTIVA') : '';
-
-                // Extraer fecha (asumiendo formato YYYY-MM-DD en la columna 5, index 4 o 5)
-                // En la tabla actual: col 5 es vigencia, contiene fecha fin. La fecha inicio no está directa en columna.
-                // Modificaremos para usar el texto visible.
+                
+                // Buscar el badge de estado específicamente en la quinta columna (index 4)
+                const statusCell = row.cells[4];
+                const statusBadge = statusCell ? statusCell.querySelector('.badge') : null;
+                const status = statusBadge ? statusBadge.innerText.trim().toUpperCase() : '';
 
                 let matchesSearch = text.includes(searchText);
                 let matchesStatus = statusFilter === '' || status === statusFilter;
-
-                // Filtro fecha simple: si la fila contiene la fecha seleccionada
                 let matchesDate = dateFilter === '' || text.includes(dateFilter);
 
                 row.style.display = (matchesSearch && matchesStatus && matchesDate) ? '' : 'none';

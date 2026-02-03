@@ -91,7 +91,7 @@
                             </div>
 
                             <!-- 2FA -->
-                            <div class="card border-0 shadow-sm">
+                            <div class="card border-0 shadow-sm mb-4">
                                 <div class="card-header bg-transparent border-0 pt-4 px-4">
                                     <h5 class="fw-bold mb-0">Autenticación (2FA)</h5>
                                 </div>
@@ -122,6 +122,34 @@
                                                 onclick="cancel2FASetup()">Cancelar</button>
                                         </div>
                                         <div id="2faMsg" class="mt-2 text-danger small text-center"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CUENTAS VINCULADAS -->
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                    <h5 class="fw-bold mb-0">Cuentas Vinculadas</h5>
+                                </div>
+                                <div class="card-body px-4 pb-4">
+                                    <p class="text-muted small">Inicia sesión rápidamente con tus cuentas sociales.</p>
+
+                                    <!-- Google -->
+                                    <div
+                                        class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-white p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                <img src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                                    alt="Google" width="24" height="24">
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">Google</h6>
+                                                <small class="text-muted" id="status-google">No vinculado</small>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-warning" id="btn-google"
+                                            onclick="toggleLink('google')">Vincular</button>
                                     </div>
                                 </div>
                             </div>
@@ -170,12 +198,19 @@
                             root.setAttribute('data-theme', user.tema);
                             toggle.checked = (user.tema === 'dark');
                         }
+                        // Google account check - ALWAYS update UI based on provider
+                        if (user.provider && user.provider === 'google') {
+                            updateLinkUI('google', true);
+                        } else {
+                            updateLinkUI('google', false);
+                        }
                     }
                     // Check 2FA
                     const res2fa = await fetch(`${apiTwoFactorUrl}/status`, { headers: { 'Authorization': 'Bearer ' + token } });
                     if (res2fa.ok) {
                         const data = await res2fa.json();
                         update2FAUI(data.data);
+
                     }
                 } catch (e) { }
             }
@@ -266,6 +301,29 @@
                     await fetch(`${apiTwoFactorUrl}/disable`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
                     update2FAUI(false);
                 });
+            }
+
+            // --- LINKED ACCOUNTS ---
+            function updateLinkUI(provider, isLinked) {
+                const statusEl = document.getElementById(`status-${provider}`);
+                const btnEl = document.getElementById(`btn-${provider}`);
+
+                if (isLinked) {
+                    statusEl.innerText = 'Vinculado';
+                    statusEl.className = 'text-success fw-bold';
+                    btnEl.innerText = 'Desvincular';
+                    btnEl.className = 'btn btn-sm btn-outline-danger';
+                    btnEl.disabled = true; // Disable unlinking for OAuth users
+                } else {
+                    statusEl.innerText = 'No vinculado';
+                    statusEl.className = 'text-muted';
+                    btnEl.innerText = 'Vincular';
+                    btnEl.className = 'btn btn-sm btn-outline-warning';
+                }
+            }
+
+            function toggleLink(provider) {
+                window.location.href = `/vesta-web/oauth2/authorization/${provider}`;
             }
         </script>
 </body>

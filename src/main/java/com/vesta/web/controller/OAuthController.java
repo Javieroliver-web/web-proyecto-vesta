@@ -68,8 +68,14 @@ public class OAuthController {
             session.setAttribute("usuarioId", response.getId());
             session.setAttribute("usuarioEmail", email);
 
-            logger.info("🚀 Redirigiendo a Dashboard");
-            return "redirect:/cliente/dashboard";
+            logger.info("🚀 Redirigiendo según rol: {}", response.getRol());
+
+            // Redirigir según el rol del usuario
+            if ("ADMIN".equals(response.getRol()) || "OWNER".equals(response.getRol())) {
+                return "redirect:/admin/dashboard";
+            } else {
+                return "redirect:/cliente/dashboard";
+            }
 
         } catch (Exception e) {
             String msg = e.getMessage();

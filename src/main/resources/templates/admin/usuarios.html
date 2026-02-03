@@ -42,7 +42,8 @@
                             <select class="form-select" id="filterRol" onchange="applyFilters()">
                                 <option value="">Todos los Roles</option>
                                 <option value="ADMIN">Admin</option>
-                                <option value="USER">Usuario</option>
+                                <option value="USUARIO">Usuario</option>
+                                <option value="OWNER">Propietario</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -122,51 +123,56 @@
                                 <td>
                                     <span th:if="${u.activo == true && u.emailConfirmado == true}"
                                         class="badge bg-success bg-opacity-10 text-success border border-success">ACTIVO</span>
-                                    <span
-                                        th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
+                                    <span th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
                                         class="badge bg-warning bg-opacity-10 text-warning border border-warning"
-                                        style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN
-                                        ACTIVAR</span>
+                                        style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN ACTIVAR</span>
                                     <span th:if="${u.activo == false}"
                                         class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
                                 </td>
                                 <td>
-                                    <!-- Botón Ver Detalle -->
-                                    <button class="btn btn-sm btn-outline-primary me-1" th:data-id="${u.id}"
-                                        th:data-nombre="${u.nombreCompleto}" th:data-email="${u.email}"
-                                        th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}" th:data-movil="${u.movil}"
-                                        th:data-nacimiento="${u.fechaNacimiento}" th:data-direccion="${u.direccion}"
-                                        onclick="verDetalle(this)" title="Ver Detalle">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-
-                                    <!-- Botón Cambiar Rol (Solo OWNER) -->
-                                    <button th:if="${session.rol == 'OWNER' && u.rol != 'OWNER'}"
-                                        class="btn btn-sm btn-outline-warning text-dark me-1" th:data-id="${u.id}"
-                                        th:data-nombre="${u.nombreCompleto}" th:data-rolactual="${u.rol}"
-                                        onclick="console.log('Click en Cambiar Rol'); mostrarCambioRol(this)"
-                                        title="Cambiar Rol">
-                                        <i class="bi bi-person-badge"></i>
-                                    </button>
-
-                                    <!-- Botón Bloquear/Desbloquear -->
-                                    <div th:if="${u.rol != 'ADMIN' && u.rol != 'OWNER'}" class="d-inline">
-                                        <button th:if="${u.activo == true}" class="btn btn-sm btn-outline-danger"
-                                            th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
-                                            onclick="toggleEstado(this, false)" title="Bloquear Usuario">
-                                            <i class="bi bi-ban"></i>
-                                        </button>
-                                        <button th:if="${u.activo == false}" class="btn btn-sm btn-outline-success"
-                                            th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
-                                            onclick="toggleEstado(this, true)" title="Desbloquear Usuario">
-                                            <i class="bi bi-check-lg"></i>
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <!-- Botón Ver Detalle -->
+                                        <button class="btn btn-sm btn-outline-primary" th:data-id="${u.id}"
+                                            th:data-nombre="${u.nombreCompleto}" th:data-email="${u.email}"
+                                            th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}" th:data-movil="${u.movil}"
+                                            th:data-nacimiento="${u.fechaNacimiento}" th:data-direccion="${u.direccion}"
+                                            onclick="verDetalle(this)" title="Ver Detalle">
+                                            <i class="bi bi-eye"></i>
                                         </button>
 
-                                        <!-- Botón Eliminar -->
-                                        <button class="btn btn-sm btn-danger ms-1" th:data-id="${u.id}"
-                                            th:data-nombre="${u.nombreCompleto}" onclick="eliminarUsuario(this)"
-                                            title="Eliminar Usuario Permanentemente">
-                                            <i class="bi bi-trash"></i>
+                                        <!-- Botón Cambiar Rol (Solo OWNER) -->
+                                        <button th:if="${session.rol == 'OWNER' && u.rol != 'OWNER'}"
+                                            class="btn btn-sm btn-outline-warning text-dark" th:data-id="${u.id}"
+                                            th:data-nombre="${u.nombreCompleto}" th:data-rolactual="${u.rol}"
+                                            onclick="mostrarCambioRol(this)" title="Cambiar Rol">
+                                            <i class="bi bi-person-badge"></i>
+                                        </button>
+
+                                        <!-- Acciones para perfiles no administrativos -->
+                                        <th:block th:if="${u.rol != 'ADMIN' && u.rol != 'OWNER'}">
+                                            <button th:if="${u.activo == true}" class="btn btn-sm btn-outline-danger"
+                                                th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
+                                                onclick="toggleEstado(this, false)" title="Bloquear Usuario">
+                                                <i class="bi bi-ban"></i>
+                                            </button>
+                                            <button th:if="${u.activo == false}" class="btn btn-sm btn-outline-success"
+                                                th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
+                                                onclick="toggleEstado(this, true)" title="Desbloquear Usuario">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+
+                                            <!-- Botón Eliminar -->
+                                            <button class="btn btn-sm btn-danger" th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}" onclick="eliminarUsuario(this)"
+                                                title="Eliminar Usuario Permanentemente">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </th:block>
+
+                                        <!-- Botón Descargar Logs -->
+                                        <button class="btn btn-sm btn-outline-secondary" th:data-email="${u.email}"
+                                            onclick="descargarLogs(this)" title="Descargar Logs (TXT)">
+                                            <i class="bi bi-file-text"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -273,8 +279,8 @@
                 const statusCell = row.cells[6].innerText.trim().toUpperCase();
 
                 let matchesSearch = text.includes(searchText);
-                let matchesRol = rolFilter === '' || rolCell === rolFilter;
-                let matchesStatus = statusFilter === '' || statusCell === statusFilter;
+                let matchesRol = rolFilter === '' || rolCell.includes(rolFilter);
+                let matchesStatus = statusFilter === '' || statusCell.includes(statusFilter);
 
                 row.style.display = (matchesSearch && matchesRol && matchesStatus) ? '' : 'none';
             });
@@ -438,6 +444,34 @@
                 },
                 'Eliminar Usuario'
             );
+        }
+
+        // --- DESCARGAR LOGS ---
+        async function descargarLogs(btn) {
+            const email = btn.dataset.email;
+            try {
+                // Notificar al usuario que la descarga ha comenzado (solicitado pop-up de 3s)
+                showToast('Descargando log...', 'success', 3000);
+
+                const response = await fetch(`${apiBaseUrl}/auditoria/exportar/${email}`);
+                if (!response.ok) {
+                    const errorMsg = await response.text();
+                    throw new Error(errorMsg || 'Error al descargar logs');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `logs_${email}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            } catch (error) {
+                console.error('Error en descarga:', error);
+                showErrorModal('Error', 'No se pudieron descargar los logs: ' + error.message);
+            }
         }
     </script>
 </body>

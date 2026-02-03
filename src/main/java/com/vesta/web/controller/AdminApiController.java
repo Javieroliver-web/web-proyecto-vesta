@@ -31,7 +31,7 @@ public class AdminApiController {
             Object usuarios = apiService.obtenerTodosLosUsuarios(token);
             return ResponseEntity.ok(usuarios);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al obtener usuarios: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500).body(Map.of("error", "Error al obtener usuarios: " + e.getMessage()));
         }
     }
 
@@ -48,10 +48,10 @@ public class AdminApiController {
         try {
             // Usar método genérico para soportar cambio de rol y estado
             apiService.actualizarUsuario(token, id, updates);
-            return ResponseEntity.ok("{\"message\":\"Usuario actualizado correctamente\"}");
+            return ResponseEntity.ok(Map.of("message", "Usuario actualizado correctamente"));
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                    .body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
+                    .body(Map.of("error", "Error al actualizar usuario: " + e.getMessage()));
         }
     }
 
@@ -167,7 +167,7 @@ public class AdminApiController {
             return ResponseEntity.ok(productoActualizado);
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                    .body("{\"error\":\"Error al actualizar producto: " + e.getMessage() + "\"}");
+                    .body(Map.of("error", "Error al actualizar producto: " + e.getMessage()));
         }
     }
 
@@ -244,6 +244,27 @@ public class AdminApiController {
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body("{\"error\":\"Error al obtener logs de auditoría: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @GetMapping("/api/auditoria/exportar/{email}")
+    @ResponseBody
+    public ResponseEntity<?> exportarLogsUsuario(@PathVariable String email, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            String content = apiService.exportarLogsUsuario(token, email);
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"logs_" + email + ".txt\"")
+                    .header("Content-Type", "text/plain; charset=utf-8")
+                    .body(content);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al exportar logs: " + e.getMessage() + "\"}");
         }
     }
 }

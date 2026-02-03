@@ -23,6 +23,45 @@
                 </button>
             </div>
 
+            <!-- Toolbar de Filtros -->
+            <div class="card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-body py-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="search-expandable">
+                                <input type="text" id="searchProduct" placeholder="Buscar producto...">
+                                <div class="search-expandable-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterCategoria" onchange="applyFilters()">
+                                <option value="">Todas las Categorías</option>
+                                <option value="Mascota">Mascota</option>
+                                <option value="Movilidad">Movilidad</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Hogar">Hogar</option>
+                                <option value="Viaje">Viaje</option>
+                                <option value="Entretenimiento">Entretenimiento</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterActivo" onchange="applyFilters()">
+                                <option value="">Todos los Estados</option>
+                                <option value="true">Activos</option>
+                                <option value="false">Inactivos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="bi bi-x-circle me-1"></i>Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TABLA PRODUCTOS -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
@@ -151,6 +190,7 @@
                 });
                 if (!res.ok) throw new Error("Error loading");
                 const products = await res.json();
+                window.allProducts = products; // Guardar para filtrado local
                 renderTable(products);
             } catch (e) {
                 console.error(e);
@@ -253,9 +293,39 @@
                     productModal.hide();
                     loadProducts();
                 } else {
-                    showToast('Error al guardar', 'error');
+                    const errorData = await res.json();
+                    showToast('Error: ' + (errorData.error || errorData.message || 'No se pudo guardar'), 'error');
                 }
             } catch (e) { showToast('Error de conexión', 'error'); }
+        }
+
+        // --- LÓGICA DE FILTROS ---
+        document.getElementById('searchProduct').addEventListener('keyup', applyFilters);
+
+        function applyFilters() {
+            if (!window.allProducts) return;
+
+            const searchText = document.getElementById('searchProduct').value.toLowerCase();
+            const categoryFilter = document.getElementById('filterCategoria').value;
+            const activeFilter = document.getElementById('filterActivo').value;
+
+            const filtered = window.allProducts.filter(p => {
+                const matchesSearch = p.nombre.toLowerCase().includes(searchText) ||
+                    p.descripcion.toLowerCase().includes(searchText);
+                const matchesCategory = categoryFilter === '' || p.categoria === categoryFilter;
+                const matchesActive = activeFilter === '' || p.activo.toString() === activeFilter;
+
+                return matchesSearch && matchesCategory && matchesActive;
+            });
+
+            renderTable(filtered);
+        }
+
+        function clearFilters() {
+            document.getElementById('searchProduct').value = '';
+            document.getElementById('filterCategoria').value = '';
+            document.getElementById('filterActivo').value = '';
+            renderTable(window.allProducts);
         }
 
         function deleteProduct(id) {

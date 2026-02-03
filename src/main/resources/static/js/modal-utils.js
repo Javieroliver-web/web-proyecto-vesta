@@ -257,3 +257,50 @@ window.showErrorModal = showErrorModal;
 window.showWarningModal = showWarningModal;
 window.showConfirmModal = showConfirmModal;
 window.showSafeDeleteModal = showSafeDeleteModal;
+
+/**
+ * Muestra una notificación temporal (Toast) en la esquina superior derecha
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - info, success, error (opcional, por defecto success)
+ * @param {number} duration - Duración en ms (opcional, por defecto 3000)
+ */
+function showToast(message, type = 'success', duration = 3000) {
+    const toastId = `toast${modalCounter++}`;
+
+    // Contenedor de toasts si no existe
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+    }
+
+    const bgClass = type === 'error' ? 'bg-danger' : type === 'info' ? 'bg-info' : 'bg-success';
+    const icon = type === 'error' ? 'bi-x-circle' : type === 'info' ? 'bi-info-circle' : 'bi-check-circle';
+
+    const toastHTML = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi ${icon} me-2"></i>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: duration });
+
+    toast.show();
+
+    // Eliminar del DOM después de ocultarse
+    toastElement.addEventListener('hidden.bs.modal', () => {
+        toastElement.remove();
+    });
+}
+
+window.showToast = showToast;

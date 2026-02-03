@@ -23,6 +23,35 @@
                 </div>
             </div>
 
+            <!-- Toolbar de Filtros -->
+            <div class="card shadow-sm border-0 mb-4 bg-light">
+                <div class="card-body py-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-5">
+                            <div class="search-expandable">
+                                <input type="text" id="searchSiniestro" placeholder="Buscar siniestro...">
+                                <div class="search-expandable-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterEstado" onchange="applyFilters()">
+                                <option value="">Todos los Estados</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="APROBADO">Aprobado</option>
+                                <option value="RECHAZADO">Rechazado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="bi bi-x-circle me-1"></i>Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-0 fw-bold py-3">
                     <i class="bi bi-robot me-2 text-warning"></i> Reportes Recibidos
@@ -40,7 +69,7 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="siniestrosTableBody">
                             <tr th:each="sin : ${siniestros}">
                                 <td class="text-muted fw-bold">#<span th:text="${sin.id}">1</span></td>
                                 <td th:text="${sin.fecha}">2025-01-01</td>
@@ -260,6 +289,38 @@
                     }
                 }
             );
+        }
+
+        // --- LÓGICA DE FILTROS ---
+        document.getElementById('searchSiniestro').addEventListener('keyup', applyFilters);
+
+        function applyFilters() {
+            const searchText = document.getElementById('searchSiniestro').value.toLowerCase();
+            const statusFilter = document.getElementById('filterEstado').value;
+
+            const rows = document.querySelectorAll('#siniestrosTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                
+                // El estado está en la columna 6 (index 5)
+                const statusCell = row.cells[5];
+                const statusBadge = statusCell ? statusCell.querySelector('.badge') : null;
+                // Normalizar: PENDIENTE_REVISION -> PENDIENTE para que coincida con el filtro
+                let status = statusBadge ? statusBadge.innerText.trim().toUpperCase() : '';
+                if (status === 'PENDIENTE_REVISION') status = 'PENDIENTE';
+
+                const matchesSearch = text.includes(searchText);
+                const matchesStatus = statusFilter === '' || status.includes(statusFilter);
+
+                row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchSiniestro').value = '';
+            document.getElementById('filterEstado').value = '';
+            applyFilters();
         }
     </script>
 </body>
