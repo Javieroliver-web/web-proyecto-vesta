@@ -178,7 +178,10 @@
                             <hr>
 
                             <h6 class="fw-bold text-primary"><i class="bi bi-robot"></i> Análisis IA Vesta</h6>
-                            <div class="alert alert-info py-2 small" id="modalIA">...</div>
+                            <div class="p-3 rounded" style="background-color: #1a4d6d; color: #ffffff;" id="modalIA">
+                                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                                <span id="modalIAText">...</span>
+                            </div>
 
                             <h6 class="fw-bold text-danger"><i class="bi bi-shield-exclamation"></i> Score de Fraude
                             </h6>
@@ -239,7 +242,8 @@
                      onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-danger p-3\'><i class=\'bi bi-exclamation-triangle\'></i> No se pudo cargar la imagen</div>'">
             `;
 
-            document.getElementById('modalIA').innerText = ia;
+            document.getElementById('modalIAText').innerText = ia;
+
             document.getElementById('modalScore').innerText = score + '%';
 
             // Configurar etiqueta de riesgo según el score

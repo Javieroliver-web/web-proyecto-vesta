@@ -303,7 +303,6 @@
                 });
             }
 
-            // --- LINKED ACCOUNTS ---
             function updateLinkUI(provider, isLinked) {
                 const statusEl = document.getElementById(`status-${provider}`);
                 const btnEl = document.getElementById(`btn-${provider}`);
@@ -313,17 +312,43 @@
                     statusEl.className = 'text-success fw-bold';
                     btnEl.innerText = 'Desvincular';
                     btnEl.className = 'btn btn-sm btn-outline-danger';
-                    btnEl.disabled = true; // Disable unlinking for OAuth users
+                    btnEl.onclick = () => unlinkOAuth(provider);
                 } else {
                     statusEl.innerText = 'No vinculado';
                     statusEl.className = 'text-muted';
                     btnEl.innerText = 'Vincular';
                     btnEl.className = 'btn btn-sm btn-outline-warning';
+                    btnEl.onclick = () => linkOAuth(provider);
                 }
             }
 
-            function toggleLink(provider) {
+            function linkOAuth(provider) {
                 window.location.href = `/vesta-web/oauth2/authorization/${provider}`;
+            }
+
+            async function unlinkOAuth(provider) {
+                showConfirmModal(
+                    'Desvincular cuenta de Google',
+                    '¿Estás seguro de que deseas desvincular tu cuenta de Google? Podrás volver a vincularla más tarde.',
+                    async () => {
+                        try {
+                            const res = await fetch(`${apiBaseUrl}/${userId}/unlink-oauth`, {
+                                method: 'POST',
+                                credentials: 'include'
+                            });
+
+                            if (res.ok) {
+                                updateLinkUI(provider, false);
+                                showToast('Cuenta desvinculada correctamente', 'success');
+                            } else {
+                                const error = await res.json();
+                                showToast(error.error || error.message || 'Error al desvincular cuenta', 'error');
+                            }
+                        } catch (e) {
+                            showToast('Error al desvincular cuenta', 'error');
+                        }
+                    }
+                );
             }
         </script>
 </body>

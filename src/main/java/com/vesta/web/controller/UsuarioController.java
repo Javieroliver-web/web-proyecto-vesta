@@ -17,12 +17,12 @@ public class UsuarioController {
     private ApiService apiService;
 
     // === CONFIGURACIÓN DE USUARIO ===
-    
+
     @GetMapping("/api/{userId}")
     @ResponseBody
     public ResponseEntity<?> obtenerUsuario(@PathVariable Long userId, HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -37,9 +37,10 @@ public class UsuarioController {
 
     @PutMapping("/api/{userId}")
     @ResponseBody
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Long userId, @RequestBody Map<String, Object> updates, HttpSession session) {
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long userId, @RequestBody Map<String, Object> updates,
+            HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }
@@ -48,7 +49,25 @@ public class UsuarioController {
             Object resultado = apiService.actualizarUsuario(token, userId, updates);
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
+            return ResponseEntity.status(500)
+                    .body("{\"error\":\"Error al actualizar usuario: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @PostMapping("/api/{userId}/unlink-oauth")
+    @ResponseBody
+    public ResponseEntity<?> unlinkOAuth(@PathVariable Long userId, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
+        }
+
+        try {
+            Map<String, Object> resultado = apiService.unlinkOAuth(token, userId);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -56,7 +75,7 @@ public class UsuarioController {
     @ResponseBody
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long userId, HttpSession session) {
         String token = (String) session.getAttribute("token");
-        
+
         if (token == null) {
             return ResponseEntity.status(401).body("{\"error\":\"No autenticado\"}");
         }

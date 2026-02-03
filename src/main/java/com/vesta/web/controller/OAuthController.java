@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class OAuthController {
@@ -41,6 +43,35 @@ public class OAuthController {
 
         logger.info("✅ OAuth Login exitoso para: {}", email);
 
+        // Check if user is already logged in (linking flow) vs new login
+        String existingToken = (String) session.getAttribute("token");
+        Long existingUserId = (Long) session.getAttribute("usuarioId");
+
+        if (existingToken != null && existingUserId != null) {
+            // LINKING FLOW: User is already logged in, just link Google to their account
+            logger.info("🔗 Modo vinculación detectado para usuario ID: {}", existingUserId);
+            try {
+                Map<String, Object> linkResult = apiService.linkOAuthProvider(existingToken, existingUserId, provider,
+                        email);
+                logger.info("✅ Vinculación exitosa: {}", linkResult.get("message"));
+
+                // Redirect back to configuration based on role
+                String rol = (String) session.getAttribute("rol");
+                if ("ADMIN".equals(rol) || "OWNER".equals(rol)) {
+                    return "redirect:/admin/configuracion";
+                } else {
+                    return "redirect:/cliente/configuracion";
+                }
+            } catch (Exception e) {
+                logger.error("❌ Error al vincular cuenta OAuth: {}", e.getMessage());
+                String rol = (String) session.getAttribute("rol");
+                String redirectPage = ("ADMIN".equals(rol) || "OWNER".equals(rol)) ? "/admin/configuracion"
+                        : "/cliente/configuracion";
+                return "redirect:" + redirectPage + "?error=oauth_link_failed";
+            }
+        }
+
+        // LOGIN FLOW: No existing session, proceed with normal OAuth login
         try {
             // Llamar a la API de Vesta para obtener el JWT real
             // Nota: Se asume que existe un método socialLogin en ApiService

@@ -664,7 +664,54 @@ public class ApiService {
         }
     }
 
+    public Map<String, Object> unlinkOAuth(String token, Long userId) {
+        String url = apiUrl + "/usuarios/" + userId + "/unlink-oauth";
+
+        try {
+            logger.debug("Desvinculando OAuth para usuario: {}", userId);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al desvincular OAuth usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al desvincular cuenta: " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> linkOAuthProvider(String token, Long userId, String provider, String googleEmail) {
+        String url = apiUrl + "/usuarios/" + userId + "/link-oauth";
+
+        try {
+            logger.debug("Vinculando proveedor OAuth {} para usuario: {}", provider, userId);
+
+            Map<String, String> payload = Map.of(
+                    "provider", provider,
+                    "googleEmail", googleEmail);
+
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(payload, getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            logger.error("Error al vincular OAuth usuario {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error al vincular cuenta: " + e.getMessage());
+        }
+    }
+
     public void eliminarUsuario(String token, Long userId) {
+
         String url = apiUrl + "/usuarios/" + userId;
 
         try {
