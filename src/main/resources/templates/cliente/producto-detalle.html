@@ -263,7 +263,7 @@
                 <div class="pricing-card">
                     <div class="price-label">Precio base</div>
                     <div>
-                        <span id="precioBase" class="price-amount">$0.00</span>
+                        <span id="precioBase" class="price-amount">0.00€</span>
                         <span class="price-period">/por día</span>
                     </div>
 
@@ -292,15 +292,15 @@
                     <div class="summary-box">
                         <div class="summary-row">
                             <span>Subtotal</span>
-                            <span id="subtotal">$0.00</span>
+                            <span id="subtotal">0.00€</span>
                         </div>
                         <div class="summary-row">
                             <span>Impuestos (16%)</span>
-                            <span id="impuestos">$0.00</span>
+                            <span id="impuestos">0.00€</span>
                         </div>
                         <div class="summary-row total">
                             <span>Total</span>
-                            <span id="total">$0.00</span>
+                            <span id="total">0.00€</span>
                         </div>
                     </div>
 
@@ -464,7 +464,7 @@
             document.getElementById('categoryBadge').textContent = productoActual.categoria;
             document.getElementById('productTitle').textContent = productoActual.nombre;
             document.getElementById('productDescription').textContent = productoActual.descripcion;
-            document.getElementById('precioBase').textContent = '$' + productoActual.precioBase;
+            document.getElementById('precioBase').textContent = productoActual.precioBase + '€';
 
             // Mostrar coberturas
             const coberturas = coberturasPorCategoria[productoActual.categoria] || [
@@ -499,9 +499,9 @@
             const impuestos = subtotal * 0.16;
             const total = subtotal + impuestos;
 
-            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
-            document.getElementById('impuestos').textContent = '$' + impuestos.toFixed(2);
-            document.getElementById('total').textContent = '$' + total.toFixed(2);
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2) + '€';
+            document.getElementById('impuestos').textContent = impuestos.toFixed(2) + '€';
+            document.getElementById('total').textContent = total.toFixed(2) + '€';
         }
 
         async function comprarAhora() {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,27 +14,31 @@
             --vesta-gold: #f1a61c;
             --vesta-navy: #282c3f;
         }
-        body { 
+
+        body {
             background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);
             min-height: 100vh;
             padding: 2rem 0;
         }
-        .legal-container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: white; 
+
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
             padding: 0;
-            border-radius: 20px; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
             overflow: hidden;
         }
-        .legal-header { 
-            background: linear-gradient(135deg, var(--vesta-navy) 0%, #3c425e 100%); 
-            color: white; 
-            padding: 3rem 3rem 2.5rem; 
+
+        .legal-header {
+            background: linear-gradient(135deg, var(--vesta-navy) 0%, #3c425e 100%);
+            color: white;
+            padding: 3rem 3rem 2.5rem;
             position: relative;
             overflow: hidden;
         }
+
         .legal-header::before {
             content: '';
             position: absolute;
@@ -44,6 +49,7 @@
             right: -100px;
             border-radius: 50%;
         }
+
         .legal-header h1 {
             position: relative;
             z-index: 2;
@@ -51,16 +57,19 @@
             font-weight: 700;
             margin-bottom: 0.75rem;
         }
+
         .legal-header p {
             position: relative;
             z-index: 2;
             opacity: 0.9;
         }
+
         .legal-content {
             padding: 3rem;
         }
-        h2 { 
-            color: var(--vesta-gold); 
+
+        h2 {
+            color: var(--vesta-gold);
             margin-top: 2.5rem;
             margin-bottom: 1rem;
             font-size: 1.5rem;
@@ -68,9 +77,11 @@
             padding-bottom: 0.5rem;
             border-bottom: 2px solid rgba(241, 166, 28, 0.2);
         }
+
         h2:first-of-type {
             margin-top: 0;
         }
+
         h3 {
             color: var(--vesta-navy);
             font-size: 1.15rem;
@@ -78,18 +89,21 @@
             margin-top: 1.5rem;
             margin-bottom: 0.75rem;
         }
-        .highlight-box { 
+
+        .highlight-box {
             background: linear-gradient(135deg, rgba(241, 166, 28, 0.08) 0%, rgba(244, 185, 76, 0.05) 100%);
-            border-left: 4px solid var(--vesta-gold); 
-            padding: 1.25rem; 
+            border-left: 4px solid var(--vesta-gold);
+            padding: 1.25rem;
             margin: 1.5rem 0;
             border-radius: 0 8px 8px 0;
         }
+
         .cookie-table {
             width: 100%;
             margin: 1.5rem 0;
             border-collapse: collapse;
         }
+
         .cookie-table th {
             background: var(--vesta-navy);
             color: white;
@@ -97,13 +111,16 @@
             text-align: left;
             font-weight: 600;
         }
+
         .cookie-table td {
             padding: 0.75rem;
             border-bottom: 1px solid #e9ecef;
         }
+
         .cookie-table tr:hover {
             background: #f8f9fa;
         }
+
         .cookie-type {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -111,18 +128,22 @@
             font-size: 0.85rem;
             font-weight: 600;
         }
+
         .cookie-essential {
             background: #d4edda;
             color: #155724;
         }
+
         .cookie-analytics {
             background: #cfe2ff;
             color: #084298;
         }
+
         .cookie-marketing {
             background: #fff3cd;
             color: #856404;
         }
+
         .btn-container {
             display: flex;
             gap: 1rem;
@@ -131,25 +152,31 @@
             padding-top: 2rem;
             border-top: 1px solid #e9ecef;
         }
+
         @media (max-width: 768px) {
             .legal-content {
                 padding: 2rem 1.5rem;
             }
+
             .legal-header {
                 padding: 2rem 1.5rem;
             }
+
             .legal-header h1 {
                 font-size: 1.75rem;
             }
+
             .cookie-table {
                 font-size: 0.9rem;
             }
+
             .btn-container {
                 flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="legal-container">
         <div class="legal-header">
@@ -159,18 +186,22 @@
 
         <div class="legal-content">
             <div class="highlight-box">
-                <strong>🍪 Resumen:</strong> Utilizamos cookies para mejorar tu experiencia en nuestra web. Aquí te explicamos qué son, para qué las usamos y cómo puedes gestionarlas.
+                <strong>🍪 Resumen:</strong> Utilizamos cookies para mejorar tu experiencia en nuestra web. Aquí te
+                explicamos qué son, para qué las usamos y cómo puedes gestionarlas.
             </div>
 
             <h2>1. ¿Qué son las Cookies?</h2>
-            <p>Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo (ordenador, tablet o móvil) cuando visitas una página web. Permiten que el sitio web recuerde tus acciones y preferencias durante un período de tiempo.</p>
+            <p>Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo (ordenador, tablet o móvil)
+                cuando visitas una página web. Permiten que el sitio web recuerde tus acciones y preferencias durante un
+                período de tiempo.</p>
 
             <h2>2. ¿Qué Cookies Utilizamos?</h2>
             <p>En Vesta utilizamos diferentes tipos de cookies según su finalidad:</p>
 
             <h3>2.1. Cookies Técnicas (Esenciales)</h3>
-            <p>Son imprescindibles para el funcionamiento de la web. Sin ellas, no podrías navegar correctamente ni utilizar servicios básicos.</p>
-            
+            <p>Son imprescindibles para el funcionamiento de la web. Sin ellas, no podrías navegar correctamente ni
+                utilizar servicios básicos.</p>
+
             <table class="cookie-table">
                 <thead>
                     <tr>
@@ -204,7 +235,7 @@
 
             <h3>2.2. Cookies Analíticas</h3>
             <p>Nos ayudan a entender cómo interactúas con nuestra web para mejorar tu experiencia.</p>
-            
+
             <table class="cookie-table">
                 <thead>
                     <tr>
@@ -238,7 +269,7 @@
 
             <h3>2.3. Cookies de Marketing</h3>
             <p>Se utilizan para mostrarte publicidad relevante basada en tus intereses.</p>
-            
+
             <table class="cookie-table">
                 <thead>
                     <tr>
@@ -272,9 +303,10 @@
             </ul>
 
             <h2>4. ¿Cómo Gestionar las Cookies?</h2>
-            
+
             <h3>4.1. Panel de Configuración</h3>
-            <p>Puedes gestionar tus preferencias de cookies en cualquier momento haciendo clic en el botón "Configurar Cookies" que aparece en la parte inferior de la web.</p>
+            <p>Puedes gestionar tus preferencias de cookies en cualquier momento haciendo clic en el botón "Configurar
+                Cookies" que aparece en la parte inferior de la web.</p>
 
             <h3>4.2. Configuración del Navegador</h3>
             <p>También puedes configurar tu navegador para rechazar cookies:</p>
@@ -286,25 +318,32 @@
             </ul>
 
             <div class="highlight-box">
-                <strong>⚠️ Importante:</strong> Si bloqueas todas las cookies, es posible que algunas funcionalidades de la web no funcionen correctamente.
+                <strong>⚠️ Importante:</strong> Si bloqueas todas las cookies, es posible que algunas funcionalidades de
+                la web no funcionen correctamente.
             </div>
 
             <h2>5. Cookies de Terceros</h2>
             <p>Algunos servicios externos que utilizamos pueden instalar sus propias cookies:</p>
             <ul>
-                <li><strong>Google Analytics:</strong> Para análisis de tráfico - <a href="https://policies.google.com/privacy" target="_blank">Política de privacidad</a></li>
-                <li><strong>Google Maps:</strong> Para mostrar mapas interactivos - <a href="https://policies.google.com/privacy" target="_blank">Política de privacidad</a></li>
-                <li><strong>Facebook Pixel:</strong> Para publicidad personalizada - <a href="https://www.facebook.com/privacy/explanation" target="_blank">Política de privacidad</a></li>
+                <li><strong>Google Analytics:</strong> Para análisis de tráfico - <a
+                        href="https://policies.google.com/privacy" target="_blank">Política de privacidad</a></li>
+                <li><strong>Google Maps:</strong> Para mostrar mapas interactivos - <a
+                        href="https://policies.google.com/privacy" target="_blank">Política de privacidad</a></li>
+                <li><strong>Facebook Pixel:</strong> Para publicidad personalizada - <a
+                        href="https://www.facebook.com/privacy/explanation" target="_blank">Política de privacidad</a>
+                </li>
             </ul>
 
             <h2>6. Actualización de la Política</h2>
-            <p>Esta política de cookies puede ser modificada en función de cambios legislativos o de nuestros servicios. Te recomendamos revisarla periódicamente.</p>
+            <p>Esta política de cookies puede ser modificada en función de cambios legislativos o de nuestros servicios.
+                Te recomendamos revisarla periódicamente.</p>
             <p>Cualquier cambio sustancial será notificado mediante un aviso destacado en la web.</p>
 
             <h2>7. Más Información</h2>
             <p>Para más información sobre cookies y privacidad:</p>
             <ul>
-                <li><a href="https://www.aepd.es" target="_blank">Agencia Española de Protección de Datos (AEPD)</a></li>
+                <li><a href="https://www.aepd.es" target="_blank">Agencia Española de Protección de Datos (AEPD)</a>
+                </li>
                 <li><a href="https://www.allaboutcookies.org" target="_blank">All About Cookies</a></li>
                 <li><a th:href="@{/privacidad}">Nuestra Política de Privacidad</a></li>
             </ul>
@@ -312,9 +351,9 @@
             <h2>8. Contacto</h2>
             <p>Si tienes dudas sobre nuestra política de cookies:</p>
             <ul>
-                <li>📧 <strong>Email:</strong> javip200555@gmail.com</li>
-                <li>📞 <strong>Teléfono:</strong> +34 622 645 922</li>
-                <li>📍 <strong>Dirección:</strong> Calle Francisco Arias, 22A, 1, 41440 Lora del Río, Sevilla, España</li>
+                <li>📧 <strong>Email:</strong> info@vesta.com</li>
+                <li>📞 <strong>Teléfono:</strong> +34 900 123 456</li>
+                <li>📍 <strong>Dirección:</strong> Calle Ejemplo, 123, 28001 Madrid, España</li>
             </ul>
 
             <div class="btn-container">
@@ -330,4 +369,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

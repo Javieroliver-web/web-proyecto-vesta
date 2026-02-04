@@ -12,7 +12,10 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 import org.springframework.lang.NonNull;
-
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,9 +61,10 @@ public class RestTemplateConfig {
         // 3. Instancia directa
         RestTemplate restTemplate = new RestTemplate(bufferingFactory);
 
-        // 4. Interceptor con Logging del Body DE RESPUESTA
+        // 4. Interceptores
         List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new LoggingInterceptor());
+        interceptors.add(new IpForwardingInterceptor()); // Reenvío de IP Real
         restTemplate.setInterceptors(interceptors);
 
         return restTemplate;
@@ -103,6 +107,43 @@ public class RestTemplateConfig {
                     request.getMethod(), request.getURI(), response.getStatusCode(), responseBody);
 
             return response;
+        }
+    }
+
+    /**
+     * Interceptor para reenviar la IP real del cliente a la API
+     */
+    private static class IpForwardingInterceptor implements ClientHttpRequestInterceptor {
+        @Override
+        @NonNull
+        public org.springframework.http.client.ClientHttpResponse intercept(
+                @NonNull org.springframework.http.HttpRequest request,
+                @NonNull byte[] body,
+                @NonNull org.springframework.http.client.ClientHttpRequestExecution execution)
+                throws IOException {
+
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+                    .getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest currentRequest = attributes.getRequest();
+                // Preferimos X-Forwarded-For (puesto por Nginx)
+                String clientIp = currentRequest.getHeader("X-Forwarded-For");
+                if (clientIp == null || clientIp.isEmpty()) {
+                    clientIp = currentRequest.getRemoteAddr();
+                }
+
+                // Si hay una lista de IPs, tomamos la primera
+                if (clientIp != null && clientIp.contains(",")) {
+                    clientIp = clientIp.split(",")[0].trim();
+                }
+
+                if (clientIp != null) {
+                    // Forwarded headers names must be exactly as expected by the API
+                    request.getHeaders().add("X-Forwarded-For", clientIp);
+                }
+            }
+
+            return execution.execute(request, body);
         }
     }
 }

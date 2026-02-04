@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,27 +14,32 @@
             --vesta-gold: #f1a61c;
             --vesta-navy: #282c3f;
         }
+
         body {
             background: #f8f9fa;
         }
+
         .hero-section {
             background: linear-gradient(135deg, #282c3f 0%, #1a1d2e 50%, #141620 100%);
             color: white;
             padding: 4rem 0 3rem;
             margin-bottom: 3rem;
         }
+
         .hero-section h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
         }
+
         .filter-bar {
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 2rem;
         }
+
         .filter-btn {
             border: 2px solid #e9ecef;
             background: white;
@@ -44,20 +50,24 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .filter-btn:hover, .filter-btn.active {
+
+        .filter-btn:hover,
+        .filter-btn.active {
             border-color: var(--vesta-gold);
             background: linear-gradient(135deg, var(--vesta-gold) 0%, #f4b94c 100%);
             color: white;
         }
+
         .insurance-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
             border: none;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             position: relative;
         }
+
         .insurance-card::before {
             content: '';
             position: absolute;
@@ -69,13 +79,16 @@
             transition: left 0.6s ease;
             z-index: 1;
         }
+
         .insurance-card:hover::before {
             left: 100%;
         }
+
         .insurance-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
+
         .badge-category {
             position: absolute;
             top: 1rem;
@@ -89,6 +102,7 @@
             z-index: 2;
             font-size: 0.85rem;
         }
+
         .price-tag {
             font-size: 1.75rem;
             font-weight: 700;
@@ -97,11 +111,13 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .feature-list {
             list-style: none;
             padding: 0;
             margin: 1rem 0;
         }
+
         .feature-list li {
             padding: 0.5rem 0;
             color: #6c757d;
@@ -109,21 +125,25 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .feature-list li i {
             color: var(--vesta-gold);
         }
     </style>
 </head>
+
 <body>
     <div class="hero-section">
         <div class="container position-relative">
             <!-- Back Button -->
-            <a href="/" class="text-white text-decoration-none fw-bold position-absolute top-50 start-0 translate-middle-y d-none d-md-flex align-items-center" style="opacity: 0.8; transition: opacity 0.3s;">
+            <a href="/"
+                class="text-white text-decoration-none fw-bold position-absolute top-50 start-0 translate-middle-y d-none d-md-flex align-items-center"
+                style="opacity: 0.8; transition: opacity 0.3s;">
                 <i class="bi bi-arrow-left me-2"></i> Volver
             </a>
             <!-- Mobile Back Button -->
             <div class="d-md-none text-start mb-3">
-                 <a href="/" class="text-white text-decoration-none fw-bold d-flex align-items-center">
+                <a href="/" class="text-white text-decoration-none fw-bold d-flex align-items-center">
                     <i class="bi bi-arrow-left me-2"></i> Volver
                 </a>
             </div>
@@ -148,82 +168,81 @@
             </div>
         </div>
 
-            <div class="row g-4" id="insuranceGrid">
-                <!-- Dynamic Products Loop -->
-                <div th:each="p : ${productos}" 
-                     th:if="${p.activo}"
-                     class="col-md-6 col-lg-4 insurance-item" 
-                     th:with="catLower=${#strings.toLowerCase(p.categoria).replace('í','i').replace('ó','o').replace('á','a').replace('é','e').replace('ú','u')}"
-                     th:attr="data-category=${catLower}">
-                    
-                    <div class="card insurance-card h-100 border-0">
-                        <div class="position-relative">
-                            <img th:src="${p.imagenUrl}" class="card-img-top" th:alt="${p.nombre}" 
-                                 style="height: 200px; object-fit: cover;"
-                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500'">
-                            <span class="badge-category" th:text="${p.categoria}">Categoría</span>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="fw-bold" th:text="${p.nombre}">Nombre del Seguro</h5>
-                            <p class="text-muted small" th:text="${p.descripcion}">Descripción del seguro</p>
-                            
-                            <!-- Features based on Category -->
-                            <ul class="feature-list">
-                                <th:block th:switch="${p.categoria}">
-                                    <th:block th:case="'Viaje'">
-                                        <li><i class="bi bi-check-circle-fill"></i> Asistencia médica 24/7</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Cancelación de vuelos</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Pérdida de equipaje</li>
-                                    </th:block>
-                                    <th:block th:case="'Tecnología'">
-                                        <li><i class="bi bi-check-circle-fill"></i> Rotura de pantalla</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Daños por líquidos</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Robo y hurto</li>
-                                    </th:block>
-                                    <th:block th:case="'Hogar'">
-                                        <li><i class="bi bi-check-circle-fill"></i> Daños a la propiedad</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Robo de pertenencias</li>
-                                    </th:block>
-                                    <th:block th:case="'Mascota'">
-                                        <li><i class="bi bi-check-circle-fill"></i> Gastos veterinarios</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Cirugías de emergencia</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                                    </th:block>
-                                    <th:block th:case="'Movilidad'">
-                                        <li><i class="bi bi-check-circle-fill"></i> Daños al vehículo</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Asistencia en carretera</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
-                                    </th:block>
-                                    <th:block th:case="*">
-                                        <li><i class="bi bi-check-circle-fill"></i> Cobertura completa</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Atención 24/7</li>
-                                        <li><i class="bi bi-check-circle-fill"></i> Cancelación flexible</li>
-                                    </th:block>
-                                </th:block>
-                            </ul>
+        <div class="row g-4" id="insuranceGrid">
+            <!-- Dynamic Products Loop -->
+            <div th:each="p : ${productos}" th:if="${p.activo}" class="col-md-6 col-lg-4 insurance-item"
+                th:with="catLower=${#strings.toLowerCase(p.categoria).replace('í','i').replace('ó','o').replace('á','a').replace('é','e').replace('ú','u')}"
+                th:attr="data-category=${catLower}">
 
-                            <div class="d-flex justify-content-between align-items-end mt-4">
-                                <div>
-                                    <span class="small text-muted fw-semibold">Desde</span>
-                                    <div class="price-tag">
-                                        $<span th:text="${p.precioBase}">0.00</span>
-                                        <span class="fs-6 text-muted fw-normal">/mes</span>
-                                    </div>
+                <div class="card insurance-card h-100 border-0">
+                    <div class="position-relative">
+                        <img th:src="${p.imagenUrl}" class="card-img-top" th:alt="${p.nombre}"
+                            style="height: 200px; object-fit: cover;"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500'">
+                        <span class="badge-category" th:text="${p.categoria}">Categoría</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold" th:text="${p.nombre}">Nombre del Seguro</h5>
+                        <p class="text-muted small" th:text="${p.descripcion}">Descripción del seguro</p>
+
+                        <!-- Features based on Category -->
+                        <ul class="feature-list">
+                            <th:block th:switch="${p.categoria}">
+                                <th:block th:case="'Viaje'">
+                                    <li><i class="bi bi-check-circle-fill"></i> Asistencia médica 24/7</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Cancelación de vuelos</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Pérdida de equipaje</li>
+                                </th:block>
+                                <th:block th:case="'Tecnología'">
+                                    <li><i class="bi bi-check-circle-fill"></i> Rotura de pantalla</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Daños por líquidos</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Robo y hurto</li>
+                                </th:block>
+                                <th:block th:case="'Hogar'">
+                                    <li><i class="bi bi-check-circle-fill"></i> Daños a la propiedad</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Robo de pertenencias</li>
+                                </th:block>
+                                <th:block th:case="'Mascota'">
+                                    <li><i class="bi bi-check-circle-fill"></i> Gastos veterinarios</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Cirugías de emergencia</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                </th:block>
+                                <th:block th:case="'Movilidad'">
+                                    <li><i class="bi bi-check-circle-fill"></i> Daños al vehículo</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Asistencia en carretera</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Responsabilidad civil</li>
+                                </th:block>
+                                <th:block th:case="*">
+                                    <li><i class="bi bi-check-circle-fill"></i> Cobertura completa</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Atención 24/7</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Cancelación flexible</li>
+                                </th:block>
+                            </th:block>
+                        </ul>
+
+                        <div class="d-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <span class="small text-muted fw-semibold">Desde</span>
+                                <div class="price-tag">
+                                    <span th:text="${p.precioBase}">0.00</span>€
+                                    <span class="fs-6 text-muted fw-normal">/mes</span>
                                 </div>
-                                <a href="/login-page" class="btn btn-primary btn-sm px-4">
-                                    Contratar <i class="bi bi-arrow-right"></i>
-                                </a>
                             </div>
+                            <a href="/login-page" class="btn btn-primary btn-sm px-4">
+                                Contratar <i class="bi bi-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
         <div class="text-center mt-5">
             <div class="alert alert-info d-inline-block">
                 <i class="bi bi-info-circle me-2"></i>
-                <strong>¿Necesitas ayuda?</strong> Nuestro equipo está disponible para asesorarte en la elección del seguro perfecto para ti.
+                <strong>¿Necesitas ayuda?</strong> Nuestro equipo está disponible para asesorarte en la elección del
+                seguro perfecto para ti.
                 <a href="/faq" class="alert-link ms-2">Ver Preguntas Frecuentes</a>
             </div>
         </div>
@@ -234,11 +253,11 @@
         function filterCategory(category) {
             const items = document.querySelectorAll('.insurance-item');
             const buttons = document.querySelectorAll('.filter-btn');
-            
+
             // Update active button
             buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Filter items
             items.forEach(item => {
                 if (category === 'all' || item.dataset.category === category) {
@@ -250,4 +269,5 @@
         }
     </script>
 </body>
+
 </html>
