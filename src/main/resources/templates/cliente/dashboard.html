@@ -710,7 +710,11 @@
             if (!texto) return;
 
             const chatBody = document.getElementById('chatBody');
-            chatBody.innerHTML += `<div class="chat-message chat-user">${texto}</div>`;
+            // ✅ SEGURO - Evita XSS usando textContent en lugar de innerHTML
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message chat-user';
+            userMsg.textContent = texto;
+            chatBody.appendChild(userMsg);
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -725,13 +729,23 @@
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    chatBody.innerHTML += `<div class="chat-message chat-bot">${data.respuesta}</div>`;
+                    // ✅ SEGURO - Respuesta del bot también escapada
+                    const botMsg = document.createElement('div');
+                    botMsg.className = 'chat-message chat-bot';
+                    botMsg.textContent = data.respuesta;
+                    chatBody.appendChild(botMsg);
                 } else {
-                    chatBody.innerHTML += `<div class="chat-message chat-bot text-danger">Error de autorización.</div>`;
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'chat-message chat-bot text-danger';
+                    errorMsg.textContent = 'Error de autorización.';
+                    chatBody.appendChild(errorMsg);
                 }
                 chatBody.scrollTop = chatBody.scrollHeight;
             } catch (e) {
-                chatBody.innerHTML += `<div class="chat-message chat-bot text-danger">Error de conexión con Vesta Brain.</div>`;
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'chat-message chat-bot text-danger';
+                errorMsg.textContent = 'Error de conexión con Vesta Brain.';
+                chatBody.appendChild(errorMsg);
             }
         }
 
