@@ -220,7 +220,7 @@
                         </span>
                     </td>
                     <td class="text-end pe-4">
-                        <button class="btn btn-sm btn-outline-secondary me-1" onclick='editProduct(${JSON.stringify(p)})'><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="editProduct(${p.id})"><i class="bi bi-pencil-fill"></i></button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash-fill"></i></button>
                     </td>
                 `;
@@ -236,7 +236,10 @@
             productModal.show();
         }
 
-        function editProduct(p) {
+        function editProduct(id) {
+            const p = window.allProducts.find(product => product.id === id);
+            if (!p) return;
+
             document.getElementById('prodId').value = p.id;
             document.getElementById('prodNombre').value = p.nombre;
             document.getElementById('prodCategoria').value = p.categoria;
