@@ -113,7 +113,7 @@ public class ApiService {
         }
     }
 
-    public AuthResponseDTO socialLogin(String email, String name, String provider) {
+    public AuthResponseDTO socialLogin(String email, String name, String provider, String providerId) {
         try {
             String url = apiUrl + "/auth/social-login";
             logger.debug("Procesando login social para: {}", email);
@@ -122,6 +122,7 @@ public class ApiService {
             request.put("email", email);
             request.put("nombre", name);
             request.put("proveedor", provider);
+            request.put("providerId", providerId);
 
             ResponseEntity<ApiResponseWrapper<AuthResponseDTO>> response = restTemplate.exchange(
                     url,
@@ -685,7 +686,8 @@ public class ApiService {
         }
     }
 
-    public Map<String, Object> linkOAuthProvider(String token, Long userId, String provider, String googleEmail) {
+    public Map<String, Object> linkOAuthProvider(String token, Long userId, String provider, String googleEmail,
+            String providerId) {
         String url = apiUrl + "/usuarios/" + userId + "/link-oauth";
 
         try {
@@ -693,7 +695,8 @@ public class ApiService {
 
             Map<String, String> payload = Map.of(
                     "provider", provider,
-                    "googleEmail", googleEmail);
+                    "googleEmail", googleEmail,
+                    "providerId", providerId);
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,

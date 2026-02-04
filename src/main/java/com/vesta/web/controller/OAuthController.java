@@ -31,7 +31,13 @@ public class OAuthController {
 
         String email = principal.getAttribute("email");
         String name = principal.getAttribute("name");
-        logger.info("👤 Principal recibido: Email={}, Name={}", email, name);
+        String providerId = principal.getAttribute("sub");
+        if (providerId == null) {
+            // Fallback for providers that might not use 'sub' standardly (e.g. Apple uses
+            // sub too)
+            providerId = principal.getName();
+        }
+        logger.info("👤 Principal recibido: Email={}, Name={}, ProviderId={}", email, name, providerId);
 
         // Identificar proveedor (simplificado, podría mejorarse)
         // Google usa "sub", Apple "sub" también, pero atributos varían
@@ -52,7 +58,7 @@ public class OAuthController {
             logger.info("🔗 Modo vinculación detectado para usuario ID: {}", existingUserId);
             try {
                 Map<String, Object> linkResult = apiService.linkOAuthProvider(existingToken, existingUserId, provider,
-                        email);
+                        email, providerId);
                 logger.info("✅ Vinculación exitosa: {}", linkResult.get("message"));
 
                 // Redirect back to configuration based on role
@@ -74,9 +80,8 @@ public class OAuthController {
         // LOGIN FLOW: No existing session, proceed with normal OAuth login
         try {
             // Llamar a la API de Vesta para obtener el JWT real
-            // Nota: Se asume que existe un método socialLogin en ApiService
-            logger.info("📡 Llamando a ApiService.socialLogin...");
-            AuthResponseDTO response = apiService.socialLogin(email, name, provider);
+            logger.info("📡 Llamando a ApiService.socialLogin con providerId...");
+            AuthResponseDTO response = apiService.socialLogin(email, name, provider, providerId);
             logger.info("⬇️ Respuesta de API recibida.{}",
                     response.getToken() != null ? " Token generado." : " Token NULO (Verificación pendiente).");
 

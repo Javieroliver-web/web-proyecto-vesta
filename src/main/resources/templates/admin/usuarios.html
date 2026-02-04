@@ -123,9 +123,11 @@
                                 <td>
                                     <span th:if="${u.activo == true && u.emailConfirmado == true}"
                                         class="badge bg-success bg-opacity-10 text-success border border-success">ACTIVO</span>
-                                    <span th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
+                                    <span
+                                        th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
                                         class="badge bg-warning bg-opacity-10 text-warning border border-warning"
-                                        style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN ACTIVAR</span>
+                                        style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN
+                                        ACTIVAR</span>
                                     <span th:if="${u.activo == false}"
                                         class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
                                 </td>
@@ -134,9 +136,10 @@
                                         <!-- Botón Ver Detalle -->
                                         <button class="btn btn-sm btn-outline-primary" th:data-id="${u.id}"
                                             th:data-nombre="${u.nombreCompleto}" th:data-email="${u.email}"
-                                            th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}" th:data-movil="${u.movil}"
-                                            th:data-nacimiento="${u.fechaNacimiento}" th:data-direccion="${u.direccion}"
-                                            onclick="verDetalle(this)" title="Ver Detalle">
+                                            th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}"
+                                            th:data-movil="${u.movil}" th:data-nacimiento="${u.fechaNacimiento}"
+                                            th:data-direccion="${u.direccion}" onclick="verDetalle(this)"
+                                            title="Ver Detalle">
                                             <i class="bi bi-eye"></i>
                                         </button>
 
@@ -248,6 +251,20 @@
                     <button type="button" class="btn btn-primary" onclick="confirmarCambioRol()">Guardar
                         Cambios</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i id="toastIcon" class="bi"></i>
+                    <strong id="toastMessage" class="me-auto"></strong>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
     </div>
@@ -472,6 +489,22 @@
                 console.error('Error en descarga:', error);
                 showErrorModal('Error', 'No se pudieron descargar los logs: ' + error.message);
             }
+        }
+
+        function showToast(msg, type, duration = 5000) {
+            const el = document.getElementById('liveToast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMessage');
+
+            el.className = 'toast align-items-center text-white border-0 shadow-lg';
+            if (type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
+            else { el.classList.add('bg-danger'); icon.className = 'bi bi-x-circle-fill'; }
+
+            text.innerText = msg;
+
+            // Create toast with custom delay
+            const toast = new bootstrap.Toast(el, { delay: duration });
+            toast.show();
         }
     </script>
 </body>
