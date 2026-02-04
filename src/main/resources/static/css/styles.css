@@ -346,6 +346,35 @@ body {
     box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
 }
 
+.btn-warning {
+    background: linear-gradient(135deg, #e09200 0%, #c67f00 100%);
+    color: white !important;
+    /* Force white text for contrast on dark gold */
+    border: none;
+    box-shadow: 0 4px 12px rgba(224, 146, 0, 0.3);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #c67f00 0%, #b37000 100%);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224, 146, 0, 0.4);
+}
+
+.btn-outline-warning {
+    border: 2px solid #e09200;
+    color: #e09200;
+    background: transparent;
+    font-weight: 600;
+}
+
+.btn-outline-warning:hover {
+    background: #e09200;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(224, 146, 0, 0.3);
+}
+
 .btn-light {
     background: var(--theme-card-bg, white);
     border: 2px solid var(--theme-border, #e9ecef);

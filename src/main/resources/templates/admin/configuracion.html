@@ -106,22 +106,80 @@
                                     </div>
 
                                     <div id="2faSetupArea" class="mt-4 p-4 bg-light rounded-3" style="display:none;">
-                                        <div class="text-center my-3">
-                                            <div class="bg-white p-2 rounded d-inline-block">
-                                                <canvas id="qrCanvas"></canvas>
+                                        <div class="row align-items-start">
+                                            <!-- Left: Guide Image -->
+                                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                                <img th:src="@{/images/google-authenticator-guide.jpg}"
+                                                    alt="Google Authenticator App" class="img-fluid rounded shadow-sm"
+                                                    style="max-height: 400px; object-fit: contain;">
+                                            </div>
+
+                                            <!-- Right: QR Code and Instructions -->
+                                            <div class="col-md-8">
+                                                <div class="mb-3">
+                                                    <h6 class="fw-bold text-dark mb-2">
+                                                        <i class="bi bi-1-circle-fill text-warning me-2"></i>Descarga
+                                                        Google Authenticator
+                                                    </h6>
+                                                    <p class="small text-muted mb-2">
+                                                        Instala la aplicación <strong>Google Authenticator</strong>
+                                                        desde:
+                                                    </p>
+                                                    <div class="d-flex gap-2 mb-3">
+                                                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+                                                            target="_blank"
+                                                            class="btn btn-success d-flex align-items-center gap-2 flex-fill">
+                                                            <i class="bi bi-google-play fs-5"></i>
+                                                            <div class="text-start">
+                                                                <div class="small">Disponible en</div>
+                                                                <div class="fw-bold">Google Play</div>
+                                                            </div>
+                                                        </a>
+                                                        <a href="https://apps.apple.com/app/google-authenticator/id388497605"
+                                                            target="_blank"
+                                                            class="btn btn-dark d-flex align-items-center gap-2 flex-fill">
+                                                            <i class="bi bi-apple fs-5"></i>
+                                                            <div class="text-start">
+                                                                <div class="small">Disponible en</div>
+                                                                <div class="fw-bold">App Store</div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <h6 class="fw-bold text-dark mb-2">
+                                                        <i class="bi bi-2-circle-fill text-warning me-2"></i>Escanea el
+                                                        código QR
+                                                    </h6>
+                                                    <div class="text-center my-3">
+                                                        <div class="bg-white p-3 rounded d-inline-block shadow-sm">
+                                                            <canvas id="qrCanvas"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <h6 class="fw-bold text-dark mb-2">
+                                                        <i class="bi bi-3-circle-fill text-warning me-2"></i>Introduce
+                                                        el código de 6 dígitos
+                                                    </h6>
+                                                    <input type="text" class="form-control text-center fw-bold"
+                                                        id="verify2faInput" placeholder="000 000" maxlength="6"
+                                                        style="font-size: 1.25rem; letter-spacing: 0.25rem;">
+                                                </div>
+
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-warning w-100 text-white"
+                                                        onclick="verifyAndEnable2FA()">
+                                                        <i class="bi bi-shield-check me-2"></i>Activar 2FA
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary w-100"
+                                                        onclick="cancel2FASetup()">Cancelar</button>
+                                                </div>
+                                                <div id="2faMsg" class="mt-2 text-danger small text-center"></div>
                                             </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <input type="text" class="form-control text-center" id="verify2faInput"
-                                                placeholder="Código 6 dígitos" maxlength="6">
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-warning w-100 text-white"
-                                                onclick="verifyAndEnable2FA()">Activar</button>
-                                            <button class="btn btn-outline-secondary w-100"
-                                                onclick="cancel2FASetup()">Cancelar</button>
-                                        </div>
-                                        <div id="2faMsg" class="mt-2 text-danger small text-center"></div>
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +238,8 @@
             const userId = /*[[${usuarioId}]]*/ null;
             const token = /*[[${session.token}]]*/ null;
             const apiBaseUrl = '/vesta-web/usuario/api';
-            const apiTwoFactorUrl = '/vesta-web/auth/api/2fa';
+            // FIX: Point directly to vesta-api backend as there is no proxy in vesta-web
+            const apiTwoFactorUrl = '/vesta-api/api/auth/2fa';
 
             // --- TEMA ---
             const toggle = document.getElementById('themeToggle');
@@ -198,7 +257,6 @@
                             root.setAttribute('data-theme', user.tema);
                             toggle.checked = (user.tema === 'dark');
                         }
-                        // Google account check - ALWAYS update UI based on provider
                         if (user.provider && user.provider === 'google') {
                             updateLinkUI('google', true);
                         } else {
@@ -210,9 +268,8 @@
                     if (res2fa.ok) {
                         const data = await res2fa.json();
                         update2FAUI(data.data);
-
                     }
-                } catch (e) { }
+                } catch (e) { console.error("Error details:", e); }
             }
             loadSettings();
 
@@ -273,11 +330,18 @@
             }
 
             async function setup2FA() {
-                const res = await fetch(`${apiTwoFactorUrl}/setup`, { headers: { 'Authorization': 'Bearer ' + token } });
-                const d = await res.json();
-                if (res.ok) {
-                    document.getElementById('2faSetupArea').style.display = 'block';
-                    new QRious({ element: document.getElementById('qrCanvas'), value: d.data.qrCodeUrl, size: 150 });
+                try {
+                    const res = await fetch(`${apiTwoFactorUrl}/setup`, { headers: { 'Authorization': 'Bearer ' + token } });
+                    const d = await res.json();
+                    if (res.ok) {
+                        document.getElementById('2faSetupArea').style.display = 'block';
+                        new QRious({ element: document.getElementById('qrCanvas'), value: d.data.qrCodeUrl, size: 150 });
+                    } else {
+                        alert("Error al iniciar configuración: " + (d.message || res.status));
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert("Error de conexión al configurar 2FA");
                 }
             }
             function cancel2FASetup() { document.getElementById('2faSetupArea').style.display = 'none'; }
