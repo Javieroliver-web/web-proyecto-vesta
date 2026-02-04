@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * Servicio para comunicación con la API backend
  */
 @Service
+@SuppressWarnings("null")
 public class ApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
@@ -61,8 +62,9 @@ public class ApiService {
             logger.info("Login exitoso para: {}", email);
 
             // Extraer el AuthResponseDTO del wrapper
-            if (response.getBody() != null && response.getBody().getData() != null) {
-                return response.getBody().getData();
+            ApiResponseWrapper<AuthResponseDTO> body = response.getBody();
+            if (body != null && body.getData() != null) {
+                return body.getData();
             } else {
                 throw new RuntimeException("Respuesta de la API vacía o inválida");
             }
@@ -100,8 +102,9 @@ public class ApiService {
                     new ParameterizedTypeReference<ApiResponseWrapper<AuthResponseDTO>>() {
                     });
 
-            if (response.getBody() != null && response.getBody().getData() != null) {
-                return response.getBody().getData();
+            ApiResponseWrapper<AuthResponseDTO> body = response.getBody();
+            if (body != null && body.getData() != null) {
+                return body.getData();
             } else {
                 throw new RuntimeException("Respuesta 2FA vacía");
             }
@@ -131,8 +134,9 @@ public class ApiService {
                     new ParameterizedTypeReference<ApiResponseWrapper<AuthResponseDTO>>() {
                     });
 
-            if (response.getBody() != null && response.getBody().getData() != null) {
-                return response.getBody().getData();
+            ApiResponseWrapper<AuthResponseDTO> body = response.getBody();
+            if (body != null && body.getData() != null) {
+                return body.getData();
             } else {
                 throw new RuntimeException("Respuesta de API vacía en social login");
             }
@@ -197,8 +201,9 @@ public class ApiService {
 
             logger.info("Solicitud de recuperación enviada para: {}", email);
 
-            if (response.getBody() != null && response.getBody().getMessage() != null) {
-                return response.getBody().getMessage();
+            ApiResponseWrapper<String> body = response.getBody();
+            if (body != null && body.getMessage() != null) {
+                return body.getMessage();
             } else {
                 return "Se ha enviado un código de verificación a tu correo electrónico";
             }
@@ -240,8 +245,9 @@ public class ApiService {
 
             logger.info("Solicitud de recuperación enviada para: {} por {}", email, method);
 
-            if (response.getBody() != null && response.getBody().getMessage() != null) {
-                return response.getBody().getMessage();
+            ApiResponseWrapper<String> body = response.getBody();
+            if (body != null && body.getMessage() != null) {
+                return body.getMessage();
             } else {
                 return "Se ha enviado un código de verificación";
             }
@@ -280,7 +286,11 @@ public class ApiService {
                     new ParameterizedTypeReference<ApiResponseWrapper<Map<String, Object>>>() {
                     });
 
-            return response.getBody().getData();
+            ApiResponseWrapper<Map<String, Object>> body = response.getBody();
+            if (body != null && body.getData() != null) {
+                return body.getData();
+            }
+            return new HashMap<>();
 
         } catch (HttpClientErrorException e) {
             logger.error("Error verificando métodos: {}", e.getResponseBodyAsString());
@@ -309,8 +319,9 @@ public class ApiService {
                     new ParameterizedTypeReference<ApiResponseWrapper<String>>() {
                     });
 
-            if (response.getBody() != null && response.getBody().getMessage() != null) {
-                return response.getBody().getMessage();
+            ApiResponseWrapper<String> body = response.getBody();
+            if (body != null && body.getMessage() != null) {
+                return body.getMessage();
             } else {
                 return "Correo de confirmación reenviado";
             }
@@ -345,8 +356,9 @@ public class ApiService {
 
             logger.info("Contraseña reseteada exitosamente");
 
-            if (response.getBody() != null && response.getBody().getMessage() != null) {
-                return response.getBody().getMessage();
+            ApiResponseWrapper<String> body = response.getBody();
+            if (body != null && body.getMessage() != null) {
+                return body.getMessage();
             } else {
                 return "Contraseña actualizada exitosamente";
             }
@@ -418,7 +430,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente al obtener pólizas del usuario: {}", e.getResponseBodyAsString());
@@ -460,7 +473,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al obtener recomendación IA: {}", e.getMessage(), e);
@@ -488,7 +502,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error en chat IA: {}", e.getMessage(), e);
@@ -514,7 +529,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente al contratar póliza: {}", e.getResponseBodyAsString());
@@ -546,7 +562,8 @@ public class ApiService {
                     new HttpEntity<>(getHeaders(token)),
                     byte[].class);
 
-            return response.getBody();
+            byte[] body = response.getBody();
+            return body != null ? body : new byte[0];
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente al generar PDF: {}", e.getResponseBodyAsString());
@@ -603,7 +620,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> responseBody = response.getBody();
+            return responseBody != null ? responseBody : new HashMap<>();
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente al reportar siniestro: {}", e.getResponseBodyAsString());
@@ -636,7 +654,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al obtener usuario {}: {}", userId, e.getMessage());
@@ -657,7 +676,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al actualizar usuario {}: {}", userId, e.getMessage());
@@ -678,7 +698,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al desvincular OAuth usuario {}: {}", userId, e.getMessage());
@@ -705,7 +726,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al vincular OAuth usuario {}: {}", userId, e.getMessage());
@@ -747,7 +769,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al solicitar supresión: {}", e.getMessage());
@@ -768,7 +791,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al solicitar derecho {}: {}", endpoint, e.getMessage());
@@ -789,7 +813,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (Exception e) {
             logger.error("Error al obtener solicitudes del usuario {}: {}", userId, e.getMessage());
@@ -812,7 +837,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al actualizar siniestro {}: {}", siniestroId, e.getMessage());
@@ -835,7 +861,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al crear producto: {}", e.getMessage());
@@ -856,7 +883,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al actualizar producto {}: {}", productoId, e.getMessage());
@@ -897,7 +925,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al guardar consentimiento: {}", e.getMessage());
@@ -941,7 +970,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (Exception e) {
             logger.error("Error al obtener órdenes: {}", e.getMessage(), e);
@@ -961,7 +991,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (Exception e) {
             logger.error("Error al obtener órdenes pendientes del usuario {}: {}", usuarioId, e.getMessage(), e);
@@ -981,7 +1012,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (Exception e) {
             logger.error("Error al obtener solicitudes RGPD: {}", e.getMessage(), e);
@@ -1002,7 +1034,8 @@ public class ApiService {
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
 
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
 
         } catch (Exception e) {
             logger.error("Error al obtener siniestros: {}", e.getMessage(), e);
@@ -1084,7 +1117,8 @@ public class ApiService {
                     HttpMethod.GET,
                     new HttpEntity<>(getHeaders(token)),
                     String.class);
-            return response.getBody();
+            String body = response.getBody();
+            return body != null ? body : "";
         } catch (Exception e) {
             logger.error("Error al exportar logs para {}: {}", email, e.getMessage());
             throw new RuntimeException("Error al exportar logs: " + e.getMessage());
@@ -1101,7 +1135,8 @@ public class ApiService {
                     new HttpEntity<>(getHeaders(token)),
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
         } catch (Exception e) {
             logger.error("Error al obtener estadísticas: {}", e.getMessage());
             return new HashMap<>();
@@ -1118,7 +1153,8 @@ public class ApiService {
                     null, // No auth headers required
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
                     });
-            return response.getBody();
+            List<Map<String, Object>> body = response.getBody();
+            return body != null ? body : List.of();
         } catch (Exception e) {
             logger.error("Error al obtener productos: {}", e.getMessage());
             return List.of();
@@ -1134,7 +1170,8 @@ public class ApiService {
                     null, // No auth headers required
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
         } catch (Exception e) {
             logger.error("Error al obtener producto por ID {}: {}", id, e.getMessage());
             return new HashMap<>();
@@ -1193,7 +1230,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            return response.getBody();
+            Map<String, Object> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (HttpClientErrorException e) {
             logger.error("Error de cliente en checkout TPV: {}", e.getResponseBodyAsString());
@@ -1217,7 +1255,8 @@ public class ApiService {
                     new ParameterizedTypeReference<Map<String, String>>() {
                     });
 
-            return response.getBody();
+            Map<String, String> body = response.getBody();
+            return body != null ? body : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al obtener tarjetas de prueba: {}", e.getMessage(), e);

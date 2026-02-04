@@ -42,9 +42,12 @@ public class OAuthController {
         // Identificar proveedor (simplificado, podría mejorarse)
         // Google usa "sub", Apple "sub" también, pero atributos varían
         String provider = "google"; // Default a Google por ahora, se puede refinar
-        if (principal.getAttributes().containsKey("iss")
-                && principal.getAttribute("iss").toString().contains("apple")) {
-            provider = "apple";
+        Map<String, Object> attributes = principal.getAttributes();
+        if (attributes != null && attributes.containsKey("iss")) {
+            Object issObj = attributes.get("iss");
+            if (issObj != null && issObj.toString().contains("apple")) {
+                provider = "apple";
+            }
         }
 
         logger.info("✅ OAuth Login exitoso para: {}", email);
