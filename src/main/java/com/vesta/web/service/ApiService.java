@@ -1022,24 +1022,24 @@ public class ApiService {
     }
 
     // === NUEVO MÉTODO: OBTENER SINIESTROS ===
-    public List<Map<String, Object>> obtenerSiniestros(String token) {
-        String url = apiUrl + "/siniestros";
+    // === NUEVO MÉTODO: OBTENER SINIESTROS ===
+    public Map<String, Object> obtenerSiniestros(String token, int page) {
+        String url = apiUrl + "/siniestros?page=" + page;
         try {
-            logger.debug("Obteniendo siniestros");
+            logger.debug("Obteniendo siniestros paginados");
 
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(getHeaders(token)),
-                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    new ParameterizedTypeReference<Map<String, Object>>() {
                     });
 
-            List<Map<String, Object>> body = response.getBody();
-            return body != null ? body : List.of();
+            return response.getBody() != null ? response.getBody() : new HashMap<>();
 
         } catch (Exception e) {
             logger.error("Error al obtener siniestros: {}", e.getMessage(), e);
-            return List.of();
+            return new HashMap<>();
         }
     }
 
@@ -1105,19 +1105,20 @@ public class ApiService {
     }
 
     // === AUDITORÍA ===
-    public List<Map<String, Object>> obtenerLogsAuditoria(String token) {
-        String url = apiUrl + "/auditoria";
+    // === AUDITORÍA ===
+    public Map<String, Object> obtenerLogsAuditoria(String token, int page) {
+        String url = apiUrl + "/auditoria?page=" + page;
         try {
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(getHeaders(token)),
-                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    new ParameterizedTypeReference<Map<String, Object>>() {
                     });
-            return response.getBody();
+            return response.getBody() != null ? response.getBody() : new HashMap<>();
         } catch (Exception e) {
             logger.error("Error al obtener logs: {}", e.getMessage());
-            return List.of();
+            return new HashMap<>();
         }
     }
 

@@ -134,6 +134,22 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Pagination Controls -->
+            <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/siniestros(page=${currentPage - 1})}">Anterior</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
+                                th:text="${totalPages}">1</span></span>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/siniestros(page=${currentPage + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
@@ -306,7 +322,7 @@
 
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
-                
+
                 // El estado está en la columna 6 (index 5)
                 const statusCell = row.cells[5];
                 const statusBadge = statusCell ? statusCell.querySelector('.badge') : null;

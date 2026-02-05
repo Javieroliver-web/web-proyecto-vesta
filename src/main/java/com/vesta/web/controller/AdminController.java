@@ -246,24 +246,48 @@ public class AdminController {
     }
 
     @GetMapping("/auditoria")
-    public String auditoria(HttpSession session, Model model) {
+    public String auditoria(HttpSession session, Model model,
+            @RequestParam(defaultValue = "0") int page) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
         if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol) && !"OWNER".equals(rol)))
             return "redirect:/";
 
-        model.addAttribute("logs", apiService.obtenerLogsAuditoria(token));
+        Map<String, Object> pageData = apiService.obtenerLogsAuditoria(token, page);
+        model.addAttribute("logs", pageData.get("content"));
+
+        // Pagination logic
+        Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);
+        int totalPages = totalPagesNum.intValue();
+        Number numberNum = (Number) pageData.getOrDefault("number", 0);
+        int currentPage = numberNum.intValue();
+
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+
         return "admin/auditoria";
     }
 
     @GetMapping("/siniestros")
-    public String siniestros(HttpSession session, Model model) {
+    public String siniestros(HttpSession session, Model model,
+            @RequestParam(defaultValue = "0") int page) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
         if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol) && !"OWNER".equals(rol)))
             return "redirect:/";
 
-        model.addAttribute("siniestros", apiService.obtenerSiniestros(token));
+        Map<String, Object> pageData = apiService.obtenerSiniestros(token, page);
+        model.addAttribute("siniestros", pageData.get("content"));
+
+        // Pagination logic
+        Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);
+        int totalPages = totalPagesNum.intValue();
+        Number numberNum = (Number) pageData.getOrDefault("number", 0);
+        int currentPage = numberNum.intValue();
+
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+
         return "admin/siniestros";
     }
 

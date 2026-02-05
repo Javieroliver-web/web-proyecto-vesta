@@ -67,7 +67,8 @@ public class AdminApiController {
         }
 
         try {
-            Object siniestros = apiService.obtenerSiniestros(token);
+            // Default to page 0 for API
+            Object siniestros = apiService.obtenerSiniestros(token, 0);
             return ResponseEntity.ok(siniestros);
         } catch (Exception e) {
             return ResponseEntity.status(500)
@@ -239,7 +240,8 @@ public class AdminApiController {
         }
 
         try {
-            Object logs = apiService.obtenerLogsAuditoria(token);
+            // Default to page 0 for API
+            Object logs = apiService.obtenerLogsAuditoria(token, 0);
             return ResponseEntity.ok(logs);
         } catch (Exception e) {
             return ResponseEntity.status(500)

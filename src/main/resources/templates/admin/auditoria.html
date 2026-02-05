@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Auditoría de Acciones - Vesta Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css(v=3.4)}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 </head>
+
 <body>
     <div class="d-flex flex-column flex-md-row">
         <!-- Sidebar -->
@@ -31,7 +33,8 @@
                     <i class="bi bi-terminal me-2"></i> System Logs
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle mb-0 font-monospace" style="font-size: 0.9rem;">
+                    <table class="table table-hover table-striped align-middle mb-0 font-monospace"
+                        style="font-size: 0.9rem;">
                         <thead>
                             <tr>
                                 <th>Timestamp</th>
@@ -43,28 +46,47 @@
                         </thead>
                         <tbody id="logTableBody">
                             <tr th:each="log : ${logs}">
-                                <td class="text-muted" th:text="${#strings.substring(log.fecha, 0, 19)}">2026-01-01 10:00:00</td>
+                                <td class="text-muted" th:text="${#strings.substring(log.fecha, 0, 19)}">2026-01-01
+                                    10:00:00</td>
                                 <td class="fw-bold text-primary" th:text="${log.usuarioEmail}">admin@vesta.com</td>
                                 <td>
-                                    <span th:class="${'badge ' + (log.accion.contains('DELETE') || log.accion.contains('BAN') ? 'bg-danger' : (log.accion.contains('UPDATE') ? 'bg-warning text-dark' : 'bg-info text-dark'))}" 
-                                          th:text="${log.accion}">LOGIN</span>
+                                    <span
+                                        th:class="${'badge ' + (log.accion.contains('DELETE') || log.accion.contains('BAN') ? 'bg-danger' : (log.accion.contains('UPDATE') ? 'bg-warning text-dark' : 'bg-info text-dark'))}"
+                                        th:text="${log.accion}">LOGIN</span>
                                 </td>
                                 <td th:text="${log.detalle}">Detalles...</td>
                                 <td class="text-muted small" th:text="${log.ip}">127.0.0.1</td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(logs)}">
-                                <td colspan="5" class="text-center py-5 text-muted">No hay registros de actividad recientes.</td>
+                                <td colspan="5" class="text-center py-5 text-muted">No hay registros de actividad
+                                    recientes.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- Pagination Controls -->
+            <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/auditoria(page=${currentPage - 1})}">Anterior</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
+                                th:text="${totalPages}">1</span></span>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/auditoria(page=${currentPage + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('searchLog').addEventListener('keyup', function() {
+        document.getElementById('searchLog').addEventListener('keyup', function () {
             const value = this.value.toLowerCase();
             const rows = document.querySelectorAll('#logTableBody tr');
             rows.forEach(row => {
@@ -74,4 +96,5 @@
         });
     </script>
 </body>
+
 </html>
