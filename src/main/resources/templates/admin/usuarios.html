@@ -184,329 +184,355 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal Detalle -->
-    <div class="modal fade" id="modalUsuario" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detalle Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-person-circle display-1 text-secondary"></i>
-                    </div>
-                    <h4 id="detailNombre" class="fw-bold"></h4>
-                    <p id="detailEmail" class="text-muted mb-4"></p>
+            <!-- Paginación -->
+            <nav th:if="${totalPages > 1}" class="mt-4" aria-label="Navegación de páginas">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/admin/usuarios(page=${currentPage - 1}, keyword=${keyword}, role=${role}, status=${status})}">Anterior</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
+                                th:text="${totalPages}">1</span></span>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/admin/usuarios(page=${currentPage + 1}, keyword=${keyword}, role=${role}, status=${status})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="modal fade" id="modalUsuario" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Detalle Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-person-circle display-1 text-secondary"></i>
+                            </div>
+                            <h4 id="detailNombre" class="fw-bold"></h4>
+                            <p id="detailEmail" class="text-muted mb-4"></p>
 
-                    <div class="row text-start bg-light p-3 rounded mx-2">
-                        <div class="col-6 mb-2"><small class="text-muted d-block">ID</small> <span id="detailId"
-                                class="fw-bold"></span></div>
-                        <div class="col-6 mb-2"><small class="text-muted d-block">Rol</small> <span id="detailRol"
-                                class="fw-bold"></span></div>
+                            <div class="row text-start bg-light p-3 rounded mx-2">
+                                <div class="col-6 mb-2"><small class="text-muted d-block">ID</small> <span id="detailId"
+                                        class="fw-bold"></span></div>
+                                <div class="col-6 mb-2"><small class="text-muted d-block">Rol</small> <span
+                                        id="detailRol" class="fw-bold"></span></div>
 
-                        <div class="col-6 mb-2"><small class="text-muted d-block">Teléfono</small> <span
-                                id="detailMovil"></span></div>
-                        <div class="col-6 mb-2"><small class="text-muted d-block">Nacimiento</small> <span
-                                id="detailNacimiento"></span></div>
+                                <div class="col-6 mb-2"><small class="text-muted d-block">Teléfono</small> <span
+                                        id="detailMovil"></span></div>
+                                <div class="col-6 mb-2"><small class="text-muted d-block">Nacimiento</small> <span
+                                        id="detailNacimiento"></span></div>
 
-                        <div class="col-6 mb-2"><small class="text-muted d-block">Ciudad</small> <span
-                                id="detailCiudad"></span></div>
-                        <div class="col-12"><small class="text-muted d-block">Dirección</small> <span
-                                id="detailDireccion"></span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal Cambio de Rol -->
-    <div class="modal fade" id="modalCambioRol" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cambiar Rol de Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Estás editando el rol de: <strong id="roleChangeUserName">Nombre</strong></p>
-                    <input type="hidden" id="roleChangeUserId">
-
-                    <div class="mb-3">
-                        <label for="selectNewRole" class="form-label">Nuevo Rol</label>
-                        <select class="form-select" id="selectNewRole">
-                            <option value="USUARIO">USUARIO (Cliente)</option>
-                            <option value="ADMIN">ADMIN (Administrador)</option>
-                        </select>
-                        <div class="form-text text-danger mt-2" id="roleChangeWarning" style="display:none;">
-                            <i class="bi bi-exclamation-triangle-fill"></i> Estás a punto de dar permisos de
-                            Administrador.
+                                <div class="col-6 mb-2"><small class="text-muted d-block">Ciudad</small> <span
+                                        id="detailCiudad"></span></div>
+                                <div class="col-12"><small class="text-muted d-block">Dirección</small> <span
+                                        id="detailDireccion"></span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmarCambioRol()">Guardar
-                        Cambios</button>
+            </div>
+            <!-- Modal Cambio de Rol -->
+            <div class="modal fade" id="modalCambioRol" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Cambiar Rol de Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Estás editando el rol de: <strong id="roleChangeUserName">Nombre</strong></p>
+                            <input type="hidden" id="roleChangeUserId">
+
+                            <div class="mb-3">
+                                <label for="selectNewRole" class="form-label">Nuevo Rol</label>
+                                <select class="form-select" id="selectNewRole">
+                                    <option value="USUARIO">USUARIO (Cliente)</option>
+                                    <option value="ADMIN">ADMIN (Administrador)</option>
+                                </select>
+                                <div class="form-text text-danger mt-2" id="roleChangeWarning" style="display:none;">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Estás a punto de dar permisos de
+                                    Administrador.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onclick="confirmarCambioRol()">Guardar
+                                Cambios</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- TOAST -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
-        <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body d-flex align-items-center gap-2">
-                    <i id="toastIcon" class="bi"></i>
-                    <strong id="toastMessage" class="me-auto"></strong>
+            <!-- TOAST -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+                <div id="liveToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert"
+                    aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center gap-2">
+                            <i id="toastIcon" class="bi"></i>
+                            <strong id="toastMessage" class="me-auto"></strong>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"></button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/modal-utils.js}"></script>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        const token = /*[[${session.token}]]*/ null;
-        /*]]>*/
-        const apiBaseUrl = '/vesta-web/admin/api';
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script th:src="@{/js/modal-utils.js}"></script>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                const token = /*[[${session.token}]]*/ null;
+                /*]]>*/
+                const apiBaseUrl = '/vesta-web/admin/api';
 
-        // Filtro de búsqueda
-        // --- FILTROS ---
-        document.getElementById('searchUser').addEventListener('keyup', applyFilters);
-
-        function applyFilters() {
-            const searchText = document.getElementById('searchUser').value.toLowerCase();
-            const rolFilter = document.getElementById('filterRol').value.toUpperCase();
-            const statusFilter = document.getElementById('filterStatus').value.toUpperCase();
-
-            const rows = document.querySelectorAll('#userTableBody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-
-                // Rol en columna 6 (index 5)
-                const rolCell = row.cells[5].innerText.trim().toUpperCase();
-                // Estado en columna 7 (index 6)
-                const statusCell = row.cells[6].innerText.trim().toUpperCase();
-
-                let matchesSearch = text.includes(searchText);
-                let matchesRol = rolFilter === '' || rolCell.includes(rolFilter);
-                let matchesStatus = statusFilter === '' || statusCell.includes(statusFilter);
-
-                row.style.display = (matchesSearch && matchesRol && matchesStatus) ? '' : 'none';
-            });
-        }
-
-        function clearFilters() {
-            document.getElementById('searchUser').value = '';
-            document.getElementById('filterRol').value = '';
-            document.getElementById('filterStatus').value = '';
-            applyFilters();
-        }
-
-        // --- EXPORTAR ---
-        function exportToExcel() {
-            const table = document.querySelector("table");
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Usuarios" });
-            XLSX.writeFile(wb, "Reporte_Usuarios_Vesta.xlsx");
-        }
-
-        function verDetalle(btn) {
-            const d = btn.dataset;
-            document.getElementById('detailId').innerText = '#' + d.id;
-            document.getElementById('detailNombre').innerText = d.nombre;
-            document.getElementById('detailEmail').innerText = d.email;
-
-            document.getElementById('detailCiudad').innerText = d.ciudad || 'No registrada';
-            document.getElementById('detailRol').innerText = d.rol;
-
-            document.getElementById('detailMovil').innerText = d.movil || '-';
-            document.getElementById('detailNacimiento').innerText = d.nacimiento || '-';
-            document.getElementById('detailDireccion').innerText = d.direccion || '-';
-
-            new bootstrap.Modal(document.getElementById('modalUsuario')).show();
-        }
-
-        // --- CAMBIO DE ROL (OWNER ONLY) ---
-        function mostrarCambioRol(btn) {
-            const id = btn.dataset.id;
-            const nombre = btn.dataset.nombre;
-            const rolActual = btn.dataset.rolactual;
-
-            document.getElementById('roleChangeUserId').value = id;
-            document.getElementById('roleChangeUserName').innerText = nombre;
-            document.getElementById('selectNewRole').value = rolActual;
-
-            // Warning logic
-            const select = document.getElementById('selectNewRole');
-            select.onchange = function () {
-                const warn = document.getElementById('roleChangeWarning');
-                warn.style.display = (this.value === 'ADMIN') ? 'block' : 'none';
-            }
-            // Trigger change to set warning initial state
-            select.dispatchEvent(new Event('change'));
-
-            new bootstrap.Modal(document.getElementById('modalCambioRol')).show();
-        }
-
-        async function confirmarCambioRol() {
-            const id = document.getElementById('roleChangeUserId').value;
-            const nuevoRol = document.getElementById('selectNewRole').value;
-
-            try {
-                const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rol: nuevoRol })
-                });
-
-                if (res.ok) {
-                    showSuccessModal('Rol Actualizado', 'El rol del usuario ha sido modificado correctamente.');
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    const data = await res.json();
-                    showErrorModal('Error', data.message || 'No se pudo cambiar el rol.');
-                }
-            } catch (e) {
-                showErrorModal('Error', 'Error de conexión.');
-            }
-        }
-
-        // --- CAMBIO DE ESTADO (User/Admin) ---
-        async function toggleEstado(btn, nuevoEstado) {
-            const id = btn.dataset.id;
-            const nombre = btn.dataset.nombre;
-
-            const accion = nuevoEstado ? 'DESBLOQUEAR' : 'BLOQUEAR';
-            const color = nuevoEstado ? 'success' : 'danger';
-
-            if (nuevoEstado === false) {
-                // BLOQUEAR REQUIERE CONFIRMACIÓN SEGURA
-                showSafeDeleteModal(
-                    'Confirmar Bloqueo',
-                    `Para bloquear el acceso a <b>${nombre}</b>, escribe "BLOQUEAR" a continuación:`,
-                    'BLOQUEAR',
-                    async () => {
-                        await ejecutarCambio(id, nuevoEstado, accion);
-                    },
-                    'Confirmar Bloqueo'
-                );
-            } else {
-                showSafeDeleteModal(
-                    'Confirmar Desbloqueo',
-                    `Para reactivar a <b>${nombre}</b>, escribe "DESBLOQUEAR" a continuación:`,
-                    'DESBLOQUEAR',
-                    async () => {
-                        await ejecutarCambio(id, nuevoEstado, accion);
-                    },
-                    'Confirmar Desbloqueo'
-                );
-            }
-
-            async function ejecutarCambio(id, estado, accionTxt) {
-                try {
-                    const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ activo: estado })
-                    });
-
-                    if (res.ok) {
-                        showSuccessModal('Éxito', `Usuario ${accionTxt.toLowerCase()} correctamente.`);
-                        setTimeout(() => window.location.reload(), 1000);
-                    } else {
-                        showErrorModal('Error', 'No se pudo actualizar el estado.');
+                function getHeaders() {
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) {
+                        headers['Authorization'] = 'Bearer ' + token;
                     }
-                } catch (e) {
-                    showErrorModal('Error', 'Error de conexión.');
+                    return headers;
                 }
-            }
-        }
 
-        // --- ELIMINAR USUARIO ---
-        async function eliminarUsuario(btn) {
-            const id = btn.dataset.id;
-            const nombre = btn.dataset.nombre;
+                // Filtro de búsqueda
+                // --- FILTROS ---
+                document.getElementById('searchUser').addEventListener('keyup', applyFilters);
 
-            showSafeDeleteModal(
-                'Confirmar Eliminación',
-                `Estás a punto de eliminar permanentemente a <b>${nombre}</b>. Esta acción no se puede deshacer.<br>Escribe "ELIMINAR" para confirmar:`,
-                'ELIMINAR',
-                async () => {
+                function applyFilters() {
+                    const searchText = document.getElementById('searchUser').value.toLowerCase();
+                    const rolFilter = document.getElementById('filterRol').value.toUpperCase();
+                    const statusFilter = document.getElementById('filterStatus').value.toUpperCase();
+
+                    const rows = document.querySelectorAll('#userTableBody tr');
+                    rows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
+
+                        // Rol en columna 6 (index 5)
+                        const rolCell = row.cells[5].innerText.trim().toUpperCase();
+                        // Estado en columna 7 (index 6)
+                        const statusCell = row.cells[6].innerText.trim().toUpperCase();
+
+                        let matchesSearch = text.includes(searchText);
+                        let matchesRol = rolFilter === '' || rolCell.includes(rolFilter);
+                        let matchesStatus = statusFilter === '' || statusCell.includes(statusFilter);
+
+                        row.style.display = (matchesSearch && matchesRol && matchesStatus) ? '' : 'none';
+                    });
+                }
+
+                function clearFilters() {
+                    document.getElementById('searchUser').value = '';
+                    document.getElementById('filterRol').value = '';
+                    document.getElementById('filterStatus').value = '';
+                    applyFilters();
+                }
+
+                // --- EXPORTAR ---
+                function exportToExcel() {
+                    const table = document.querySelector("table");
+                    const wb = XLSX.utils.table_to_book(table, { sheet: "Usuarios" });
+                    XLSX.writeFile(wb, "Reporte_Usuarios_Vesta.xlsx");
+                }
+
+                function verDetalle(btn) {
+                    const d = btn.dataset;
+                    document.getElementById('detailId').innerText = '#' + d.id;
+                    document.getElementById('detailNombre').innerText = d.nombre;
+                    document.getElementById('detailEmail').innerText = d.email;
+
+                    document.getElementById('detailCiudad').innerText = d.ciudad || 'No registrada';
+                    document.getElementById('detailRol').innerText = d.rol;
+
+                    document.getElementById('detailMovil').innerText = d.movil || '-';
+                    document.getElementById('detailNacimiento').innerText = d.nacimiento || '-';
+                    document.getElementById('detailDireccion').innerText = d.direccion || '-';
+
+                    new bootstrap.Modal(document.getElementById('modalUsuario')).show();
+                }
+
+                // --- CAMBIO DE ROL (OWNER ONLY) ---
+                function mostrarCambioRol(btn) {
+                    const id = btn.dataset.id;
+                    const nombre = btn.dataset.nombre;
+                    const rolActual = btn.dataset.rolactual;
+
+                    document.getElementById('roleChangeUserId').value = id;
+                    document.getElementById('roleChangeUserName').innerText = nombre;
+                    document.getElementById('selectNewRole').value = rolActual;
+
+                    // Warning logic
+                    const select = document.getElementById('selectNewRole');
+                    select.onchange = function () {
+                        const warn = document.getElementById('roleChangeWarning');
+                        warn.style.display = (this.value === 'ADMIN') ? 'block' : 'none';
+                    }
+                    // Trigger change to set warning initial state
+                    select.dispatchEvent(new Event('change'));
+
+                    new bootstrap.Modal(document.getElementById('modalCambioRol')).show();
+                }
+
+                async function confirmarCambioRol() {
+                    const id = document.getElementById('roleChangeUserId').value;
+                    const nuevoRol = document.getElementById('selectNewRole').value;
+
                     try {
                         const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json' }
+                            method: 'PUT',
+                            headers: getHeaders(),
+                            body: JSON.stringify({ rol: nuevoRol })
                         });
 
                         if (res.ok) {
-                            showSuccessModal('Usuario Eliminado', 'El usuario ha sido eliminado correctamente.');
+                            showSuccessModal('Rol Actualizado', 'El rol del usuario ha sido modificado correctamente.');
                             setTimeout(() => window.location.reload(), 1500);
                         } else {
                             const data = await res.json();
-                            showErrorModal('Error', data.message || 'No se pudo eliminar el usuario.');
+                            showErrorModal('Error', data.message || 'No se pudo cambiar el rol.');
                         }
                     } catch (e) {
                         showErrorModal('Error', 'Error de conexión.');
                     }
-                },
-                'Eliminar Usuario'
-            );
-        }
-
-        // --- DESCARGAR LOGS ---
-        async function descargarLogs(btn) {
-            const email = btn.dataset.email;
-            try {
-                // Notificar al usuario que la descarga ha comenzado (solicitado pop-up de 3s)
-                showToast('Descargando log...', 'success', 3000);
-
-                const response = await fetch(`${apiBaseUrl}/auditoria/exportar/${email}`);
-                if (!response.ok) {
-                    const errorMsg = await response.text();
-                    throw new Error(errorMsg || 'Error al descargar logs');
                 }
 
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `logs_${email}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
-            } catch (error) {
-                console.error('Error en descarga:', error);
-                showErrorModal('Error', 'No se pudieron descargar los logs: ' + error.message);
-            }
-        }
+                // --- CAMBIO DE ESTADO (User/Admin) ---
+                async function toggleEstado(btn, nuevoEstado) {
+                    const id = btn.dataset.id;
+                    const nombre = btn.dataset.nombre;
 
-        function showToast(msg, type, duration = 5000) {
-            const el = document.getElementById('liveToast');
-            const icon = document.getElementById('toastIcon');
-            const text = document.getElementById('toastMessage');
+                    const accion = nuevoEstado ? 'DESBLOQUEAR' : 'BLOQUEAR';
+                    const color = nuevoEstado ? 'success' : 'danger';
 
-            el.className = 'toast align-items-center text-white border-0 shadow-lg';
-            if (type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
-            else { el.classList.add('bg-danger'); icon.className = 'bi bi-x-circle-fill'; }
+                    if (nuevoEstado === false) {
+                        // BLOQUEAR REQUIERE CONFIRMACIÓN SEGURA
+                        showSafeDeleteModal(
+                            'Confirmar Bloqueo',
+                            `Para bloquear el acceso a <b>${nombre}</b>, escribe "BLOQUEAR" a continuación:`,
+                            'BLOQUEAR',
+                            async () => {
+                                await ejecutarCambio(id, nuevoEstado, accion);
+                            },
+                            'Confirmar Bloqueo'
+                        );
+                    } else {
+                        showSafeDeleteModal(
+                            'Confirmar Desbloqueo',
+                            `Para reactivar a <b>${nombre}</b>, escribe "DESBLOQUEAR" a continuación:`,
+                            'DESBLOQUEAR',
+                            async () => {
+                                await ejecutarCambio(id, nuevoEstado, accion);
+                            },
+                            'Confirmar Desbloqueo'
+                        );
+                    }
 
-            text.innerText = msg;
+                    async function ejecutarCambio(id, estado, accionTxt) {
+                        try {
+                            const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
+                                method: 'PUT',
+                                headers: getHeaders(),
+                                credentials: 'include',
+                                body: JSON.stringify({ activo: estado })
+                            });
 
-            // Create toast with custom delay
-            const toast = new bootstrap.Toast(el, { delay: duration });
-            toast.show();
-        }
-    </script>
+                            if (res.ok) {
+                                showSuccessModal('Éxito', `Usuario ${accionTxt.toLowerCase()} correctamente.`);
+                                setTimeout(() => window.location.reload(), 1000);
+                            } else {
+                                showErrorModal('Error', 'No se pudo actualizar el estado.');
+                            }
+                        } catch (e) {
+                            showErrorModal('Error', 'Error de conexión.');
+                        }
+                    }
+                }
+
+                // --- ELIMINAR USUARIO ---
+                async function eliminarUsuario(btn) {
+                    const id = btn.dataset.id;
+                    const nombre = btn.dataset.nombre;
+
+                    showSafeDeleteModal(
+                        'Confirmar Eliminación',
+                        `Estás a punto de eliminar permanentemente a <b>${nombre}</b>. Esta acción no se puede deshacer.<br>Escribe "ELIMINAR" para confirmar:`,
+                        'ELIMINAR',
+                        async () => {
+                            try {
+                                const res = await fetch(`${apiBaseUrl}/usuarios/${id}`, {
+                                    method: 'DELETE',
+                                    headers: getHeaders()
+                                });
+
+                                if (res.ok) {
+                                    showSuccessModal('Usuario Eliminado', 'El usuario ha sido eliminado correctamente.');
+                                    setTimeout(() => window.location.reload(), 1500);
+                                } else {
+                                    const data = await res.json();
+                                    showErrorModal('Error', data.message || 'No se pudo eliminar el usuario.');
+                                }
+                            } catch (e) {
+                                showErrorModal('Error', 'Error de conexión.');
+                            }
+                        },
+                        'Eliminar Usuario'
+                    );
+                }
+
+                // --- DESCARGAR LOGS ---
+                async function descargarLogs(btn) {
+                    const email = btn.dataset.email;
+                    try {
+                        // Notificar al usuario que la descarga ha comenzado (solicitado pop-up de 3s)
+                        showToast('Descargando log...', 'success', 3000);
+
+                        const response = await fetch(`${apiBaseUrl}/auditoria/exportar`, {
+                            method: 'POST',
+                            headers: getHeaders(),
+                            body: JSON.stringify({ email: email })
+                        });
+
+                        if (!response.ok) {
+                            const errorMsg = await response.text();
+                            throw new Error(errorMsg || 'Error al descargar logs');
+                        }
+
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `logs_${email}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                    } catch (error) {
+                        console.error('Error en descarga:', error);
+                        showErrorModal('Error', 'No se pudieron descargar los logs: ' + error.message);
+                    }
+                }
+
+                function showToast(msg, type, duration = 5000) {
+                    const el = document.getElementById('liveToast');
+                    const icon = document.getElementById('toastIcon');
+                    const text = document.getElementById('toastMessage');
+
+                    el.className = 'toast align-items-center text-white border-0 shadow-lg';
+                    if (type === 'success') { el.classList.add('bg-success'); icon.className = 'bi bi-check-circle-fill'; }
+                    else { el.classList.add('bg-danger'); icon.className = 'bi bi-x-circle-fill'; }
+
+                    text.innerText = msg;
+
+                    // Create toast with custom delay
+                    const toast = new bootstrap.Toast(el, { delay: duration });
+                    toast.show();
+                }
+            </script>
 </body>
 
 </html>

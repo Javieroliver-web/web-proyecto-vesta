@@ -1044,19 +1044,31 @@ public class ApiService {
     }
 
     // === GESTIÓN DE USUARIOS ===
+    // === GESTIÓN DE USUARIOS ===
+
+    // Sobrecarga para mantener compatibilidad (obtiene página 0)
     public List<Map<String, Object>> obtenerTodosLosUsuarios(String token) {
-        String url = apiUrl + "/usuarios";
+        Map<String, Object> paginatedResult = obtenerUsuariosPaginados(token, 0, 1000);
+        Object contentObj = paginatedResult.get("content");
+        if (contentObj instanceof List) {
+            return (List<Map<String, Object>>) contentObj;
+        }
+        return List.of();
+    }
+
+    public Map<String, Object> obtenerUsuariosPaginados(String token, int page, int size) {
+        String url = apiUrl + "/usuarios?page=" + page + "&size=" + size;
         try {
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(getHeaders(token)),
-                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    new ParameterizedTypeReference<Map<String, Object>>() {
                     });
-            return response.getBody();
+            return response.getBody() != null ? response.getBody() : new HashMap<>();
         } catch (Exception e) {
-            logger.error("Error al obtener usuarios: {}", e.getMessage());
-            return List.of();
+            logger.error("Error al obtener usuarios paginados: {}", e.getMessage());
+            return new HashMap<>();
         }
     }
 
@@ -1110,15 +1122,18 @@ public class ApiService {
     }
 
     public String exportarLogsUsuario(String token, String email) {
-        String url = apiUrl + "/auditoria/exportar/" + email;
+        String url = apiUrl + "/auditoria/exportar";
         try {
+            // Enviar email en el body
+            Map<String, String> body = new HashMap<>();
+            body.put("email", email);
+
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
-                    HttpMethod.GET,
-                    new HttpEntity<>(getHeaders(token)),
+                    HttpMethod.POST,
+                    new HttpEntity<>(body, getHeaders(token)),
                     String.class);
-            String body = response.getBody();
-            return body != null ? body : "";
+            return response.getBody() != null ? response.getBody() : "";
         } catch (Exception e) {
             logger.error("Error al exportar logs para {}: {}", email, e.getMessage());
             throw new RuntimeException("Error al exportar logs: " + e.getMessage());

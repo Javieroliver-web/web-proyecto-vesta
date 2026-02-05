@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -136,7 +139,11 @@ public class AdminController {
     }
 
     @GetMapping("/usuarios")
-    public String usuarios(HttpSession session, Model model) {
+    public String usuarios(HttpSession session, Model model,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String role,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String status) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
 
@@ -144,7 +151,30 @@ public class AdminController {
             return "redirect:/";
         }
 
-        List<Map<String, Object>> usuarios = apiService.obtenerTodosLosUsuarios(token);
+        // Validar y normalizar página
+        if (page < 0)
+            page = 0;
+
+        // Obtener página de usuarios (size 10 por defecto)
+        Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> usuarios = (List<Map<String, Object>>) pageData.getOrDefault("content", List.of());
+
+        // Safe casting for numbers using Number to avoid ClassCastException
+        Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);
+        int totalPages = totalPagesNum.intValue();
+
+        Number numberNum = (Number) pageData.getOrDefault("number", 0);
+        int currentPage = numberNum.intValue();
+
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+
+        // Preservar parámetros de filtro en el modelo
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
 
         // Procesar usuarios para calcular edad y manejar fechas correctamente
         for (Map<String, Object> u : usuarios) {
@@ -254,6 +284,26 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(Map.of("message", "Error al eliminar usuario: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/api/auditoria/exportar")
+    @ResponseBody
+    public ResponseEntity<String> exportarLogs(@RequestBody Map<String, String> payload, HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        if (token == null) {
+            return ResponseEntity.status(401).body("No autenticado");
+        }
+        try {
+            String email = payload.get("email");
+            String content = apiService.exportarLogsUsuario(token, email);
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"logs_" + email + ".txt\"")
+                    .contentType(org.springframework.http.MediaType.TEXT_PLAIN)
+                    .body(content);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al exportar logs: " + e.getMessage());
         }
     }
 }
