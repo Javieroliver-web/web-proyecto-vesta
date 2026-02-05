@@ -319,6 +319,7 @@ public class AdminController {
 
     @PostMapping("/api/auditoria/exportar")
     @ResponseBody
+    @SuppressWarnings("null")
     public ResponseEntity<String> exportarLogs(@RequestBody Map<String, String> payload, HttpSession session) {
         String token = (String) session.getAttribute("token");
         if (token == null) {

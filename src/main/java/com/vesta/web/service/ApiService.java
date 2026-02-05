@@ -1024,7 +1024,6 @@ public class ApiService {
     }
 
     // === NUEVO MÉTODO: OBTENER SINIESTROS ===
-    // === NUEVO MÉTODO: OBTENER SINIESTROS ===
     public Map<String, Object> obtenerSiniestros(String token, int page, String search, String estado) {
         String url = apiUrl + "/siniestros?page=" + page;
         if (search != null && !search.trim().isEmpty()) {
@@ -1055,7 +1054,7 @@ public class ApiService {
     public Map<String, Object> obtenerLogsAuditoria(String token, int page, String search) {
         String url = apiUrl + "/auditoria?page=" + page;
         if (search != null && !search.trim().isEmpty()) {
-            url += "&search=" + search;
+            url += "&search=" + URLEncoder.encode(search.trim(), StandardCharsets.UTF_8);
         }
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
@@ -1072,14 +1071,15 @@ public class ApiService {
     }
 
     // === GESTIÓN DE USUARIOS ===
-    // === GESTIÓN DE USUARIOS ===
 
     // Sobrecarga para mantener compatibilidad (obtiene página 0)
     public List<Map<String, Object>> obtenerTodosLosUsuarios(String token) {
         Map<String, Object> paginatedResult = obtenerUsuariosPaginados(token, 0, 1000, null, null, null);
         Object contentObj = paginatedResult.get("content");
         if (contentObj instanceof List) {
-            return (List<Map<String, Object>>) contentObj;
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> result = (List<Map<String, Object>>) contentObj;
+            return result;
         }
         return List.of();
     }
@@ -1143,22 +1143,6 @@ public class ApiService {
     }
 
     // === AUDITORÍA ===
-    // === AUDITORÍA ===
-    public Map<String, Object> obtenerLogsAuditoria(String token, int page) {
-        String url = apiUrl + "/auditoria?page=" + page;
-        try {
-            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    new HttpEntity<>(getHeaders(token)),
-                    new ParameterizedTypeReference<Map<String, Object>>() {
-                    });
-            return response.getBody() != null ? response.getBody() : new HashMap<>();
-        } catch (Exception e) {
-            logger.error("Error al obtener logs: {}", e.getMessage());
-            return new HashMap<>();
-        }
-    }
 
     public String exportarLogsUsuario(String token, String email) {
         String url = apiUrl + "/auditoria/exportar";
