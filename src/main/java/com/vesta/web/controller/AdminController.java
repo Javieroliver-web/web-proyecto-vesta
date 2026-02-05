@@ -155,8 +155,8 @@ public class AdminController {
         if (page < 0)
             page = 0;
 
-        // Obtener página de usuarios (size 10 por defecto)
-        Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10);
+        // Obtener página de usuarios (size 10 por defecto) con filtros
+        Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10, keyword, role, status);
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) pageData.getOrDefault("content", List.of());
@@ -247,14 +247,16 @@ public class AdminController {
 
     @GetMapping("/auditoria")
     public String auditoria(HttpSession session, Model model,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String search) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
         if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol) && !"OWNER".equals(rol)))
             return "redirect:/";
 
-        Map<String, Object> pageData = apiService.obtenerLogsAuditoria(token, page);
+        Map<String, Object> pageData = apiService.obtenerLogsAuditoria(token, page, search);
         model.addAttribute("logs", pageData.get("content"));
+        model.addAttribute("search", search);
 
         // Pagination logic
         Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);
@@ -270,14 +272,18 @@ public class AdminController {
 
     @GetMapping("/siniestros")
     public String siniestros(HttpSession session, Model model,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String estado) {
         String token = (String) session.getAttribute("token");
         String rol = (String) session.getAttribute("rol");
         if (token == null || (!"ADMIN".equals(rol) && !"ADMINISTRADOR".equals(rol) && !"OWNER".equals(rol)))
             return "redirect:/";
 
-        Map<String, Object> pageData = apiService.obtenerSiniestros(token, page);
+        Map<String, Object> pageData = apiService.obtenerSiniestros(token, page, search, estado);
         model.addAttribute("siniestros", pageData.get("content"));
+        model.addAttribute("search", search);
+        model.addAttribute("estado", estado);
 
         // Pagination logic
         Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);

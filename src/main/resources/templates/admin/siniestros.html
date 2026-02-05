@@ -7,7 +7,7 @@
     <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/styles.css(v=3.4)}">
+    <link rel="stylesheet" th:href="@{/css/styles.css(v=3.6)}">
 </head>
 
 <body>
@@ -17,9 +17,14 @@
 
         <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="page-title-premium">Gestión de Siniestros</h2>
                 <div>
-                    <h2 class="page-title-premium">Gestión de Siniestros (IA)</h2>
-                    <p class="text-muted small mb-0">Revisión de reportes, análisis de fraude y validación.</p>
+                    <button class="btn btn-outline-secondary me-2" onclick="window.location.reload()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+                    </button>
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <i class="bi bi-file-earmark-excel me-2"></i>Exportar Excel
+                    </button>
                 </div>
             </div>
 
@@ -27,197 +32,137 @@
             <div class="card shadow-sm border-0 mb-4 bg-light">
                 <div class="card-body py-3">
                     <div class="row g-3 align-items-center">
-                        <div class="col-md-5">
-                            <div class="search-expandable">
-                                <input type="text" id="searchSiniestro" placeholder="Buscar siniestro...">
+                        <div class="col-md-4">
+                            <div class="search-expandable position-relative">
+                                <input type="text" id="searchInput" placeholder="Buscar por descripción o ID..."
+                                    class="form-control pe-5" th:value="${search}" autocomplete="off">
+                                <i class="bi bi-x-circle-fill position-absolute top-50 end-0 translate-middle-y me-5 text-secondary cursor-pointer"
+                                    id="clearSearch" style="display: none; cursor: pointer; z-index: 10;"></i>
                                 <div class="search-expandable-icon">
                                     <i class="bi bi-search"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <select class="form-select" id="filterEstado" onchange="applyFilters()">
-                                <option value="">Todos los Estados</option>
-                                <option value="PENDIENTE">Pendiente</option>
-                                <option value="APROBADO">Aprobado</option>
-                                <option value="RECHAZADO">Rechazado</option>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterEstado" onchange="performSearch()">
+                                <option value="" th:selected="${estado == null or estado == ''}">Todos los Estados
+                                </option>
+                                <option value="PENDIENTE" th:selected="${estado == 'PENDIENTE'}">Pendiente</option>
+                                <option value="EN_PROCESO" th:selected="${estado == 'EN_PROCESO'}">En Proceso</option>
+                                <option value="RESUELTO" th:selected="${estado == 'RESUELTO'}">Resuelto</option>
+                                <option value="RECHAZADO" th:selected="${estado == 'RECHAZADO'}">Rechazado</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                                <i class="bi bi-x-circle me-1"></i>Limpiar
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" id="btnLimpiarTodo">
+                                <i class="bi bi-x-circle me-1"></i>Limpiar Todo
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 fw-bold py-3">
-                    <i class="bi bi-robot me-2 text-warning"></i> Reportes Recibidos
-                </div>
+            <div class="card border-0 shadow-sm overflow-hidden" id="resultsContainer">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                        <thead class="bg-light">
                             <tr>
-                                <th>ID</th>
+                                <th class="ps-4">ID</th>
                                 <th>Fecha</th>
-                                <th>Cliente</th>
-                                <th>Póliza</th>
-                                <th>IA / Fraude</th>
+                                <th>Usuario</th>
+                                <th>Tipo de Siniestro</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
+                                <th class="text-end pe-4">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="siniestrosTableBody">
-                            <tr th:each="sin : ${siniestros}">
-                                <td class="text-muted fw-bold">#<span th:text="${sin.id}">1</span></td>
-                                <td th:text="${sin.fecha}">2025-01-01</td>
-
-                                <!-- Cliente -->
+                        <tbody>
+                            <tr th:each="s : ${siniestros}">
+                                <td class="ps-4 fw-bold text-muted">#<span th:text="${s.id}">1</span></td>
+                                <td th:text="${s.fechaOcurrencia}">2024-01-01</td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-person-circle text-primary me-2"></i>
-                                        <div>
-                                            <div class="fw-bold small" th:text="${sin.poliza.usuario.nombreCompleto}">
-                                                Usuario</div>
-                                            <div class="text-muted" style="font-size: 0.7rem;"
-                                                th:text="${sin.poliza.usuario.email}">email@example.com</div>
-                                        </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold"
+                                            th:text="${s.usuario != null ? s.usuario.nombreCompleto : 'N/A'}">Juan
+                                            Pérez</span>
+                                        <small class="text-muted"
+                                            th:text="${s.usuario != null ? s.usuario.email : 'N/A'}">juan@example.com</small>
                                     </div>
                                 </td>
-
-                                <td><span class="badge bg-light text-dark border">POL-<span
-                                            th:text="${sin.poliza.id}">1</span></span></td>
-
                                 <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <small class="d-flex align-items-center">
-                                            <i th:if="${#strings.contains(sin.analisisIA, 'APROBADO')}"
-                                                class="bi bi-check-circle-fill text-success me-1"></i>
-                                            <i th:unless="${#strings.contains(sin.analisisIA, 'APROBADO')}"
-                                                class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
-                                            <span class="text-truncate" style="max-width: 150px;"
-                                                th:text="${sin.analisisIA}" th:title="${sin.analisisIA}">IA...</span>
-                                        </small>
-                                        <div class="progress" style="height: 6px; width: 100px;">
-                                            <div th:class="${'progress-bar ' + (sin.fraudeScore > 50 ? 'bg-danger' : 'bg-success')}"
-                                                role="progressbar" th:style="'width: ' + ${sin.fraudeScore} + '%'">
-                                            </div>
-                                        </div>
-                                        <span style="font-size: 0.7rem;" class="text-muted">Riesgo Fraude: <span
-                                                th:text="${sin.fraudeScore}">0</span>%</span>
-                                    </div>
+                                    <span class="badge bg-light text-dark border" th:text="${s.tipo}">ACCIDENTE</span>
                                 </td>
-
                                 <td>
-                                    <span th:if="${sin.estado == 'PENDIENTE_REVISION'}"
-                                        class="badge bg-warning text-dark">PENDIENTE</span>
-                                    <span th:if="${sin.estado == 'APROBADO'}" class="badge bg-success">APROBADO</span>
-                                    <span th:if="${sin.estado == 'RECHAZADO'}" class="badge bg-danger">RECHAZADO</span>
+                                    <span th:if="${s.estado == 'PENDIENTE'}"
+                                        class="badge bg-warning bg-opacity-10 text-warning">PENDIENTE</span>
+                                    <span th:if="${s.estado == 'EN_PROCESO'}"
+                                        class="badge bg-info bg-opacity-10 text-info">EN PROCESO</span>
+                                    <span th:if="${s.estado == 'RESUELTO'}"
+                                        class="badge bg-success bg-opacity-10 text-success">RESUELTO</span>
+                                    <span th:if="${s.estado == 'RECHAZADO'}"
+                                        class="badge bg-danger bg-opacity-10 text-danger">RECHAZADO</span>
                                 </td>
-
-                                <td>
-                                    <button class="btn btn-sm btn-primary"
-                                        th:onclick="abrirModalSiniestro([[${sin.id}]], [[${sin.descripcion}]], [[${sin.imagenUrl}]], [[${sin.analisisIA}]], [[${sin.fraudeScore}]], [[${sin.poliza.usuario.nombreCompleto}]], [[${sin.poliza.usuario.email}]], [[${sin.poliza.id}]])">
-                                        <i class="bi bi-eye"></i> Revisar
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                        th:onclick="verDetalleSiniestro([[${s.id}]])" title="Ver Detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button th:if="${s.estado == 'PENDIENTE'}" class="btn btn-sm btn-success me-1"
+                                        th:onclick="gestionarSiniestro([[${s.id}]], 'EN_PROCESO')" title="Aceptar">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button th:if="${s.estado == 'EN_PROCESO'}"
+                                        class="btn btn-sm btn-outline-success me-1"
+                                        th:onclick="gestionarSiniestro([[${s.id}]], 'RESUELTO')" title="Resolver">
+                                        <i class="bi bi-flag-fill"></i>
                                     </button>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(siniestros)}">
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <i class="bi bi-shield-check fs-1 d-block mb-2"></i>
-                                    No hay siniestros reportados.
-                                </td>
+                                <td colspan="6" class="text-center py-5 text-muted">No se encontraron siniestros con
+                                    esos filtros.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            <!-- Pagination Controls -->
-            <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/siniestros(page=${currentPage - 1})}">Anterior</a>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
-                                th:text="${totalPages}">1</span></span>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/siniestros(page=${currentPage + 1})}">Siguiente</a>
-                    </li>
-                </ul>
-            </nav>
+                <!-- Paginación -->
+                <div class="card-footer bg-white py-3 border-0" th:if="${totalPages > 1}">
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/siniestros(page=${currentPage - 1}, search=${search}, estado=${estado})}">Anterior</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link"
+                                    th:href="@{/admin/siniestros(page=${i}, search=${search}, estado=${estado})}"
+                                    th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/siniestros(page=${currentPage + 1}, search=${search}, estado=${estado})}">Siguiente</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalDetalleSiniestro" tabindex="-1">
+    <!-- MODAL DETALLE SINIESTRO -->
+    <div class="modal fade" id="modalSiniestro" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Revisión de Siniestro #<span id="modalId"></span></h5>
+                    <h5 class="modal-title fw-bold">Detalle de Siniestro #<span id="detailId"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div
-                            class="col-md-6 text-center bg-light d-flex align-items-center justify-content-center p-3 rounded">
-                            <div id="imageContainer">
-                                <i class="bi bi-image display-1 text-muted"></i>
-                                <p class="text-muted mb-1">Cargando evidencia...</p>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <!-- Información del Cliente -->
-                            <div class="mb-3 p-3 bg-light rounded border">
-                                <h6 class="fw-bold mb-2"><i class="bi bi-person-badge text-primary"></i> Cliente</h6>
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="bi bi-person-circle text-muted me-2"></i>
-                                    <span class="fw-bold" id="modalClienteNombre">...</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="bi bi-envelope text-muted me-2"></i>
-                                    <small class="text-muted" id="modalClienteEmail">...</small>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-shield-check text-muted me-2"></i>
-                                    <small class="text-muted">Póliza #<span id="modalPolizaId">...</span></small>
-                                </div>
-                            </div>
-
-                            <h6 class="fw-bold">Declaración del Cliente:</h6>
-                            <p class="p-3 bg-light rounded fst-italic" id="modalDesc">...</p>
-
-                            <hr>
-
-                            <h6 class="fw-bold text-primary"><i class="bi bi-robot"></i> Análisis IA Vesta</h6>
-                            <div class="p-3 rounded" style="background-color: #1a4d6d; color: #ffffff;" id="modalIA">
-                                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-                                <span id="modalIAText">...</span>
-                            </div>
-
-                            <h6 class="fw-bold text-danger"><i class="bi bi-shield-exclamation"></i> Score de Fraude
-                            </h6>
-                            <div class="d-flex align-items-center mb-3">
-                                <h2 class="mb-0 me-3" id="modalScore">0%</h2>
-                                <span class="badge bg-secondary" id="modalRiskLabel">Bajo Riesgo</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-body p-4" id="detailBody">
+                    <!-- Dinámico -->
                 </div>
-                <div class="modal-footer bg-light justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <div>
-                        <button type="button" class="btn btn-danger me-2" onclick="actualizarSiniestro('RECHAZADO')">
-                            <i class="bi bi-x-circle"></i> Rechazar
-                        </button>
-                        <button type="button" class="btn btn-success" onclick="actualizarSiniestro('APROBADO')">
-                            <i class="bi bi-check-circle"></i> Aprobar
-                        </button>
-                    </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -226,73 +171,65 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/modal-utils.js}"></script>
     <script th:inline="javascript">
-        // Variables globales
-        let currentSiniestroId = null;
         /*<![CDATA[*/
         const token = /*[[${session.token}]]*/ null;
-        /*]]>*/
-        const apiBaseUrl = '/vesta-web/admin/api';
+        const apiBaseUrl = '/vesta-web/admin/api/siniestros';
 
-        // Abrir Modal con datos cargados
-        function abrirModalSiniestro(id, desc, imgUrl, ia, score, clienteNombre, clienteEmail, polizaId) {
-            currentSiniestroId = id;
-            document.getElementById('modalId').innerText = id;
-            document.getElementById('modalDesc').innerText = desc;
-
-            // Información del cliente
-            document.getElementById('modalClienteNombre').innerText = clienteNombre;
-            document.getElementById('modalClienteEmail').innerText = clienteEmail;
-            document.getElementById('modalPolizaId').innerText = polizaId;
-
-            // === LÓGICA DE IMAGEN AÑADIDA ===
-            // Construir la URL completa apuntando al servidor API (backend)
-            // Usar ruta relativa al dominio actual para evitar Mixed Content y alertas de red local
-            const fullImageUrl = window.location.origin + '/vesta-api/' + imgUrl;
-
-            const imgContainer = document.getElementById('imageContainer');
-            // Insertar etiqueta IMG real
-            imgContainer.innerHTML = `
-                <img src="${fullImageUrl}" class="img-fluid rounded shadow-sm" 
-                     style="max-height: 300px; object-fit: contain;" 
-                     alt="Evidencia" 
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-danger p-3\'><i class=\'bi bi-exclamation-triangle\'></i> No se pudo cargar la imagen</div>'">
-            `;
-
-            document.getElementById('modalIAText').innerText = ia;
-
-            document.getElementById('modalScore').innerText = score + '%';
-
-            // Configurar etiqueta de riesgo según el score
-            const label = document.getElementById('modalRiskLabel');
-            if (score > 70) {
-                label.className = 'badge bg-danger';
-                label.innerText = 'Riesgo Crítico';
-            } else if (score > 40) {
-                label.className = 'badge bg-warning text-dark';
-                label.innerText = 'Riesgo Medio';
-            } else {
-                label.className = 'badge bg-success';
-                label.innerText = 'Riesgo Bajo';
-            }
-
-            new bootstrap.Modal(document.getElementById('modalDetalleSiniestro')).show();
+        function getHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            return headers;
         }
 
-        // Llamada a la API para aprobar/rechazar
-        async function actualizarSiniestro(nuevoEstado) {
-            // Usar modal de confirmación en lugar de confirm()
-            showConfirmModal(
-                "Confirmar Acción",
-                `¿Estás seguro de marcar este siniestro como ${nuevoEstado}?`,
+        async function verDetalleSiniestro(id) {
+            try {
+                const res = await fetch(`${apiBaseUrl}/${id}`, { credentials: 'include' });
+                if (!res.ok) throw new Error();
+                const s = await res.json();
+
+                const container = document.getElementById('detailBody');
+                container.innerHTML = `
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="small text-muted d-block">Tipo</label>
+                            <span class="badge bg-light text-dark border">${s.tipo}</span>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <label class="small text-muted d-block">Estado Actual</label>
+                            <span class="badge bg-primary bg-opacity-10 text-primary">${s.estado}</span>
+                        </div>
+                        <div class="col-12">
+                            <label class="small text-muted d-block">Descripción de los hechos</label>
+                            <div class="p-3 bg-light rounded border">${s.descripcion}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted">Fecha del Suceso</label>
+                            <p class="fw-bold">${s.fechaOcurrencia}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted">Póliza Asociada</label>
+                            <p class="fw-bold">#${s.polizaId}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('detailId').innerText = id;
+                new bootstrap.Modal(document.getElementById('modalSiniestro')).show();
+            } catch (e) {
+                showErrorModal('Error', 'No se pudo cargar el detalle del siniestro.');
+            }
+        }
+
+        function gestionarSiniestro(id, nuevoEstado) {
+            showSafeDeleteModal(
+                'Actualizar Estado',
+                `¿Deseas cambiar el estado del siniestro #${id} a <b>${nuevoEstado}</b>?<br>Escribe "${nuevoEstado}" para confirmar:`,
+                nuevoEstado,
                 async () => {
-                    // Callback al confirmar
                     try {
-                        const res = await fetch(`${apiBaseUrl}/siniestros/${currentSiniestroId}/estado`, {
+                        const res = await fetch(`${apiBaseUrl}/${id}/estado`, {
                             method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            credentials: 'include',
+                            headers: getHeaders(),
                             body: JSON.stringify({ estado: nuevoEstado })
                         });
 
@@ -311,37 +248,76 @@
             );
         }
 
-        // --- LÓGICA DE FILTROS ---
-        document.getElementById('searchSiniestro').addEventListener('keyup', applyFilters);
+        // --- LÓGICA DE FILTROS AJAX (Debounced) ---
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const filterEstado = document.getElementById('filterEstado');
+            const clearBtn = document.getElementById('clearSearch');
+            const btnLimpiarTodo = document.getElementById('btnLimpiarTodo');
+            const resultsContainer = document.getElementById('resultsContainer');
+            let debounceTimer;
 
-        function applyFilters() {
-            const searchText = document.getElementById('searchSiniestro').value.toLowerCase();
-            const statusFilter = document.getElementById('filterEstado').value;
+            // Init state
+            toggleClearButton();
 
-            const rows = document.querySelectorAll('#siniestrosTableBody tr');
-
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-
-                // El estado está en la columna 6 (index 5)
-                const statusCell = row.cells[5];
-                const statusBadge = statusCell ? statusCell.querySelector('.badge') : null;
-                // Normalizar: PENDIENTE_REVISION -> PENDIENTE para que coincida con el filtro
-                let status = statusBadge ? statusBadge.innerText.trim().toUpperCase() : '';
-                if (status === 'PENDIENTE_REVISION') status = 'PENDIENTE';
-
-                const matchesSearch = text.includes(searchText);
-                const matchesStatus = statusFilter === '' || status.includes(statusFilter);
-
-                row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            // Input Listener
+            searchInput.addEventListener('input', function () {
+                toggleClearButton();
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => performSearch(), 500);
             });
-        }
 
-        function clearFilters() {
-            document.getElementById('searchSiniestro').value = '';
-            document.getElementById('filterEstado').value = '';
-            applyFilters();
-        }
+            // Evento Tecla Enter
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Clear Button
+            clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                toggleClearButton();
+                performSearch();
+            });
+
+            // Clear All
+            btnLimpiarTodo.addEventListener('click', function () {
+                searchInput.value = '';
+                filterEstado.value = '';
+                toggleClearButton();
+                performSearch();
+            });
+
+            function toggleClearButton() {
+                const hasContent = searchInput.value.trim().length > 0;
+                clearBtn.style.display = hasContent ? 'block' : 'none';
+                const container = searchInput.closest('.search-expandable');
+                if (container) container.classList.toggle('active', hasContent);
+            }
+
+            function performSearch() {
+                const query = searchInput.value;
+                const status = filterEstado.value;
+                const url = new URL(window.location.href);
+                if (query) url.searchParams.set('search', query); else url.searchParams.delete('search');
+                if (status) url.searchParams.set('estado', status); else url.searchParams.delete('estado');
+                url.searchParams.set('page', 0);
+
+                window.history.pushState({}, '', url);
+
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.getElementById('resultsContainer').innerHTML;
+                        resultsContainer.innerHTML = newContent;
+                    })
+                    .catch(e => console.error('Error:', e));
+            }
+        });
+        /*]]>*/
     </script>
 </body>
 

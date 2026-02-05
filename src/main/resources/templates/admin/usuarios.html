@@ -7,7 +7,7 @@
     <div th:replace="~{fragments/favicon :: favicon}"></div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/styles.css(v=3.4)}">
+    <link rel="stylesheet" th:href="@{/css/styles.css(v=3.6)}">
     <!-- Librería para Exportación -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 </head>
@@ -31,31 +31,35 @@
                 <div class="card-body py-3">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
-                            <div class="search-expandable">
-                                <input type="text" id="searchUser" placeholder="Buscar usuario...">
+                            <div class="search-expandable position-relative">
+                                <input type="text" id="searchInput" placeholder="Buscar usuario..."
+                                    class="form-control pe-5" autocomplete="off" th:value="${keyword}">
+                                <i class="bi bi-x-circle-fill position-absolute top-50 end-0 translate-middle-y me-5 text-secondary cursor-pointer"
+                                    id="clearSearch" style="display: none; cursor: pointer; z-index: 10;"></i>
                                 <div class="search-expandable-icon">
                                     <i class="bi bi-search"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select" id="filterRol" onchange="applyFilters()">
+                            <select class="form-select" id="filterRol">
                                 <option value="">Todos los Roles</option>
-                                <option value="ADMIN">Admin</option>
-                                <option value="USUARIO">Usuario</option>
-                                <option value="OWNER">Propietario</option>
+                                <option value="ADMIN" th:selected="${role == 'ADMIN'}">Admin</option>
+                                <option value="USUARIO" th:selected="${role == 'USUARIO'}">Usuario</option>
+                                <option value="OWNER" th:selected="${role == 'OWNER'}">Propietario</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <select class="form-select" id="filterStatus" onchange="applyFilters()">
+                            <select class="form-select" id="filterStatus">
                                 <option value="">Estado</option>
-                                <option value="ACTIVO">Activo</option>
-                                <option value="SIN ACTIVAR">Sin Activar</option>
-                                <option value="BLOQUEADO">Bloqueado</option>
+                                <option value="ACTIVO" th:selected="${status == 'ACTIVO'}">Activo</option>
+                                <option value="SIN ACTIVAR" th:selected="${status == 'SIN ACTIVAR'}">Sin Activar
+                                </option>
+                                <option value="BLOQUEADO" th:selected="${status == 'BLOQUEADO'}">Bloqueado</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                            <button class="btn btn-outline-secondary w-100" id="btnLimpiarTodo">
                                 <i class="bi bi-x-circle me-1"></i>Limpiar
                             </button>
                         </div>
@@ -63,145 +67,150 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Usuario</th>
-                                <th>Contacto</th>
-                                <th>Ubicación</th>
-                                <th>Edad</th>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody">
-                            <tr th:each="u : ${usuarios}">
-                                <td class="text-muted fw-bold">#<span th:text="${u.id}">1</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-circle bg-light text-primary me-2 rounded-circle d-flex align-items-center justify-content-center"
-                                            style="width:35px;height:35px;">
-                                            <i class="bi bi-person-fill"></i>
+            <div id="resultsContainer">
+                <div class="card shadow-sm border-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Contacto</th>
+                                    <th>Ubicación</th>
+                                    <th>Edad</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <tr th:each="u : ${usuarios}">
+                                    <td class="text-muted fw-bold">#<span th:text="${u.id}">1</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-light text-primary me-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width:35px;height:35px;">
+                                                <i class="bi bi-person-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold" th:text="${u.nombreCompleto}">Nombre</div>
+                                                <small class="text-muted" th:if="${u.fechaCreacionObj}"
+                                                    th:text="'Reg: ' + ${#temporals.format(u.fechaCreacionObj, 'dd/MM/yyyy')}">01/01/2024</small>
+                                                <small class="text-muted" th:unless="${u.fechaCreacionObj}"
+                                                    th:text="${u.fechaCreacion != null} ? ('Reg: ' + u.fechaCreacion) : '-'">-</small>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div class="fw-bold" th:text="${u.nombreCompleto}">Nombre</div>
-                                            <small class="text-muted" th:if="${u.fechaCreacionObj}"
-                                                th:text="'Reg: ' + ${#temporals.format(u.fechaCreacionObj, 'dd/MM/yyyy')}">01/01/2024</small>
-                                            <small class="text-muted" th:unless="${u.fechaCreacionObj}"
-                                                th:text="${u.fechaCreacion != null} ? ('Reg: ' + u.fechaCreacion) : '-'">-</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <small><i class="bi bi-envelope me-1"></i> <span
+                                                    th:text="${u.email}">email</span></small>
+                                            <small class="text-muted" th:if="${u.movil}"><i
+                                                    class="bi bi-phone me-1"></i>
+                                                <span th:text="${u.movil}">600...</span></small>
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <small><i class="bi bi-envelope me-1"></i> <span
-                                                th:text="${u.email}">email</span></small>
-                                        <small class="text-muted" th:if="${u.movil}"><i class="bi bi-phone me-1"></i>
-                                            <span th:text="${u.movil}">600...</span></small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span th:if="${u.ciudad}" th:text="${u.ciudad}">Sevilla</span>
-                                    <span th:unless="${u.ciudad}" class="text-muted">-</span>
-                                </td>
-                                <td>
-                                    <span th:if="${u.edad}" th:text="${u.edad} + ' años'">25 años</span>
-                                    <span th:unless="${u.fechaNacimiento}" class="text-muted">-</span>
-                                </td>
-                                <td>
-                                    <span th:class="${'badge ' + 
+                                    </td>
+                                    <td>
+                                        <span th:if="${u.ciudad}" th:text="${u.ciudad}">Sevilla</span>
+                                        <span th:unless="${u.ciudad}" class="text-muted">-</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${u.edad}" th:text="${u.edad} + ' años'">25 años</span>
+                                        <span th:unless="${u.fechaNacimiento}" class="text-muted">-</span>
+                                    </td>
+                                    <td>
+                                        <span th:class="${'badge ' + 
                                           (u.rol == 'OWNER' ? 'bg-owner' : 
                                           (u.rol == 'ADMIN' ? 'bg-warning text-dark' : 
                                           'bg-info bg-opacity-10 text-info border border-info'))}"
-                                        th:styleappend="${u.rol == 'OWNER' ? 'background-color: #282c3f !important; color: #f1a61c !important; border: 1px solid #f1a61c !important;' : ''}"
-                                        th:text="${u.rol}">USER</span>
-                                </td>
-                                <td>
-                                    <span th:if="${u.activo == true && u.emailConfirmado == true}"
-                                        class="badge bg-success bg-opacity-10 text-success border border-success">ACTIVO</span>
-                                    <span
-                                        th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
-                                        class="badge bg-warning bg-opacity-10 text-warning border border-warning"
-                                        style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN
-                                        ACTIVAR</span>
-                                    <span th:if="${u.activo == false}"
-                                        class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <!-- Botón Ver Detalle -->
-                                        <button class="btn btn-sm btn-outline-primary" th:data-id="${u.id}"
-                                            th:data-nombre="${u.nombreCompleto}" th:data-email="${u.email}"
-                                            th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}"
-                                            th:data-movil="${u.movil}" th:data-nacimiento="${u.fechaNacimiento}"
-                                            th:data-direccion="${u.direccion}" onclick="verDetalle(this)"
-                                            title="Ver Detalle">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        <!-- Botón Cambiar Rol (Solo OWNER) -->
-                                        <button th:if="${session.rol == 'OWNER' && u.rol != 'OWNER'}"
-                                            class="btn btn-sm btn-outline-warning text-dark" th:data-id="${u.id}"
-                                            th:data-nombre="${u.nombreCompleto}" th:data-rolactual="${u.rol}"
-                                            onclick="mostrarCambioRol(this)" title="Cambiar Rol">
-                                            <i class="bi bi-person-badge"></i>
-                                        </button>
-
-                                        <!-- Acciones para perfiles no administrativos -->
-                                        <th:block th:if="${u.rol != 'ADMIN' && u.rol != 'OWNER'}">
-                                            <button th:if="${u.activo == true}" class="btn btn-sm btn-outline-danger"
-                                                th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
-                                                onclick="toggleEstado(this, false)" title="Bloquear Usuario">
-                                                <i class="bi bi-ban"></i>
-                                            </button>
-                                            <button th:if="${u.activo == false}" class="btn btn-sm btn-outline-success"
-                                                th:data-id="${u.id}" th:data-nombre="${u.nombreCompleto}"
-                                                onclick="toggleEstado(this, true)" title="Desbloquear Usuario">
-                                                <i class="bi bi-check-lg"></i>
+                                            th:styleappend="${u.rol == 'OWNER' ? 'background-color: #282c3f !important; color: #f1a61c !important; border: 1px solid #f1a61c !important;' : ''}"
+                                            th:text="${u.rol}">USER</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${u.activo == true && u.emailConfirmado == true}"
+                                            class="badge bg-success bg-opacity-10 text-success border border-success">ACTIVO</span>
+                                        <span
+                                            th:if="${u.activo == true && (u.emailConfirmado == false || u.emailConfirmado == null)}"
+                                            class="badge bg-warning bg-opacity-10 text-warning border border-warning"
+                                            style="background-color: #fff3cd !important; color: #856404 !important; border-color: #ffeeba !important;">SIN
+                                            ACTIVAR</span>
+                                        <span th:if="${u.activo == false}"
+                                            class="badge bg-danger bg-opacity-10 text-danger border border-danger">BLOQUEADO</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <!-- Botón Ver Detalle -->
+                                            <button class="btn btn-sm btn-outline-primary" th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}" th:data-email="${u.email}"
+                                                th:data-ciudad="${u.ciudad}" th:data-rol="${u.rol}"
+                                                th:data-movil="${u.movil}" th:data-nacimiento="${u.fechaNacimiento}"
+                                                th:data-direccion="${u.direccion}" onclick="verDetalle(this)"
+                                                title="Ver Detalle">
+                                                <i class="bi bi-eye"></i>
                                             </button>
 
-                                            <!-- Botón Eliminar -->
-                                            <button class="btn btn-sm btn-danger" th:data-id="${u.id}"
-                                                th:data-nombre="${u.nombreCompleto}" onclick="eliminarUsuario(this)"
-                                                title="Eliminar Usuario Permanentemente">
-                                                <i class="bi bi-trash"></i>
+                                            <!-- Botón Cambiar Rol (Solo OWNER) -->
+                                            <button th:if="${session.rol == 'OWNER' && u.rol != 'OWNER'}"
+                                                class="btn btn-sm btn-outline-warning text-dark" th:data-id="${u.id}"
+                                                th:data-nombre="${u.nombreCompleto}" th:data-rolactual="${u.rol}"
+                                                onclick="mostrarCambioRol(this)" title="Cambiar Rol">
+                                                <i class="bi bi-person-badge"></i>
                                             </button>
-                                        </th:block>
 
-                                        <!-- Botón Descargar Logs -->
-                                        <button class="btn btn-sm btn-outline-secondary" th:data-email="${u.email}"
-                                            onclick="descargarLogs(this)" title="Descargar Logs (TXT)">
-                                            <i class="bi bi-file-text"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                            <!-- Acciones para perfiles no administrativos -->
+                                            <th:block th:if="${u.rol != 'ADMIN' && u.rol != 'OWNER'}">
+                                                <button th:if="${u.activo == true}"
+                                                    class="btn btn-sm btn-outline-danger" th:data-id="${u.id}"
+                                                    th:data-nombre="${u.nombreCompleto}"
+                                                    onclick="toggleEstado(this, false)" title="Bloquear Usuario">
+                                                    <i class="bi bi-ban"></i>
+                                                </button>
+                                                <button th:if="${u.activo == false}"
+                                                    class="btn btn-sm btn-outline-success" th:data-id="${u.id}"
+                                                    th:data-nombre="${u.nombreCompleto}"
+                                                    onclick="toggleEstado(this, true)" title="Desbloquear Usuario">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+
+                                                <!-- Botón Eliminar -->
+                                                <button class="btn btn-sm btn-danger" th:data-id="${u.id}"
+                                                    th:data-nombre="${u.nombreCompleto}" onclick="eliminarUsuario(this)"
+                                                    title="Eliminar Usuario Permanentemente">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </th:block>
+
+                                            <!-- Botón Descargar Logs -->
+                                            <button class="btn btn-sm btn-outline-secondary" th:data-email="${u.email}"
+                                                onclick="descargarLogs(this)" title="Descargar Logs (TXT)">
+                                                <i class="bi bi-file-text"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Paginación -->
-            <nav th:if="${totalPages > 1}" class="mt-4" aria-label="Navegación de páginas">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link"
-                            th:href="@{/admin/usuarios(page=${currentPage - 1}, keyword=${keyword}, role=${role}, status=${status})}">Anterior</a>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
-                                th:text="${totalPages}">1</span></span>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link"
-                            th:href="@{/admin/usuarios(page=${currentPage + 1}, keyword=${keyword}, role=${role}, status=${status})}">Siguiente</a>
-                    </li>
-                </ul>
-            </nav>
+                <!-- Paginación -->
+                <nav th:if="${totalPages > 1}" class="mt-4" aria-label="Navegación de páginas">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/admin/usuarios(page=${currentPage - 1}, keyword=${keyword}, role=${role}, status=${status})}">Anterior</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Página <span th:text="${currentPage + 1}">1</span> de <span
+                                    th:text="${totalPages}">1</span></span>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/admin/usuarios(page=${currentPage + 1}, keyword=${keyword}, role=${role}, status=${status})}">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
             <div class="modal fade" id="modalUsuario" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -300,38 +309,80 @@
                     return headers;
                 }
 
-                // Filtro de búsqueda
-                // --- FILTROS ---
-                document.getElementById('searchUser').addEventListener('keyup', applyFilters);
+                // Filtro de búsqueda AJAX Server-Side
+                document.addEventListener('DOMContentLoaded', () => {
+                    const searchInput = document.getElementById('searchInput');
+                    const filterRol = document.getElementById('filterRol');
+                    const filterStatus = document.getElementById('filterStatus');
+                    const clearBtn = document.getElementById('clearSearch');
+                    const btnLimpiarTodo = document.getElementById('btnLimpiarTodo');
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    let debounceTimer;
 
-                function applyFilters() {
-                    const searchText = document.getElementById('searchUser').value.toLowerCase();
-                    const rolFilter = document.getElementById('filterRol').value.toUpperCase();
-                    const statusFilter = document.getElementById('filterStatus').value.toUpperCase();
+                    toggleClearButton();
 
-                    const rows = document.querySelectorAll('#userTableBody tr');
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-
-                        // Rol en columna 6 (index 5)
-                        const rolCell = row.cells[5].innerText.trim().toUpperCase();
-                        // Estado en columna 7 (index 6)
-                        const statusCell = row.cells[6].innerText.trim().toUpperCase();
-
-                        let matchesSearch = text.includes(searchText);
-                        let matchesRol = rolFilter === '' || rolCell.includes(rolFilter);
-                        let matchesStatus = statusFilter === '' || statusCell.includes(statusFilter);
-
-                        row.style.display = (matchesSearch && matchesRol && matchesStatus) ? '' : 'none';
+                    // Search Input Listener
+                    searchInput.addEventListener('input', function () {
+                        toggleClearButton();
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() => performSearch(), 500);
                     });
-                }
 
-                function clearFilters() {
-                    document.getElementById('searchUser').value = '';
-                    document.getElementById('filterRol').value = '';
-                    document.getElementById('filterStatus').value = '';
-                    applyFilters();
-                }
+                    // Select Listeners
+                    filterRol.addEventListener('change', performSearch);
+                    filterStatus.addEventListener('change', performSearch);
+
+                    // Clear Button Listener
+                    clearBtn.addEventListener('click', function () {
+                        searchInput.value = '';
+                        toggleClearButton();
+                        performSearch();
+                    });
+
+                    // Clear All Listener
+                    btnLimpiarTodo.addEventListener('click', function () {
+                        searchInput.value = '';
+                        filterRol.value = '';
+                        filterStatus.value = '';
+                        toggleClearButton();
+                        performSearch();
+                    });
+
+                    function toggleClearButton() {
+                        const hasContent = searchInput.value.trim().length > 0;
+                        clearBtn.style.display = hasContent ? 'block' : 'none';
+                        const container = searchInput.closest('.search-expandable');
+                        if (container) container.classList.toggle('active', hasContent);
+                    }
+
+                    function performSearch() {
+                        const keyword = searchInput.value;
+                        const role = filterRol.value;
+                        const status = filterStatus.value;
+
+                        const url = new URL(window.location.href);
+                        if (keyword) url.searchParams.set('keyword', keyword); else url.searchParams.delete('keyword');
+                        if (role) url.searchParams.set('role', role); else url.searchParams.delete('role');
+                        if (status) url.searchParams.set('status', status); else url.searchParams.delete('status');
+
+                        // Reset page on filter change
+                        url.searchParams.set('page', 0);
+
+                        window.history.pushState({}, '', url);
+
+                        fetch(url)
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newContent = doc.getElementById('resultsContainer') ? doc.getElementById('resultsContainer').innerHTML : null;
+                                if (newContent) {
+                                    resultsContainer.innerHTML = newContent;
+                                }
+                            })
+                            .catch(e => console.error('Error fetching results:', e));
+                    }
+                });
 
                 // --- EXPORTAR ---
                 function exportToExcel() {

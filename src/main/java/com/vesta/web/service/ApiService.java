@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Servicio para comunicación con la API backend
@@ -1023,10 +1025,17 @@ public class ApiService {
 
     // === NUEVO MÉTODO: OBTENER SINIESTROS ===
     // === NUEVO MÉTODO: OBTENER SINIESTROS ===
-    public Map<String, Object> obtenerSiniestros(String token, int page) {
+    public Map<String, Object> obtenerSiniestros(String token, int page, String search, String estado) {
         String url = apiUrl + "/siniestros?page=" + page;
+        if (search != null && !search.trim().isEmpty()) {
+            url += "&search=" + URLEncoder.encode(search.trim(), StandardCharsets.UTF_8);
+        }
+        if (estado != null && !estado.trim().isEmpty() && !"ALL".equals(estado)) {
+            url += "&estado=" + URLEncoder.encode(estado.trim(), StandardCharsets.UTF_8);
+        }
+
         try {
-            logger.debug("Obteniendo siniestros paginados");
+            logger.debug("Obteniendo siniestros paginados con busqueda: {}", search);
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
@@ -1043,12 +1052,31 @@ public class ApiService {
         }
     }
 
+    public Map<String, Object> obtenerLogsAuditoria(String token, int page, String search) {
+        String url = apiUrl + "/auditoria?page=" + page;
+        if (search != null && !search.trim().isEmpty()) {
+            url += "&search=" + search;
+        }
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+            return response.getBody() != null ? response.getBody() : new HashMap<>();
+        } catch (Exception e) {
+            logger.error("Error al obtener logs: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
     // === GESTIÓN DE USUARIOS ===
     // === GESTIÓN DE USUARIOS ===
 
     // Sobrecarga para mantener compatibilidad (obtiene página 0)
     public List<Map<String, Object>> obtenerTodosLosUsuarios(String token) {
-        Map<String, Object> paginatedResult = obtenerUsuariosPaginados(token, 0, 1000);
+        Map<String, Object> paginatedResult = obtenerUsuariosPaginados(token, 0, 1000, null, null, null);
         Object contentObj = paginatedResult.get("content");
         if (contentObj instanceof List) {
             return (List<Map<String, Object>>) contentObj;
@@ -1056,8 +1084,18 @@ public class ApiService {
         return List.of();
     }
 
-    public Map<String, Object> obtenerUsuariosPaginados(String token, int page, int size) {
+    public Map<String, Object> obtenerUsuariosPaginados(String token, int page, int size, String keyword, String role,
+            String status) {
         String url = apiUrl + "/usuarios?page=" + page + "&size=" + size;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            url += "&keyword=" + URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8);
+        }
+        if (role != null && !role.trim().isEmpty() && !"ALL".equals(role)) {
+            url += "&role=" + URLEncoder.encode(role.trim(), StandardCharsets.UTF_8);
+        }
+        if (status != null && !status.trim().isEmpty() && !"ALL".equals(status)) {
+            url += "&status=" + URLEncoder.encode(status.trim(), StandardCharsets.UTF_8);
+        }
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
