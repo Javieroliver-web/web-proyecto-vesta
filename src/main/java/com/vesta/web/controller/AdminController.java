@@ -17,9 +17,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.ResponseEntity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private ApiService apiService;
@@ -157,9 +162,11 @@ public class AdminController {
 
         // Obtener página de usuarios (size 10 por defecto) con filtros
         Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10, keyword, role, status);
+        logger.debug("DEBUG ADMIN: Received pageData for users: {}", pageData);
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) pageData.getOrDefault("content", List.of());
+        logger.debug("DEBUG ADMIN: Users list size: {}", usuarios.size());
 
         // Safe casting for numbers using Number to avoid ClassCastException
         Number totalPagesNum = (Number) pageData.getOrDefault("totalPages", 0);
@@ -281,7 +288,13 @@ public class AdminController {
             return "redirect:/";
 
         Map<String, Object> pageData = apiService.obtenerSiniestros(token, page, search, estado);
-        model.addAttribute("siniestros", pageData.get("content"));
+        logger.debug("DEBUG ADMIN: Received pageData for siniestros: {}", pageData);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) pageData.getOrDefault("content", List.of());
+        logger.debug("DEBUG ADMIN: Siniestros list size: {}", contentList.size());
+
+        model.addAttribute("siniestros", contentList);
         model.addAttribute("search", search);
         model.addAttribute("estado", estado);
 
@@ -335,6 +348,21 @@ public class AdminController {
                     .body(content);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al exportar logs: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/debug/seed")
+    @ResponseBody
+    public ResponseEntity<?> generarDatosPrueba(HttpSession session) {
+        String token = (String) session.getAttribute("token");
+        if (token == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "No autenticado"));
+        }
+        try {
+            Map<String, Object> result = apiService.generarDatosPrueba(token);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 }

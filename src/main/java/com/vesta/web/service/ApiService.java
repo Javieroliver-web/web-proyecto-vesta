@@ -1311,4 +1311,24 @@ public class ApiService {
         headers.set("Authorization", "Bearer " + token);
         return headers;
     }
+
+    // === DEBUG / SEEDER ===
+    public Map<String, Object> generarDatosPrueba(String token) {
+        String url = apiUrl + "/debug/seed";
+        try {
+            logger.info("Solicitando generación de datos de prueba...");
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+            return response.getBody() != null ? response.getBody() : new HashMap<>();
+        } catch (Exception e) {
+            logger.error("Error al generar datos de prueba: {}", e.getMessage());
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return error;
+        }
+    }
 }

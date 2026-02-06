@@ -63,6 +63,11 @@
                                 <i class="bi bi-x-circle me-1"></i>Limpiar
                             </button>
                         </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-warning text-white w-100" type="button" onclick="generarDatosPrueba()">
+                                <i class="bi bi-database-add me-1"></i>Generar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -582,6 +587,44 @@
                     // Create toast with custom delay
                     const toast = new bootstrap.Toast(el, { delay: duration });
                     toast.show();
+                }
+
+                // === GENERAR DATOS DE PRUEBA ===
+                function generarDatosPrueba() {
+                    if(!confirm('¿Estás seguro de generar datos de prueba? Esto creará usuarios y siniestros ficticios.')) return;
+
+                    // Mostrar loading
+                    const btn = document.querySelector('button[onclick="generarDatosPrueba()"]');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...';
+                    btn.disabled = true;
+
+                    fetch('/admin/debug/seed', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if(data.error) {
+                            showToast(data.error, 'error');
+                        } else {
+                            showToast('Datos generados correctamente. Recargando...', 'success');
+                            setTimeout(() => window.location.reload(), 1500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Error al conectar con el servidor.', 'error');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
                 }
             </script>
 </body>

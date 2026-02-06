@@ -55,16 +55,14 @@ pdf_options:
 7. **Interfaz Web y Experiencia de Usuario** ............................................................... 17
     7.1. Estructura del Proyecto Web ............................................................................. 17
     7.2. Flujos de Usuario ................................................................................................ 18
-8. **Manual de Instrucciones** ....................................................................................... 19
-    8.1. Guía para Clientes .............................................................................................. 19
-    8.2. Guía para Administradores ................................................................................ 20
-9. **Análisis de Seguridad (OWASP Top 10)** ........................................................... 21
-10. **Justificación de Diseño y Tecnologías** .............................................................. 22
-11. **Glosario de Negocio** ............................................................................................ 23
-12. **Líneas Futuras y Escalabilidad** ........................................................................... 24
-13. **Plan de Pruebas y Calidad** ..................................................................................... 25
-14. **Estudio Económico y Gestión** ............................................................................... 26
-15. **Guía de Despliegue e Instalación** ........................................................................ 27
+8. **Análisis de Seguridad (OWASP Top 10)** ........................................................... 21
+9. **Justificación de Diseño y Tecnologías** .............................................................. 22
+10. **Glosario de Negocio** ............................................................................................ 23
+11. **Líneas Futuras y Escalabilidad** ........................................................................... 24
+12. **Plan de Pruebas y Calidad** ..................................................................................... 25
+13. **Estudio Económico y Gestión** ............................................................................... 26
+14. **Guía de Despliegue e Instalación** ........................................................................ 27
+15. **Bibliografía y Referencias** .................................................................................... 28
 
 <div style="page-break-after: always;"></div>
 
@@ -349,43 +347,8 @@ Un asistente flotante en la esquina inferior derecha utiliza la API de `ApiServi
 
 <div style="page-break-after: always;"></div>
 
-# 8. Manual de Instrucciones
 
-## 8.1. Guía para Clientes
-
-### Paso 1: Crear una cuenta
-Vesta ofrece dos métodos:
-- **Formulario Clásico**: Introduzca nombre, email y contraseña segura. Recibirá un correo de confirmación.
-- **Google Login**: Pulse el botón "Continuar con Google" para un acceso inmediato sin contraseñas.
-
-### Paso 2: Proteger sus bienes
-1. Vaya a la pestaña "Productos".
-2. Seleccione la categoría (Hogar, Tecnología, Movilidad).
-3. Pulse "Contratar".
-4. Verifique las fechas de cobertura. ¡Puede asegurar un objeto solo por un fin de semana!
-
-### Paso 3: Reportar un incidente
-Si ha sufrido un percance:
-1. Entre en "Mis Pólizas".
-2. Seleccione la póliza activa.
-3. Pulse el botón rojo "Reportar Siniestro".
-4. Escriba qué ha ocurrido y **suba una foto clara**.
-5. Espere unos segundos: Nuestro sistema le dirá inmediatamente si su siniestro está pre-aprobado.
-
-## 8.2. Guía para Administradores
-
-### Gestión de Catálogo
-- Para subir un precio: Vaya a `Admin > Productos`, edite el ítem y cambie el `Precio Base`. Los cambios aplican solo a nuevas pólizas.
-- Para descatalogar: Marque el producto como `Inactivo`. Desaparecerá de la tienda pero las pólizas existentes se mantendrán.
-
-### Revisión de Fraude
-- Revise diariamente la cola de "Siniestros en Revisión".
-- El sistema marca en rojo los casos con `Score > 50`.
-- Revise la foto y el historial del cliente antes de aprobar el pago.
-
-<div style="page-break-after: always;"></div>
-
-# 9. Análisis de Seguridad (Cumplimiento OWASP)
+# 8. Análisis de Seguridad (Cumplimiento OWASP)
 
 La seguridad ha sido un pilar fundamental en el desarrollo de Vesta, abordando proactivamente las vulnerabilidades más críticas del OWASP Top 10.
 
@@ -412,7 +375,7 @@ Vesta mitiga este riesgo mediante el uso estricto de **JPA (Java Persistence API
 
 <div style="page-break-after: always;"></div>
 
-# 10. Justificación de Diseño y Tecnologías
+# 9. Justificación de Diseño y Tecnologías
 
 La elección del stack tecnológico responde a criterios de robustez empresarial y mantenibilidad.
 
@@ -434,7 +397,7 @@ Aunque los microservicios son populares, para un equipo y alcance acotado, un **
 
 <div style="page-break-after: always;"></div>
 
-# 11. Glosario de Negocio
+# 10. Glosario de Negocio
 
 Para asegurar la correcta interpretación de la documentación, se definen los términos del dominio asegurador utilizados en el sistema.
 
@@ -460,7 +423,7 @@ Para asegurar la correcta interpretación de la documentación, se definen los t
 
 <div style="page-break-after: always;"></div>
 
-# 12. Líneas Futuras y Escalabilidad
+# 11. Líneas Futuras y Escalabilidad
 
 Vesta Seguros está diseñada como un MVP (Producto Mínimo Viable) robusto, pero el roadmap tecnológico contempla evoluciones ambiciosas.
 
@@ -485,13 +448,9 @@ Cuando la carga de usuarios supere los 100k concurrentes:
 
 <div style="page-break-after: always;"></div>
 
-    13. **Plan de Pruebas y Calidad** ......................................................................... 25
-    14. **Estudio Económico y Gestión** ....................................................................... 26
-    15. **Guía de Despliegue e Instalación** ........................................................................ 27
-
 <div style="page-break-after: always;"></div>
 
-# 13. Plan de Pruebas y Aseguramiento de la Calidad
+# 12. Plan de Pruebas y Aseguramiento de la Calidad
 
 Para garantizar la fiabilidad del software, se ha seguido una estrategia de pruebas piramidal.
 
@@ -518,7 +477,7 @@ Realizadas manualmente navegando por el Portal Web para asegurar la usabilidad.
 
 <div style="page-break-after: always;"></div>
 
-# 14. Estudio Económico y Gestión del Proyecto
+# 13. Estudio Económico y Gestión del Proyecto
 
 ## 14.1. Herramientas de Gestión
 El desarrollo ha seguido una metodología ágil (Kanban simplificado).
@@ -541,7 +500,7 @@ Para un despliegue en producción real (ej: Google Cloud Platform), se estima el
 
 <div style="page-break-after: always;"></div>
 
-# 15. Guía de Despliegue e Instalación
+# 14. Guía de Despliegue e Instalación
 
 Este manual técnico está dirigido al equipo de DevOps para la puesta en producción.
 
@@ -596,7 +555,7 @@ Actualmente, existe una versión desplegada y accesible públicamente para demos
 
 <div style="page-break-after: always;"></div>
 
-# 16. Bibliografía y Referencias
+# 15. Bibliografía y Referencias
 
 Para el desarrollo de este proyecto se han consultado las siguientes fuentes oficiales y estándares de la industria.
 
