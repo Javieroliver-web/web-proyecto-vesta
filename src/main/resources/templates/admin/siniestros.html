@@ -78,38 +78,41 @@
                         <tbody>
                             <tr th:each="s : ${siniestros}">
                                 <td class="ps-4 fw-bold text-muted">#<span th:text="${s.id}">1</span></td>
-                                <td th:text="${s.fechaOcurrencia}">2024-01-01</td>
+                                <td th:text="${s.fecha}">2024-01-01</td>
                                 <td>
                                     <div class="d-flex flex-column">
                                         <span class="fw-bold"
-                                            th:text="${s.usuario != null ? s.usuario.nombreCompleto : 'N/A'}">Juan
+                                            th:text="${s.poliza != null && s.poliza.usuario != null ? s.poliza.usuario.nombreCompleto : 'N/A'}">Juan
                                             Pérez</span>
                                         <small class="text-muted"
-                                            th:text="${s.usuario != null ? s.usuario.email : 'N/A'}">juan@example.com</small>
+                                            th:text="${s.poliza != null && s.poliza.usuario != null ? s.poliza.usuario.email : 'N/A'}">juan@example.com</small>
                                     </div>
                                 </td>
+                                <td
+                                    th:text="${s.poliza != null && s.poliza.producto != null ? s.poliza.producto.categoria : 'N/A'}">
+                                    ACCIDENTE</td>
                                 <td>
-                                    <span class="badge bg-light text-dark border" th:text="${s.tipo}">ACCIDENTE</span>
-                                </td>
-                                <td>
-                                    <span th:if="${s.estado == 'PENDIENTE'}"
-                                        class="badge bg-warning bg-opacity-10 text-warning">PENDIENTE</span>
-                                    <span th:if="${s.estado == 'EN_PROCESO'}"
-                                        class="badge bg-info bg-opacity-10 text-info">EN PROCESO</span>
-                                    <span th:if="${s.estado == 'RESUELTO'}"
-                                        class="badge bg-success bg-opacity-10 text-success">RESUELTO</span>
-                                    <span th:if="${s.estado == 'RECHAZADO'}"
-                                        class="badge bg-danger bg-opacity-10 text-danger">RECHAZADO</span>
+                                    <span th:if="${s.estado == 'PENDIENTE' || s.estado == 'PENDIENTE_REVISION'}"
+                                        class="badge shadow-sm px-3"
+                                        style="background-color: #f1a61c !important; color: #000 !important; font-weight: 800;">PENDIENTE</span>
+                                    <span th:if="${s.estado == 'EN_PROCESO'}" class="badge shadow-sm px-3"
+                                        style="background-color: #0dcaf0 !important; color: #000 !important; font-weight: 800;">EN
+                                        PROCESO</span>
+                                    <span th:if="${s.estado == 'RESUELTO' || s.estado == 'APROBADO'}"
+                                        class="badge shadow-sm px-3"
+                                        style="background-color: #198754 !important; color: #fff !important; font-weight: 800;">APROBADO</span>
+                                    <span th:if="${s.estado == 'RECHAZADO'}" class="badge shadow-sm px-3"
+                                        style="background-color: #dc3545 !important; color: #fff !important; font-weight: 800;">RECHAZADO</span>
+                                    <span
+                                        th:if="${s.estado != 'PENDIENTE' && s.estado != 'PENDIENTE_REVISION' && s.estado != 'EN_PROCESO' && s.estado != 'RESUELTO' && s.estado != 'APROBADO' && s.estado != 'RECHAZADO'}"
+                                        class="badge bg-secondary shadow-sm px-3" th:text="${s.estado}">ESTADO</span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <button class="btn btn-sm btn-outline-primary me-1"
                                         th:onclick="verDetalleSiniestro([[${s.id}]])" title="Ver Detalle">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <button th:if="${s.estado == 'PENDIENTE'}" class="btn btn-sm btn-success me-1"
-                                        th:onclick="gestionarSiniestro([[${s.id}]], 'EN_PROCESO')" title="Aceptar">
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
+                                    <!-- El botón de aceptar ahora solo aparece dentro del detalle -->
                                     <button th:if="${s.estado == 'EN_PROCESO'}"
                                         class="btn btn-sm btn-outline-success me-1"
                                         th:onclick="gestionarSiniestro([[${s.id}]], 'RESUELTO')" title="Resolver">
@@ -150,7 +153,6 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE SINIESTRO -->
     <div class="modal fade" id="modalSiniestro" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content border-0 shadow-lg">
@@ -158,11 +160,12 @@
                     <h5 class="modal-title fw-bold">Detalle de Siniestro #<span id="detailId"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" id="detailBody">
-                    <!-- Dinámico -->
+                <div class="modal-body p-0" id="detailBody">
+                    <!-- Contenido dinámico cargado por JS -->
                 </div>
-                <div class="modal-footer bg-light border-0">
+                <div class="modal-footer bg-light border-0 py-3" id="modalFooter">
                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <!-- Botones dinámicos -->
                 </div>
             </div>
         </div>
@@ -188,30 +191,89 @@
                 const s = await res.json();
 
                 const container = document.getElementById('detailBody');
+                const footer = document.getElementById('modalFooter');
+
+                // Construir URL de imagen
+                const imgUrl = s.imagenUrl ? (window.location.origin + '/vesta-api/' + s.imagenUrl) : null;
+                const riskLabel = s.fraudeScore > 70 ? 'Riesgo Crítico' : (s.fraudeScore > 30 ? 'Riesgo Medio' : 'Riesgo Bajo');
+                const riskClass = s.fraudeScore > 70 ? 'bg-danger' : (s.fraudeScore > 30 ? 'bg-warning text-dark' : 'bg-success');
+
                 container.innerHTML = `
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="small text-muted d-block">Tipo</label>
-                            <span class="badge bg-light text-dark border">${s.tipo}</span>
+                    <div class="row g-0">
+                        <!-- Lado izquierdo: Imagen -->
+                        <div class="col-md-6 bg-dark d-flex align-items-center justify-content-center p-3" style="min-height: 400px;">
+                            ${imgUrl ? `
+                                <img src="${imgUrl}" class="img-fluid rounded shadow" style="max-height: 350px; object-fit: contain;" 
+                                     onerror="this.parentElement.innerHTML='<div class=\'text-white-50\'><i class=\'bi bi-image display-1\'></i><p>Imagen no disponible</p></div>'">
+                            ` : `
+                                <div class="text-white-50 text-center">
+                                    <i class="bi bi-image display-1"></i>
+                                    <p>Sin evidencia visual</p>
+                                </div>
+                            `}
                         </div>
-                        <div class="col-md-6 text-end">
-                            <label class="small text-muted d-block">Estado Actual</label>
-                            <span class="badge bg-primary bg-opacity-10 text-primary">${s.estado}</span>
-                        </div>
-                        <div class="col-12">
-                            <label class="small text-muted d-block">Descripción de los hechos</label>
-                            <div class="p-3 bg-light rounded border">${s.descripcion}</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="small text-muted">Fecha del Suceso</label>
-                            <p class="fw-bold">${s.fechaOcurrencia}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="small text-muted">Póliza Asociada</label>
-                            <p class="fw-bold">#${s.polizaId}</p>
+                        
+                        <!-- Lado derecho: Info -->
+                        <div class="col-md-6 p-4">
+                            <!-- Info Cliente y Póliza -->
+                            <div class="mb-4 p-3 bg-light rounded shadow-sm border">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-person-vcard text-primary me-2"></i>Cliente</h6>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-person-circle text-muted me-2"></i>
+                                    <span class="fw-bold">${s.poliza?.usuario?.nombreCompleto || 'Usuario Demo'}</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-envelope text-muted me-2"></i>
+                                    <small class="text-muted">${s.poliza?.usuario?.email || 'demo@vesta.com'}</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-shield-check text-muted me-2"></i>
+                                    <small class="text-muted">Póliza #${s.poliza?.id || 'N/A'}</small>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold small text-muted text-uppercase mb-2">Declaración del Cliente:</h6>
+                            <div class="p-3 bg-light rounded mb-4 fst-italic border" style="min-height: 80px;">
+                                "${s.descripcion}"
+                            </div>
+
+                            <hr class="my-3">
+
+                            <h6 class="fw-bold text-primary mb-2"><i class="bi bi-robot me-2"></i>Análisis IA Vesta</h6>
+                            <div class="p-3 small mb-4 rounded shadow-sm fw-bold border" style="background-color: #1a3a5f !important; color: #ffffff !important; border-color: #3b82f6 !important; font-size: 0.95rem;">
+                                <i class="bi bi-info-circle-fill me-2 text-info"></i>${s.analisisIA || 'Análisis no disponible'}
+                            </div>
+
+                            <h6 class="fw-bold text-danger small text-uppercase mb-2">
+                                <i class="bi bi-shield-exclamation me-1"></i>Score de Fraude
+                            </h6>
+                            <div class="d-flex align-items-center">
+                                <h2 class="mb-0 me-3 fw-bold">${s.fraudeScore}%</h2>
+                                <span class="badge ${riskClass} px-3 py-2 rounded-pill">${riskLabel}</span>
+                            </div>
                         </div>
                     </div>
                 `;
+
+                // Botones del footer: Siempre permitir Aprobar/Rechazar para facilitar cambios
+                footer.innerHTML = `
+                    <div class="w-100 d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-danger px-5 py-2 shadow-sm fw-bold" onclick="gestionarSiniestro(${s.id}, 'RECHAZADO')">
+                            <i class="bi bi-x-circle me-2"></i>Rechazar
+                        </button>
+                        <button type="button" class="btn btn-success px-5 py-2 shadow-sm fw-bold" onclick="gestionarSiniestro(${s.id}, 'RESUELTO')">
+                            <i class="bi bi-check-circle me-2"></i>Aprobar
+                        </button>
+                    </div>
+                `;
+
+                if (s.estado !== 'PENDIENTE' && s.estado !== 'PENDIENTE_REVISION') {
+                    const statusColor = s.estado === 'RECHAZADO' ? 'text-danger' : 'text-success';
+                    const notice = document.createElement('div');
+                    notice.className = 'w-100 text-center mb-3 p-2 border rounded bg-light small shadow-sm';
+                    notice.innerHTML = `Este siniestro ya está <span class="fw-bold ${statusColor}">${s.estado}</span>. Puedes cambiar la decisión si lo deseas.`;
+                    footer.prepend(notice);
+                }
 
                 document.getElementById('detailId').innerText = id;
                 new bootstrap.Modal(document.getElementById('modalSiniestro')).show();
@@ -221,10 +283,10 @@
         }
 
         function gestionarSiniestro(id, nuevoEstado) {
-            showSafeDeleteModal(
-                'Actualizar Estado',
-                `¿Deseas cambiar el estado del siniestro #${id} a <b>${nuevoEstado}</b>?<br>Escribe "${nuevoEstado}" para confirmar:`,
-                nuevoEstado,
+            const accionTxt = nuevoEstado === 'RESUELTO' ? 'APROBAR' : 'RECHAZAR';
+            showConfirmModal(
+                'Confirmar Acción',
+                `¿Estás seguro de que deseas <b>${accionTxt}</b> el siniestro #${id}?`,
                 async () => {
                     try {
                         const res = await fetch(`${apiBaseUrl}/${id}/estado`, {
@@ -304,17 +366,8 @@
                 if (status) url.searchParams.set('estado', status); else url.searchParams.delete('estado');
                 url.searchParams.set('page', 0);
 
-                window.history.pushState({}, '', url);
-
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newContent = doc.getElementById('resultsContainer').innerHTML;
-                        resultsContainer.innerHTML = newContent;
-                    })
-                    .catch(e => console.error('Error:', e));
+                // Recargar la página con los nuevos parámetros
+                window.location.href = url.toString();
             }
         });
         /*]]>*/

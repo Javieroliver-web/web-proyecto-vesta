@@ -160,8 +160,19 @@ public class AdminController {
         if (page < 0)
             page = 0;
 
+        // Mapear estado para la API
+        String statusApi = status;
+        if ("ACTIVO".equals(status))
+            statusApi = "true";
+        else if ("BLOQUEADO".equals(status))
+            statusApi = "false";
+        // "SIN ACTIVAR" requiere lógica especial en el backend, por ahora lo dejamos
+        // como null para traer todos
+        else if ("SIN ACTIVAR".equals(status))
+            statusApi = null;
+
         // Obtener página de usuarios (size 10 por defecto) con filtros
-        Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10, keyword, role, status);
+        Map<String, Object> pageData = apiService.obtenerUsuariosPaginados(token, page, 10, keyword, role, statusApi);
         logger.debug("DEBUG ADMIN: Received pageData for users: {}", pageData);
 
         @SuppressWarnings("unchecked")
@@ -351,18 +362,22 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/debug/seed")
+    @GetMapping("/api/siniestros/{id}")
     @ResponseBody
-    public ResponseEntity<?> generarDatosPrueba(HttpSession session) {
+    public ResponseEntity<?> obtenerDetalleSiniestro(@PathVariable Long id, HttpSession session) {
         String token = (String) session.getAttribute("token");
         if (token == null) {
             return ResponseEntity.status(401).body(Map.of("message", "No autenticado"));
         }
         try {
-            Map<String, Object> result = apiService.generarDatosPrueba(token);
-            return ResponseEntity.ok(result);
+            Map<String, Object> siniestro = apiService.obtenerSiniestroPorId(token, id);
+            if (siniestro == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(siniestro);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
 }

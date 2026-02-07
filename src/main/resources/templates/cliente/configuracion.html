@@ -442,9 +442,16 @@
                     msgBox.style.display = 'block';
                     msgBox.className = 'alert alert-success mt-2';
                     msgBox.innerText = 'Ubicación verificada y guardada correctamente.';
-                    setTimeout(() => msgBox.style.display = 'none', 3000);
-                    // Actualizar localStorage para el dashboard
-                    loadUserData();
+                    
+                    // Notificar al dashboard para recargar el widget del clima
+                    // Usar localStorage como señal de actualización
+                    localStorage.setItem('weatherUpdateNeeded', Date.now().toString());
+                    
+                    setTimeout(() => {
+                        msgBox.style.display = 'none';
+                        // Recargar datos del usuario
+                        loadUserData();
+                    }, 2000);
                 } else {
                     const err = await res.json();
                     msgBox.style.display = 'block';

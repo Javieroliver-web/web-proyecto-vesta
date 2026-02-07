@@ -1051,6 +1051,22 @@ public class ApiService {
         }
     }
 
+    public Map<String, Object> obtenerSiniestroPorId(String token, Long id) {
+        String url = apiUrl + "/siniestros/" + id;
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(getHeaders(token)),
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error al obtener detalle de siniestro {}: {}", id, e.getMessage());
+            return null;
+        }
+    }
+
     public Map<String, Object> obtenerLogsAuditoria(String token, int page, String search) {
         String url = apiUrl + "/auditoria?page=" + page;
         if (search != null && !search.trim().isEmpty()) {
@@ -1312,23 +1328,4 @@ public class ApiService {
         return headers;
     }
 
-    // === DEBUG / SEEDER ===
-    public Map<String, Object> generarDatosPrueba(String token) {
-        String url = apiUrl + "/debug/seed";
-        try {
-            logger.info("Solicitando generación de datos de prueba...");
-            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    new HttpEntity<>(getHeaders(token)),
-                    new ParameterizedTypeReference<Map<String, Object>>() {
-                    });
-            return response.getBody() != null ? response.getBody() : new HashMap<>();
-        } catch (Exception e) {
-            logger.error("Error al generar datos de prueba: {}", e.getMessage());
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return error;
-        }
-    }
 }

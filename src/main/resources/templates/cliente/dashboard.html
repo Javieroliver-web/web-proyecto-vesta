@@ -701,6 +701,25 @@
 
             // Actualizar IA cada 5 minutos (300,000 ms)
             setInterval(cargarRecomendacion, 300000);
+            
+            // Listener para detectar cambios de ubicación desde configuración
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'weatherUpdateNeeded') {
+                    console.log('Ubicación actualizada, recargando widget del clima...');
+                    cargarRecomendacion();
+                    // Limpiar la señal
+                    localStorage.removeItem('weatherUpdateNeeded');
+                }
+            });
+            
+            // También verificar al enfocar la ventana (por si el cambio fue en la misma pestaña)
+            window.addEventListener('focus', function() {
+                if (localStorage.getItem('weatherUpdateNeeded')) {
+                    console.log('Ubicación actualizada detectada al enfocar, recargando widget del clima...');
+                    cargarRecomendacion();
+                    localStorage.removeItem('weatherUpdateNeeded');
+                }
+            });
         };
 
         // 2. CHATBOT
