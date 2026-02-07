@@ -44,12 +44,11 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select" id="filterEstado" onchange="performSearch()">
+                            <select class="form-select" id="filterEstado">
                                 <option value="" th:selected="${estado == null or estado == ''}">Todos los Estados
                                 </option>
-                                <option value="PENDIENTE" th:selected="${estado == 'PENDIENTE'}">Pendiente</option>
-                                <option value="EN_PROCESO" th:selected="${estado == 'EN_PROCESO'}">En Proceso</option>
-                                <option value="RESUELTO" th:selected="${estado == 'RESUELTO'}">Resuelto</option>
+                                <option value="PENDIENTE_REVISION" th:selected="${estado == 'PENDIENTE_REVISION'}">Pendiente Revisión</option>
+                                <option value="APROBADO" th:selected="${estado == 'APROBADO'}">Aprobado</option>
                                 <option value="RECHAZADO" th:selected="${estado == 'RECHAZADO'}">Rechazado</option>
                             </select>
                         </div>
@@ -351,6 +350,11 @@
                 performSearch();
             });
 
+            // IMPORTANTE: Agregar listener al select aquí en lugar de usar onchange inline
+            filterEstado.addEventListener('change', function () {
+                performSearch();
+            });
+
             function toggleClearButton() {
                 const hasContent = searchInput.value.trim().length > 0;
                 clearBtn.style.display = hasContent ? 'block' : 'none';
@@ -361,11 +365,15 @@
             function performSearch() {
                 const query = searchInput.value;
                 const status = filterEstado.value;
+                console.log('🔍 performSearch - query:', query, 'status:', status);
+                
                 const url = new URL(window.location.href);
                 if (query) url.searchParams.set('search', query); else url.searchParams.delete('search');
                 if (status) url.searchParams.set('estado', status); else url.searchParams.delete('estado');
                 url.searchParams.set('page', 0);
 
+                console.log('🔍 Nueva URL:', url.toString());
+                
                 // Recargar la página con los nuevos parámetros
                 window.location.href = url.toString();
             }
