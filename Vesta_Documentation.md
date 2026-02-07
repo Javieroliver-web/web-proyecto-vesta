@@ -522,56 +522,376 @@ Para un despliegue en producción real (ej: Google Cloud Platform), se estima el
 
 # 14. Guía de Despliegue e Instalación
 
-Este manual técnico está dirigido al equipo de DevOps para la puesta en producción.
+Esta guía documenta el proceso completo de despliegue de la aplicación Vesta Seguros en un servidor Ubuntu en Google Cloud Platform.
 
-## 14.1. Requisitos Previos
-- Servidor Linux (Ubuntu 22.04 recomendado) o Windows Server.
-- Java Development Kit (JDK) 21 instalado.
-- Servidor de Base de Datos PostgreSQL 15 en ejecución.
+## 14.1. Arquitectura de Despliegue
 
-## 14.2. Configuración de Base de Datos
+```
+Internet
+    ↓
+[Nginx (Puerto 80/443)]
+    ↓
+[Apache Tomcat 10 (Puerto 8080)]
+    ↓
+[PostgreSQL (Puerto 5432)]
+```
+
+### Componentes de Infraestructura:
+- **Servidor**: Ubuntu 22.04 LTS en Google Cloud Platform
+- **IP Pública**: 34.175.116.7
+- **Dominio**: vesta-web.duckdns.org
+- **Proxy Inverso**: Nginx
+- **Servidor de Aplicaciones**: Apache Tomcat 10
+- **Base de Datos**: PostgreSQL 15
+- **SSL**: Let's Encrypt (Certbot)
+
+## 14.2. Requisitos Previos
+
+### En el Servidor
+- Ubuntu 22.04 LTS
+- Java 21 (OpenJDK)
+- Apache Tomcat 10
+- PostgreSQL 15
+- Nginx
+- Certbot (para SSL)
+
+### En tu Máquina Local
+- Maven 3.8+
+- Java 21
+- SSH configurado con clave privada (`vesta_key`)
+
+## 14.3. Configuración de Base de Datos
+
 1. Crear la base de datos:
    ```sql
    CREATE DATABASE vesta_db;
    ```
+
 2. Crear usuario y otorgar permisos:
    ```sql
    CREATE USER vesta_user WITH PASSWORD 'secure_password';
    GRANT ALL PRIVILEGES ON DATABASE vesta_db TO vesta_user;
    ```
 
-## 14.3. Configuración de Variables de Entorno
-Cree un archivo `.env` o configure en el sistema:
+3. Verificar conexión:
+   ```bash
+   psql -U vesta_user -d vesta_db -h localhost
+   ```
+
+## 14.4. Configuración de Variables de Entorno
+
+Crear archivo de configuración en Tomcat: `/opt/tomcat/bin/setenv.sh`
+
 ```bash
-export DB_URL=jdbc:postgresql://localhost:5432/vesta_db
-export DB_USER=vesta_user
-export DB_PASS=secure_password
-export JWT_SECRET=una_clave_muy_larga_y_segura_base64
-export GOOGLE_CLIENT_ID=su_id_de_google_cloud
+export JAVA_OPTS="-Xms512M -Xmx1024M -server -XX:+UseG1GC"
+export CATALINA_OPTS="-Dspring.profiles.active=prod"
+
+# Variables de entorno de la aplicación
+export DB_URL="jdbc:postgresql://localhost:5432/vesta_db"
+export DB_USER="vesta_user"
+export DB_PASS="secure_password"
+export JWT_SECRET="your_jwt_secret_here"
+export GOOGLE_CLIENT_ID="your_google_client_id"
+export GOOGLE_CLIENT_SECRET="your_google_client_secret"
 ```
 
-## 14.4. Ejecución de Artefactos
-Despliegue primero la API y luego la Web:
+## 14.5. Proceso de Despliegue
 
-1. **API**:
-   ```bash
-   java -jar vesta-api-1.0.0.war --server.port=8080
-   ```
-   *Espere a que aparezca "Started VestaApiApplication..."*
+### Paso 1: Compilar los Proyectos
 
-2. **Web**:
-   ```bash
-   java -jar vesta-web-1.0.0.war --server.port=8081
-   ```
+En tu máquina local:
 
-## 14.5. Verificación
-- Acceda a `http://localhost:8081`. Debería ver la portada de Vesta Seguros.
-- Intente hacer login. Si recibe un token, la conexión API-DB es correcta.
+```bash
+# Compilar API
+cd api-proyecto-vesta
+mvn clean package -DskipTests
 
-## 14.6. Entorno de Producción (Live Demo)
+# Compilar Web
+cd ../web-proyecto-vesta
+mvn clean package -DskipTests
+```
+
+Esto genera:
+- `api-proyecto-vesta/target/vesta-api.war`
+- `web-proyecto-vesta/target/vesta-web.war`
+
+### Paso 2: Transferir los WAR al Servidor
+
+```bash
+# Desde el directorio api-proyecto-vesta
+scp -i vesta_key target/vesta-api.war vestaadmin@34.175.116.7:/tmp/
+
+# Desde el directorio web-proyecto-vesta
+scp -i ../api-proyecto-vesta/vesta_key target/vesta-web.war vestaadmin@34.175.116.7:/tmp/
+```
+
+### Paso 3: Desplegar en Tomcat
+
+```bash
+# Conectar al servidor
+ssh -i vesta_key vestaadmin@34.175.116.7
+
+# Detener Tomcat
+sudo systemctl stop tomcat
+
+# Limpiar despliegues anteriores
+sudo rm -rf /opt/tomcat/webapps/vesta-api
+sudo rm -rf /opt/tomcat/webapps/vesta-web
+
+# Copiar nuevos WAR
+sudo cp /tmp/vesta-api.war /opt/tomcat/webapps/
+sudo cp /tmp/vesta-web.war /opt/tomcat/webapps/
+
+# Ajustar permisos
+sudo chown tomcat:tomcat /opt/tomcat/webapps/vesta-api.war
+sudo chown tomcat:tomcat /opt/tomcat/webapps/vesta-web.war
+
+# Iniciar Tomcat
+sudo systemctl start tomcat
+
+# Verificar estado
+sudo systemctl status tomcat
+```
+
+### Paso 4: Verificar el Despliegue
+
+```bash
+# Ver logs en tiempo real
+sudo tail -f /opt/tomcat/logs/catalina.out
+
+# Buscar mensajes de inicio exitoso
+sudo tail -n 100 /opt/tomcat/logs/catalina.out | grep "Started Vesta"
+```
+
+Deberías ver:
+```
+Started VestaApiApplication in X seconds
+Started VestaWebApplication in Y seconds
+```
+
+## 14.6. Configuración de Nginx
+
+### Archivo de Configuración
+
+Ubicación: `/etc/nginx/sites-available/vesta`
+
+```nginx
+server {
+    listen 80;
+    server_name vesta-web.duckdns.org;
+    
+    # Redirigir HTTP a HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name vesta-web.duckdns.org;
+
+    # Certificados SSL
+    ssl_certificate /etc/letsencrypt/live/vesta-web.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/vesta-web.duckdns.org/privkey.pem;
+
+    # Configuración SSL
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Proxy a Tomcat
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Logs
+    access_log /var/log/nginx/vesta_access.log;
+    error_log /var/log/nginx/vesta_error.log;
+}
+```
+
+### Activar la Configuración
+
+```bash
+# Crear enlace simbólico
+sudo ln -s /etc/nginx/sites-available/vesta /etc/nginx/sites-enabled/
+
+# Verificar configuración
+sudo nginx -t
+
+# Recargar Nginx
+sudo systemctl reload nginx
+```
+
+## 14.7. Configuración SSL con Let's Encrypt
+
+### Instalar Certbot
+
+```bash
+sudo apt update
+sudo apt install certbot python3-certbot-nginx
+```
+
+### Obtener Certificado
+
+```bash
+sudo certbot --nginx -d vesta-web.duckdns.org
+```
+
+### Renovación Automática
+
+Certbot configura automáticamente un cron job para renovar los certificados. Verificar:
+
+```bash
+sudo systemctl status certbot.timer
+```
+
+Para renovar manualmente:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+## 14.8. Script de Despliegue Automatizado
+
+Puedes crear un script para automatizar el despliegue completo:
+
+```bash
+#!/bin/bash
+# deploy.sh
+
+echo "🚀 Iniciando despliegue de Vesta Seguros..."
+
+# Compilar proyectos
+echo "📦 Compilando proyectos..."
+cd api-proyecto-vesta
+mvn clean package -DskipTests
+cd ../web-proyecto-vesta
+mvn clean package -DskipTests
+cd ..
+
+# Transferir al servidor
+echo "📤 Transfiriendo archivos al servidor..."
+scp -i api-proyecto-vesta/vesta_key \
+    api-proyecto-vesta/target/vesta-api.war \
+    vestaadmin@34.175.116.7:/tmp/
+
+scp -i api-proyecto-vesta/vesta_key \
+    web-proyecto-vesta/target/vesta-web.war \
+    vestaadmin@34.175.116.7:/tmp/
+
+# Desplegar en el servidor
+echo "🔄 Desplegando en el servidor..."
+ssh -i api-proyecto-vesta/vesta_key vestaadmin@34.175.116.7 << 'EOF'
+sudo systemctl stop tomcat
+sudo rm -rf /opt/tomcat/webapps/vesta-api /opt/tomcat/webapps/vesta-web
+sudo cp /tmp/vesta-api.war /opt/tomcat/webapps/
+sudo cp /tmp/vesta-web.war /opt/tomcat/webapps/
+sudo chown tomcat:tomcat /opt/tomcat/webapps/vesta-*.war
+sudo systemctl start tomcat
+echo "✅ Despliegue completado"
+EOF
+
+echo "🎉 Proceso de despliegue finalizado!"
+```
+
+## 14.9. Verificación de Salud del Sistema
+
+```bash
+# Verificar servicios
+sudo systemctl status tomcat
+sudo systemctl status nginx
+sudo systemctl status postgresql
+
+# Verificar logs de aplicación
+sudo tail -f /opt/tomcat/logs/catalina.out
+
+# Verificar logs de Nginx
+sudo tail -f /var/log/nginx/vesta_access.log
+sudo tail -f /var/log/nginx/vesta_error.log
+
+# Verificar uso de recursos
+htop
+
+# Verificar espacio en disco
+df -h
+```
+
+## 14.10. Troubleshooting
+
+### Problema: Tomcat no inicia
+
+```bash
+# Ver logs detallados
+sudo journalctl -u tomcat -n 100
+
+# Verificar permisos
+ls -la /opt/tomcat/webapps/
+
+# Verificar puerto 8080
+sudo netstat -tulpn | grep 8080
+```
+
+### Problema: Error 502 Bad Gateway
+
+```bash
+# Verificar que Tomcat está corriendo
+sudo systemctl status tomcat
+
+# Verificar logs de Nginx
+sudo tail -f /var/log/nginx/vesta_error.log
+
+# Verificar conectividad
+curl http://localhost:8080/vesta-web/
+```
+
+### Problema: Certificado SSL expirado
+
+```bash
+# Renovar certificado
+sudo certbot renew
+
+# Recargar Nginx
+sudo systemctl reload nginx
+```
+
+## 14.11. Rollback en Caso de Error
+
+Si el despliegue falla, puedes hacer rollback a la versión anterior:
+
+```bash
+# Detener Tomcat
+sudo systemctl stop tomcat
+
+# Restaurar backup (si existe)
+sudo cp /opt/tomcat/webapps/vesta-api.war.backup /opt/tomcat/webapps/vesta-api.war
+sudo cp /opt/tomcat/webapps/vesta-web.war.backup /opt/tomcat/webapps/vesta-web.war
+
+# Iniciar Tomcat
+sudo systemctl start tomcat
+```
+
+## 14.12. Entorno de Producción (Live Demo)
+
 Actualmente, existe una versión desplegada y accesible públicamente para demostración:
 - **URL Pública**: [https://vesta-web.duckdns.org/vesta-web/](https://vesta-web.duckdns.org/vesta-web/)
-- **Infraestructura**: Despliegue sobre Tomcat tras un proxy inverso Nginx con certificado SSL (Let's Encrypt).
+- **Infraestructura**: Despliegue sobre Apache Tomcat 10 tras un proxy inverso Nginx con certificado SSL (Let's Encrypt)
+- **Servidor**: Ubuntu 22.04 LTS en Google Cloud Platform
+- **Monitoreo**: Logs centralizados en `/var/log/nginx/` y `/opt/tomcat/logs/`
+
+### Credenciales de Prueba
+
+Para probar la aplicación en producción:
+- **Usuario Demo**: demo@vesta.com
+- **Contraseña**: demo123
+
+### Contacto y Soporte
+
+Para problemas o dudas sobre el despliegue:
+- **Email**: javip200555@gmail.com
+- **Teléfono**: +34 622 645 922
 
 <div style="page-break-after: always;"></div>
 
