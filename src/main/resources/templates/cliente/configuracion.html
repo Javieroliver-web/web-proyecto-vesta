@@ -441,17 +441,23 @@
                 if (res.ok) {
                     msgBox.style.display = 'block';
                     msgBox.className = 'alert alert-success mt-2';
-                    msgBox.innerText = 'Ubicación verificada y guardada correctamente.';
+                    msgBox.innerText = 'Ubicación verificada y guardada correctamente. El widget del clima se actualizará en el dashboard.';
                     
                     // Notificar al dashboard para recargar el widget del clima
                     // Usar localStorage como señal de actualización
                     localStorage.setItem('weatherUpdateNeeded', Date.now().toString());
                     
+                    // También disparar evento storage manualmente para la misma pestaña
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'weatherUpdateNeeded',
+                        newValue: Date.now().toString()
+                    }));
+                    
                     setTimeout(() => {
                         msgBox.style.display = 'none';
                         // Recargar datos del usuario
                         loadUserData();
-                    }, 2000);
+                    }, 3000);
                 } else {
                     const err = await res.json();
                     msgBox.style.display = 'block';
