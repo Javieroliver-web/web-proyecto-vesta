@@ -75,6 +75,8 @@ pdf_options:
 El sistema abarca desde la contratación del seguro hasta la gestión del siniestro, ofreciendo dos interfaces principales:
 - **Portal de Cliente**: Donde los usuarios gestionan sus pólizas, contratan nuevos productos y reportan incidencias.
 - **Panel de Administración**: Herramientas para que el equipo de operaciones gestione el catálogo de productos, revise siniestros complejos y audite la actividad de la plataforma.
+    
+    ![Landing Page](./docs/img/landing_page_main.png)
 
 ## 1.3. Objetivos Técnicos
 1. **Desacoplamiento**: Separación clara entre Frontend (Web) y Backend (API) para permitir escalabilidad independiente.
@@ -110,6 +112,8 @@ graph TD
     ApiGateway -->|JPA/Hibernate| Database[(PostgreSQL DB)]
     AIService -->|File Storage| Storage[Local/Cloud Storage]
 ```
+
+![Arquitectura Lógica](./docs/img/admin_dashboard_sales.png)
 
 ## 2.2. Comunicación entre Capas
 La comunicación entre el **Portal Web** y la **API Backend** se realiza exclusivamente a través de llamadas HTTP RESTful.
@@ -307,6 +311,8 @@ Vesta implementa un sistema de **Borrado Lógico** cuidadoso:
     3. Se marca el flag `usu_datos_eliminados = true`.
     4. Se desactivan/cancelan las pólizas vigentes.
 
+![Confirmación de Eliminación](./docs/img/user_delete_confirmation_modal.png)
+
 ### Auditoría
 Cada acceso a datos sensibles queda registrado en la tabla de auditoría, incluyendo:
 - **IP del cliente**: Para geolocalización de accesos sospechosos.
@@ -344,6 +350,8 @@ El frontend está construido sobre **Spring MVC** con **Thymeleaf**, lo que perm
 
 ### Chatbot de Soporte
 Un asistente flotante en la esquina inferior derecha utiliza la API de `ApiService` para responder preguntas frecuentes sobre coberturas y estados de siniestros, reduciendo la necesidad de soporte humano.
+
+![Asistente Virtual](./docs/img/user_chatbot_ai_assistant.png)
 
 <div style="page-break-after: always;"></div>
 

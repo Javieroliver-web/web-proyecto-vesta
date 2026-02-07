@@ -54,7 +54,6 @@ img {
     margin: 30px auto;
     max-width: 85%;
     border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     border: 1px solid #e0e0e0;
 }
 
