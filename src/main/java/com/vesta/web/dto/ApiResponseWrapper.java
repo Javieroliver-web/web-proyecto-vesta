@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * DTO para mapear la respuesta envuelta de la API
- * La API devuelve: ApiResponse<AuthResponseDTO>
+ * La API devuelve: {@code ApiResponse<AuthResponseDTO>}
  */
 @Data
 @NoArgsConstructor

@@ -44,17 +44,29 @@ pdf_options:
 2. **Arquitectura del Sistema** ........................................................................................ 4
 3. **Tecnologías Utilizadas** ............................................................................................ 5
 4. **Documentación de Base de Datos** ......................................................................... 6
+    
     4.1. Esquema Relacional ............................................................................................ 6
+    
     4.2. Diccionario de Datos ........................................................................................... 7
+
 5. **Catálogo de Componentes Backend (API)** ........................................................... 9
+    
     5.1. Controladores REST ............................................................................................ 9
+    
     5.2. Servicios de Negocio .......................................................................................... 12
+
 6. **Seguridad y Cumplimiento Normativo** ................................................................. 15
+    
     6.1. Autenticación JWT y OAuth2 ............................................................................. 15
+    
     6.2. Cumplimiento RGPD .......................................................................................... 16
+
 7. **Interfaz Web y Experiencia de Usuario** ............................................................... 17
+    
     7.1. Estructura del Proyecto Web ............................................................................. 17
+    
     7.2. Flujos de Usuario ................................................................................................ 18
+
 8. **Análisis de Seguridad (OWASP Top 10)** ........................................................... 21
 9. **Justificación de Diseño y Tecnologías** .............................................................. 22
 10. **Glosario de Negocio** ............................................................................................ 23
@@ -360,24 +372,24 @@ Un asistente flotante en la esquina inferior derecha utiliza la API de `ApiServi
 
 La seguridad ha sido un pilar fundamental en el desarrollo de Vesta, abordando proactivamente las vulnerabilidades más críticas del OWASP Top 10.
 
-## 9.1. Inyección (SQL Injection)
+## 8.1. Inyección (SQL Injection)
 Vesta mitiga este riesgo mediante el uso estricto de **JPA (Java Persistence API)** y **Hibernate**.
 - **Medida**: No se concatena SQL manualmente.
 - **Implementación**: Se utilizan `Repository` interfaces y `CriteriaBuilder`. Incluso en consultas nativas, se fuerza el uso de parámetros vinculados (`:param`).
 - **Resultado**: Es matemáticamente imposible inyectar código malicioso en los formularios de búsqueda o login.
 
-## 9.2. Pérdida de Autenticación (Broken Authentication)
+## 8.2. Pérdida de Autenticación (Broken Authentication)
 - **Implementación**:
     - **Bloqueo de Cuenta**: Tras 5 intentos fallidos, la cuenta se bloquea por 15 minutos (evita fuerza bruta).
     - **2FA (MFA)**: Capa extra de seguridad obligatoria para operaciones críticas.
     - **Tokens JWT**: Los tokens tienen tiempo de vida corto (1 hora) y están firmados criptográficamente (HS512).
 
-## 9.3. Exposición de Datos Sensibles
+## 8.3. Exposición de Datos Sensibles
 - **Cifrado en Reposo**: Las contraseñas se almacenan únicamente como hashes irrevocables (**BCrypt** con Salt de 10 rondas).
 - **Transporte Seguro**: La configuración de seguridad fuerza `HSTS`, obligando a que toda comunicación viaje por HTTPS cifrado.
 - **Minimización**: La API nunca devuelve objetos `Usuario` completos con password o secretos 2FA, utilizando siempre `UserDTO`.
 
-## 9.4. XSS (Cross-Site Scripting)
+## 8.4. XSS (Cross-Site Scripting)
 - **Sanitización Automática**: El motor de plantillas **Thymeleaf** escapa por defecto cualquier variable renderizada en el HTML (`th:text`).
 - **Validación de Entrada**: Los DTOs utilizan anotaciones `@Pattern` que rechazan caracteres peligrosos (`<script>`, `alert`) antes de que lleguen al controlador.
 
@@ -387,19 +399,19 @@ Vesta mitiga este riesgo mediante el uso estricto de **JPA (Java Persistence API
 
 La elección del stack tecnológico responde a criterios de robustez empresarial y mantenibilidad.
 
-## 10.1. ¿Por qué PostgreSQL y no MySQL?
+## 9.1. ¿Por qué PostgreSQL y no MySQL?
 Se seleccionó **PostgreSQL** por su superioridad en integridad de datos y soporte avanzado:
 - **ACID Estricto**: Garantiza que ninguna póliza quede en un estado inconsistente (ej: pagada pero no creada).
 - **Soporte JSONB**: Permite en el futuro almacenar metadatos de siniestros flexibles (JSON) sin romper el esquema relacional.
 - **Concurrencia**: Mejor manejo de bloqueos para la tabla `polizas` en escenarios de alta carga.
 
-## 10.2. ¿Por qué Arquitectura Monolítica Modular?
+## 9.2. ¿Por qué Arquitectura Monolítica Modular?
 Aunque los microservicios son populares, para un equipo y alcance acotado, un **Monolito Modular** es superior:
 - **Menor Complejidad Operativa**: Un solo despliegue, sin orquestadores complejos (K8s).
 - **Transaccionalidad Simple**: No requiere patrones complejos como Sagas para asegurar la consistencia entre Pagos y Pólizas.
 - **Evolución**: Está estructurado internamente en paquetes desacoplados (`com.vesta.api`, `com.vesta.web`) que permitirían "romper" el monolito en 24h si fuera necesario escalar.
 
-## 10.3. ¿Por qué JWT sobre Sesiones (Cookies)?
+## 9.3. ¿Por qué JWT sobre Sesiones (Cookies)?
 - **Escalabilidad Horizontal**: Al no guardar estado en la RAM del servidor, podemos levantar 10 instancias de la API detrás de un balanceador de carga sin configurar "Sticky Sessions".
 - **Cliente Agnóstico**: La misma API puede servir mañana a una App Android/iOS nativa sin cambios, ya que los móviles manejan mejor tokens que cookies.
 
@@ -435,21 +447,21 @@ Para asegurar la correcta interpretación de la documentación, se definen los t
 
 Vesta Seguros está diseñada como un MVP (Producto Mínimo Viable) robusto, pero el roadmap tecnológico contempla evoluciones ambiciosas.
 
-## 12.1. Integración con Blockchain (Smart Contracts)
+## 11.1. Integración con Blockchain (Smart Contracts)
 - **Objetivo**: Automatización total de indemnizaciones (Seguros Paramétricos).
 - **Caso de Uso**: Seguro de Retraso de Vuelos. Si una API de vuelos confirma un retraso > 2h, un Smart Contract en Ethereum libera automáticamente el pago al usuario, sin intervención humana ni "Siniestros".
 
-## 12.2. App Nativa (Flutter/React Native)
+## 11.2. App Nativa (Flutter/React Native)
 - Dado que la API es REST pura y segura con JWT, el desarrollo de una app móvil sería directo.
 - **Ventajas**: Notificaciones Push para renovaciones, geolocalización en tiempo real para "Seguros de Viaje que se activan al llegar al aeropuerto".
 
-## 12.3. IA Vision Avanzada
+## 11.3. IA Vision Avanzada
 - Migración del algoritmo actual (basado en reglas y metadatos) a un modelo de **Computer Vision** (como YOLO o OpenAI Vision API) entrenado específicamente con miles de fotos de siniestros reales para detectar:
     - Roturas de pantalla vs arañazos.
     - Fugas de agua en hogar.
     - Daños en vehículos.
 
-## 12.4. Arquitectura de Microservicios Reales
+## 11.4. Arquitectura de Microservicios Reales
 Cuando la carga de usuarios supere los 100k concurrentes:
 - Extraer `SiniestroService` a su propio microservicio con base de datos propia.
 - Implementar **RabbitMQ** o **Kafka** para procesar las imágenes de siniestros de forma asíncrona ("Event Driven Architecture"), evitando que la subida de fotos pesadas bloquee el servidor principal.
@@ -462,7 +474,7 @@ Cuando la carga de usuarios supere los 100k concurrentes:
 
 Para garantizar la fiabilidad del software, se ha seguido una estrategia de pruebas piramidal.
 
-## 13.1. Pruebas Unitarias (JUnit 5 + Mockito)
+## 12.1. Pruebas Unitarias (JUnit 5 + Mockito)
 Se ha verificado la lógica de negocio aislada, especialmente en los servicios críticos.
 - **Cobertura**: Foco en `FraudService` y `AIService`.
 - **Ejemplo**:
@@ -470,7 +482,7 @@ Se ha verificado la lógica de negocio aislada, especialmente en los servicios c
     - *Mock*: Se simula una respuesta de base de datos con 5 siniestros previos.
     - *Assert*: Se verifica que el método devuelve un score > 90.
 
-## 13.2. Pruebas de Integración (Postman)
+## 12.2. Pruebas de Integración (Postman)
 Se ha validado la comunicación entre el Cliente Web, la API y la Base de Datos.
 - **Colección de Pruebas**: Se adjunta un archivo `.json` de Insomnia/Postman con todos los endpoints.
 - **Escenario Típico**:
@@ -478,7 +490,7 @@ Se ha validado la comunicación entre el Cliente Web, la API y la Base de Datos.
     2. `POST /login` -> Recibe Token.
     3. `GET /polizas` (con Token) -> Recibe 200 OK.
 
-## 13.3. Pruebas de Sistema y Aceptación (UAT)
+## 12.3. Pruebas de Sistema y Aceptación (UAT)
 Realizadas manualmente navegando por el Portal Web para asegurar la usabilidad.
 - **Casos probados**: Acceso desde Móvil, Tablet y Desktop (Responsive Design).
 - **Validación de Errores**: Intentos de subir archivos `.exe` en lugar de imágenes (el sistema lo rechaza correctamente).
@@ -487,13 +499,13 @@ Realizadas manualmente navegando por el Portal Web para asegurar la usabilidad.
 
 # 13. Estudio Económico y Gestión del Proyecto
 
-## 14.1. Herramientas de Gestión
+## 13.1. Herramientas de Gestión
 El desarrollo ha seguido una metodología ágil (Kanban simplificado).
 - **Control de Versiones**: Git + GitHub (Ramas `main` y `develop`).
 - **IDE**: IntelliJ IDEA Ultimate / VS Code con IA asistida.
 - **Documentación**: Markdown + Generación automática de PDF.
 
-## 14.2. Presupuesto Mensual Estimado (Entorno Cloud)
+## 13.2. Presupuesto Mensual Estimado (Entorno Cloud)
 Para un despliegue en producción real (ej: Google Cloud Platform), se estima el siguiente coste operativo (OPEX):
 
 | Concepto | Recurso Especificado | Coste Estimado |
@@ -512,12 +524,12 @@ Para un despliegue en producción real (ej: Google Cloud Platform), se estima el
 
 Este manual técnico está dirigido al equipo de DevOps para la puesta en producción.
 
-## 15.1. Requisitos Previos
+## 14.1. Requisitos Previos
 - Servidor Linux (Ubuntu 22.04 recomendado) o Windows Server.
 - Java Development Kit (JDK) 21 instalado.
 - Servidor de Base de Datos PostgreSQL 15 en ejecución.
 
-## 15.2. Configuración de Base de Datos
+## 14.2. Configuración de Base de Datos
 1. Crear la base de datos:
    ```sql
    CREATE DATABASE vesta_db;
@@ -528,7 +540,7 @@ Este manual técnico está dirigido al equipo de DevOps para la puesta en produc
    GRANT ALL PRIVILEGES ON DATABASE vesta_db TO vesta_user;
    ```
 
-## 15.3. Configuración de Variables de Entorno
+## 14.3. Configuración de Variables de Entorno
 Cree un archivo `.env` o configure en el sistema:
 ```bash
 export DB_URL=jdbc:postgresql://localhost:5432/vesta_db
@@ -538,7 +550,7 @@ export JWT_SECRET=una_clave_muy_larga_y_segura_base64
 export GOOGLE_CLIENT_ID=su_id_de_google_cloud
 ```
 
-## 15.4. Ejecución de Artefactos
+## 14.4. Ejecución de Artefactos
 Despliegue primero la API y luego la Web:
 
 1. **API**:
@@ -552,11 +564,11 @@ Despliegue primero la API y luego la Web:
    java -jar vesta-web-1.0.0.war --server.port=8081
    ```
 
-## 15.5. Verificación
+## 14.5. Verificación
 - Acceda a `http://localhost:8081`. Debería ver la portada de Vesta Seguros.
 - Intente hacer login. Si recibe un token, la conexión API-DB es correcta.
 
-## 15.6. Entorno de Producción (Live Demo)
+## 14.6. Entorno de Producción (Live Demo)
 Actualmente, existe una versión desplegada y accesible públicamente para demostración:
 - **URL Pública**: [https://vesta-web.duckdns.org/vesta-web/](https://vesta-web.duckdns.org/vesta-web/)
 - **Infraestructura**: Despliegue sobre Tomcat tras un proxy inverso Nginx con certificado SSL (Let's Encrypt).
@@ -567,17 +579,17 @@ Actualmente, existe una versión desplegada y accesible públicamente para demos
 
 Para el desarrollo de este proyecto se han consultado las siguientes fuentes oficiales y estándares de la industria.
 
-## 16.1. Documentación Oficial
+## 15.1. Documentación Oficial
 - **Spring Boot Reference Guide (3.2.0)**: https://docs.spring.io/spring-boot/docs/current/reference/html/
 - **PostgreSQL 15 Documentation**: https://www.postgresql.org/docs/15/index.html
 - **Thymeleaf 3.1 Standard dialects**: https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
 
-## 16.2. Estándares de Seguridad
+## 15.2. Estándares de Seguridad
 - **OWASP Top 10 - Web Application Security Risks**: https://owasp.org/www-project-top-ten/
 - **RFC 7519 - JSON Web Token (JWT)**: https://datatracker.ietf.org/doc/html/rfc7519
 - **RFC 6238 - TOTP: Time-Based One-Time Password Standard**: https://datatracker.ietf.org/doc/html/rfc6238
 
-## 16.3. Recursos y Librerías
+## 15.3. Recursos y Librerías
 - **Bootstrap 5 Components**: https://getbootstrap.com/docs/5.3/components/
 - **OpenPDF Java Library**: https://github.com/LibrePDF/OpenPDF
 - **Baeldung Guides for Spring Security**: https://www.baeldung.com/spring-security-login
