@@ -29,8 +29,20 @@ COPY --from=build /app/app.war app.war
 # Cambiar a usuario no-root
 USER spring:spring
 
-# Exponer puerto
-EXPOSE 80
+# Variable de entorno: Koyeb inyecta PORT; perfil cloud por defecto
+ENV PORT=80
+ENV SPRING_PROFILES_ACTIVE=cloud
 
-# Ejecutar aplicación
-ENTRYPOINT ["java", "-jar", "app.war"]
+# Exponer puerto
+EXPOSE ${PORT}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/vesta-web/actuator/health || exit 1
+
+# Ejecutar aplicaci\u00f3n con JVM optimizada para 512MB RAM (free tier)
+ENTRYPOINT ["java", \
+    "-Xms128m", "-Xmx384m", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-jar", "app.war"]
