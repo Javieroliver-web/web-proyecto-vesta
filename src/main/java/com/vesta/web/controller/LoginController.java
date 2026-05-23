@@ -2,6 +2,7 @@ package com.vesta.web.controller;
 
 import com.vesta.web.dto.AuthResponseDTO;
 import com.vesta.web.service.ApiService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class LoginController {
     // Endpoint para procesar el login via AJAX
     @PostMapping("/login")
     @ResponseBody
-    public ResponseEntity<?> processLogin(@RequestBody LoginRequest request, HttpSession session) {
+    public ResponseEntity<?> processLogin(@RequestBody LoginRequest request, HttpSession session, HttpServletRequest httpRequest) {
         try {
             logger.info("🔐 Procesando login para: {}", request.getEmail());
 
@@ -96,11 +97,12 @@ public class LoginController {
 
             // Determinar URL de redirección según el rol
             String redirectUrl;
+            String ctxPath = httpRequest.getContextPath();
             if ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())
                     || "OWNER".equals(response.getRol())) {
-                redirectUrl = "/admin/dashboard";
+                redirectUrl = ctxPath + "/admin/dashboard";
             } else {
-                redirectUrl = "/cliente/dashboard";
+                redirectUrl = ctxPath + "/cliente/dashboard";
             }
 
             // Crear respuesta con URL de redirección
@@ -132,7 +134,7 @@ public class LoginController {
 
     @PostMapping("/login/verify-2fa")
     @ResponseBody
-    public ResponseEntity<?> verify2fa(@RequestBody Map<String, String> request, HttpSession session) {
+    public ResponseEntity<?> verify2fa(@RequestBody Map<String, String> request, HttpSession session, HttpServletRequest httpRequest) {
         try {
             String tempToken = request.get("tempToken");
             String code = request.get("code");
@@ -146,8 +148,9 @@ public class LoginController {
             session.setAttribute("usuarioId", response.getId());
 
             // Determinar URL de redirección
+            String ctxPath = httpRequest.getContextPath();
             String redirectUrl = ("ADMIN".equals(response.getRol()) || "ADMINISTRADOR".equals(response.getRol())
-                    || "OWNER".equals(response.getRol())) ? "/admin/dashboard" : "/cliente/dashboard";
+                    || "OWNER".equals(response.getRol())) ? ctxPath + "/admin/dashboard" : ctxPath + "/cliente/dashboard";
 
             Map<String, Object> result = new HashMap<>();
             result.put("redirectUrl", redirectUrl);
@@ -164,7 +167,7 @@ public class LoginController {
     // NEW EXPLICIT ENDPOINT FOR SOCIAL LOGIN MOCK
     @PostMapping("/login/mock-social-session")
     @ResponseBody
-    public ResponseEntity<?> createMockSocialSession(@RequestBody Map<String, String> request, HttpSession session) {
+    public ResponseEntity<?> createMockSocialSession(@RequestBody Map<String, String> request, HttpSession session, HttpServletRequest httpRequest) {
         String provider = request.get("provider");
         logger.info("🎭 Creando sesión mock para: {}", provider);
 
@@ -176,7 +179,7 @@ public class LoginController {
         session.setAttribute("usuarioEmail", "demo-" + provider + "@vesta.com");
 
         Map<String, String> result = new HashMap<>();
-        result.put("redirectUrl", "/cliente/dashboard");
+        result.put("redirectUrl", httpRequest.getContextPath() + "/cliente/dashboard");
         return ResponseEntity.ok(result);
     }
 
